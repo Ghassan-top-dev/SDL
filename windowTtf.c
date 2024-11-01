@@ -8,7 +8,7 @@ game:
 
 This is in bs folder
 */
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <stdio.h>
@@ -16,56 +16,49 @@ This is in bs folder
 #include <string.h>
 #include <stdbool.h>
 
-
 // Screen dimension constants
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
-// Texture wrapper
+// Texture wrapper structure to hold texture data and dimensions
 typedef struct {
     SDL_Texture* texture;
     int width;
     int height;
 } LTexture;
 
-// Function declarations
-bool init();
-bool loadMedia();
-void close();
-bool loadFromFile(LTexture* lTexture, const char* path);
-bool loadFromRenderedText(LTexture* lTexture, const char* textureText, SDL_Color textColor);
-void freeTexture(LTexture* lTexture);
-void renderTexture(LTexture* lTexture, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip);
-int getTextureWidth(LTexture* lTexture);
-int getTextureHeight(LTexture* lTexture);
+// Function declarations for initialization, media loading, cleanup, and texture operations
+bool init(); // Initializes SDL, window, and renderer
+bool loadMedia(); // Loads media (e.g., font and text)
+void close(); // Frees resources and shuts down SDL
+bool loadFromFile(LTexture* lTexture, const char* path); // Loads image from file into texture
+bool loadFromRenderedText(LTexture* lTexture, const char* textureText, SDL_Color textColor); // Renders text as texture
+void freeTexture(LTexture* lTexture); // Frees texture memory
+void renderTexture(LTexture* lTexture, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip); // Renders texture to screen
+int getTextureWidth(LTexture* lTexture); // Returns texture width
+int getTextureHeight(LTexture* lTexture); // Returns texture height
 
-// The window we'll be rendering to
+// Global variables for the SDL window, renderer, font, and text texture
 SDL_Window* gWindow = NULL;
-
-// The window renderer
 SDL_Renderer* gRenderer = NULL;
-
-// Globally used font
 TTF_Font* gFont = NULL;
+LTexture gTextTexture; // Texture to display text
 
-// Rendered texture
-LTexture gTextTexture;
-
+// Initializes SDL, creates window and renderer, sets up image and text libraries
 bool init() {
-    // Initialization flag
-    bool success = true;
+    bool success = true; // Success flag for function
 
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
         success = false;
     } else {
-        // Set texture filtering to linear
+        // Set linear texture filtering
         if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
             printf("Warning: Linear texture filtering not enabled!\n");
         }
 
-        // Create window
+        // Create SDL window
         gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         if (gWindow == NULL) {
             printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
@@ -77,17 +70,16 @@ bool init() {
                 printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
                 success = false;
             } else {
-                // Initialize renderer color
-                SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+                SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF); // White background
 
-                // Initialize PNG loading
+                // Initialize SDL_image with PNG support
                 int imgFlags = IMG_INIT_PNG;
                 if (!(IMG_Init(imgFlags) & imgFlags)) {
                     printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
                     success = false;
                 }
 
-                // Initialize SDL_ttf
+                // Initialize SDL_ttf for text rendering
                 if (TTF_Init() == -1) {
                     printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
                     success = false;
@@ -95,42 +87,39 @@ bool init() {
             }
         }
     }
-
     return success;
 }
 
+// Loads the necessary media resources such as fonts and text textures
 bool loadMedia() {
-    // Loading success flag
     bool success = true;
 
-    // Open the font
-    gFont = TTF_OpenFont("/Users/ghassanmuradagha/Documents/fonts/open-sans/OpenSans-Bold.ttf", 28);
+    // Open the font file at size 28
+    gFont = TTF_OpenFont("/Users/ghassanmuradagha/Documents/fonts/open-sans/OpenSans-Bold.ttf", 10);
     if (gFont == NULL) {
-        printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
+        printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
         success = false;
     } else {
-        // Render text
-        SDL_Color textColor = {0, 0, 0};
+        SDL_Color textColor = {255, 3, 3}; // Black text color
+
+        // Render the text to create a texture
         if (!loadFromRenderedText(&gTextTexture, "The quick brown fox jumps over the lazy dog", textColor)) {
             printf("Failed to render text texture!\n");
             success = false;
         }
     }
-
     return success;
 }
 
+// Frees up resources and shuts down SDL libraries
 void close() {
-    // Free loaded images
-    freeTexture(&gTextTexture);
+    freeTexture(&gTextTexture); // Free text texture
 
-    // Free global font
-    TTF_CloseFont(gFont);
+    TTF_CloseFont(gFont); // Close font
     gFont = NULL;
 
-    // Destroy window    
-    SDL_DestroyRenderer(gRenderer);
-    SDL_DestroyWindow(gWindow);
+    SDL_DestroyRenderer(gRenderer); // Destroy renderer
+    SDL_DestroyWindow(gWindow); // Destroy window
     gWindow = NULL;
     gRenderer = NULL;
 
@@ -140,19 +129,18 @@ void close() {
     SDL_Quit();
 }
 
+// Loads an image from file, converts it to a texture, and sets the texture's width/height
 bool loadFromFile(LTexture* lTexture, const char* path) {
-    // Get rid of preexisting texture
-    freeTexture(lTexture);
+    freeTexture(lTexture); // Free existing texture
 
-    // The final texture
     SDL_Texture* newTexture = NULL;
 
-    // Load image at specified path
+    // Load image as surface
     SDL_Surface* loadedSurface = IMG_Load(path);
     if (loadedSurface == NULL) {
         printf("Unable to load image %s! SDL_image Error: %s\n", path, IMG_GetError());
     } else {
-        // Color key image
+        // Set color key (transparent) for the loaded image
         SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0, 0xFF, 0xFF));
 
         // Create texture from surface pixels
@@ -160,49 +148,39 @@ bool loadFromFile(LTexture* lTexture, const char* path) {
         if (newTexture == NULL) {
             printf("Unable to create texture from %s! SDL Error: %s\n", path, SDL_GetError());
         } else {
-            // Get image dimensions
             lTexture->width = loadedSurface->w;
             lTexture->height = loadedSurface->h;
         }
 
-        // Get rid of old loaded surface
-        SDL_FreeSurface(loadedSurface);
+        SDL_FreeSurface(loadedSurface); // Free loaded surface
     }
 
-    // Return success
     lTexture->texture = newTexture;
     return lTexture->texture != NULL;
 }
 
+// Renders text as a texture, stores it in the given LTexture struct
 bool loadFromRenderedText(LTexture* lTexture, const char* textureText, SDL_Color textColor) {
-    // Get rid of preexisting texture
-    freeTexture(lTexture);
+    freeTexture(lTexture); // Free existing texture
 
-    // Render text surface
     SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, textureText, textColor);
     if (textSurface == NULL) {
         printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
     } else {
-        // Create texture from surface pixels
         lTexture->texture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
         if (lTexture->texture == NULL) {
             printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
         } else {
-            // Get image dimensions
             lTexture->width = textSurface->w;
             lTexture->height = textSurface->h;
         }
-
-        // Get rid of old surface
-        SDL_FreeSurface(textSurface);
+        SDL_FreeSurface(textSurface); // Free surface
     }
-
-    // Return success
     return lTexture->texture != NULL;
 }
 
+// Frees texture memory if it exists
 void freeTexture(LTexture* lTexture) {
-    // Free texture if it exists
     if (lTexture->texture != NULL) {
         SDL_DestroyTexture(lTexture->texture);
         lTexture->texture = NULL;
@@ -211,68 +189,70 @@ void freeTexture(LTexture* lTexture) {
     }
 }
 
+// Renders a texture with optional clipping, rotation, and flipping
 void renderTexture(LTexture* lTexture, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip) {
-    // Set rendering space and render to screen
-    SDL_Rect renderQuad = {x, y, lTexture->width, lTexture->height};
+    SDL_Rect renderQuad = {x, y, lTexture->width, lTexture->height}; // Set rendering space
 
-    // Set clip rendering dimensions
     if (clip != NULL) {
         renderQuad.w = clip->w;
         renderQuad.h = clip->h;
     }
 
-    // Render to screen
     SDL_RenderCopyEx(gRenderer, lTexture->texture, clip, &renderQuad, angle, center, flip);
 }
 
+// Gets the width of a texture
 int getTextureWidth(LTexture* lTexture) {
     return lTexture->width;
 }
 
+// Gets the height of a texture
 int getTextureHeight(LTexture* lTexture) {
     return lTexture->height;
 }
 
+// Main function - sets up SDL, loads media, runs main loop, and cleans up
 int main(int argc, char* args[]) {
-    // Start up SDL and create window
-    if (!init()) {
+    if (!init()) { // Initialize SDL and create window
         printf("Failed to initialize!\n");
     } else {
-        // Load media
-        if (!loadMedia()) {
+        if (!loadMedia()) { // Load media (text textures, fonts)
             printf("Failed to load media!\n");
         } else {
-            // Main loop flag
-            int quit = 0;
+            int quit = 0; // Main loop flag
+            SDL_Event e; // Event handler
 
-            // Event handler
-            SDL_Event e;
-
-            // While application is running
             while (!quit) {
-                // Handle events on queue
-                while (SDL_PollEvent(&e) != 0) {
-                    // User requests quit
+                while (SDL_PollEvent(&e) != 0) { // Handle events
                     if (e.type == SDL_QUIT) {
-                        quit = 1;
+                        quit = 1; // User requests quit
+                    }
+
+
+
+                    if (e.type == SDL_KEYDOWN) {
+                      if (e.key.keysym.sym == SDLK_ESCAPE) {
+                          quit = true; // Exit on pressing the escape key
+                      }
                     }
                 }
 
-                // Clear screen
-                SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+                
+
+
+                // Clear screen with white background
+                SDL_SetRenderDrawColor(gRenderer, 255, 120, 0, 255);
                 SDL_RenderClear(gRenderer);
 
-                // Render current frame
-                renderTexture(&gTextTexture, (SCREEN_WIDTH - getTextureWidth(&gTextTexture)) / 2, (SCREEN_HEIGHT - getTextureHeight(&gTextTexture)) / 2, NULL, 0, NULL, SDL_FLIP_NONE);
+                // Render centered text texture
+            // renderTexture(&gTextTexture, (SCREEN_WIDTH - getTextureWidth(&gTextTexture)) / 2, (SCREEN_HEIGHT - getTextureHeight(&gTextTexture)) / 2, NULL, 0, NULL, SDL_FLIP_NONE);
+                renderTexture(&gTextTexture, (getTextureWidth(&gTextTexture)), (getTextureHeight(&gTextTexture)), NULL, 0, NULL, SDL_FLIP_NONE);
 
-                // Update screen
-                SDL_RenderPresent(gRenderer);
+                SDL_RenderPresent(gRenderer); // Update screen
             }
         }
     }
-
-    // Free resources and close SDL
-    close();
+    close(); // Free resources and close SDL
 
     return 0;
 }
