@@ -31,6 +31,8 @@ void freeTexture(LTexture* lTexture); // Frees texture memory
 void renderTexture(LTexture* lTexture, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip); // Renders texture to screen
 int getTextureWidth(LTexture* lTexture); // Returns texture width
 int getTextureHeight(LTexture* lTexture); // Returns texture height
+bool moveRight = false, moveLeft = false, moveUp = false, moveDown = false;
+
 
 // Global variables for the SDL window, renderer, font, and text texture
 SDL_Window* gWindow = NULL;
@@ -205,6 +207,8 @@ int getTextureHeight(LTexture* lTexture) {
     return lTexture->height;
 }
 
+
+//This is where the magic happens...
 // Main function - sets up SDL, loads media, runs main loop, and cleans up
 int main(int argc, char* args[]) {
     if (!init()) { // Initialize SDL and create window
@@ -235,22 +239,65 @@ int main(int argc, char* args[]) {
                     //       stepperY +=10; 
                     //   }
 
-                      if (e.key.keysym.sym == SDLK_RIGHT) {
-                        stepperX +=10;  
-                      }
-                      if (e.key.keysym.sym == SDLK_LEFT) {
-                        stepperX -=10;  
-                      }
-                      if (e.key.keysym.sym == SDLK_UP) {
-                        stepperY -=10;  
-                      }
-                      if (e.key.keysym.sym == SDLK_DOWN) {
-                        stepperY +=10;  
-                      }
+                    //   if (e.key.keysym.sym == SDLK_RIGHT) {
+                    //     stepperX +=10;  
+                    //   }
+                    //   if (e.key.keysym.sym == SDLK_LEFT) {
+                    //     stepperX -=10;  
+                    //   }
+                    //   if (e.key.keysym.sym == SDLK_UP) {
+                    //     stepperY -=10;  
+                    //   }
+                    //   if (e.key.keysym.sym == SDLK_DOWN) {
+                    //     stepperY +=10;  
+                    //   }
+
+
+           
+                        switch (e.key.keysym.sym) {
+                            case SDLK_RIGHT:
+                                moveRight = true;
+                                break;
+                            case SDLK_LEFT:
+                                moveLeft = true;
+                                break;
+                            case SDLK_UP:
+                                moveUp = true;
+                                break;
+                            case SDLK_DOWN:
+                                moveDown = true;
+                                break;
+                        }
+                    
+                    
+                    
+                    }
+
+
+                    if (e.type == SDL_KEYUP) {
+                        switch (e.key.keysym.sym) {
+                            case SDLK_RIGHT:
+                                moveRight = false;
+                                break;
+                            case SDLK_LEFT:
+                                moveLeft = false;
+                                break;
+                            case SDLK_UP:
+                                moveUp = false;
+                                break;
+                            case SDLK_DOWN:
+                                moveDown = false;
+                                break;
+                        }
                     }
                 }
 
                 
+
+                if (moveRight) stepperX += 2;
+                if (moveLeft) stepperX -= 2;
+                if (moveUp) stepperY -= 2;
+                if (moveDown) stepperY += 2;
 
 
                 // Clear screen with white background
