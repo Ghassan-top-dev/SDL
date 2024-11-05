@@ -7,8 +7,8 @@
 #include <stdbool.h>
 
 // Screen dimension constants
-const int SCREEN_WIDTH = 1200;
-const int SCREEN_HEIGHT = 600;
+const int SCREEN_WIDTH = 1400;
+const int SCREEN_HEIGHT = 750;
 
 int stepperX = 300; //both of these are used for user input movement
 int stepperY = 300;
@@ -312,6 +312,13 @@ int main(int argc, char* args[]) {
                 if (dash && moveUp) stepperY -= 30;
                 if (dash && moveDown) stepperY += 30;
 
+                //boundaries?? - HELL YEAH
+                if (stepperX >= SCREEN_WIDTH - 20) stepperX = SCREEN_WIDTH - 20; //right boundary
+                if (stepperX <= 0 ) stepperX = 0; //left boundary
+                if (stepperY <= 0) stepperY = 0; //top boundary
+                if (stepperY >= SCREEN_HEIGHT - 20) stepperY = SCREEN_HEIGHT - 20; //bottom boundary
+
+
 
 
 
@@ -323,7 +330,6 @@ int main(int argc, char* args[]) {
                 //Maybe place shapes here?
 
                 //rect:
-
                 SDL_Rect rect = {stepperX, stepperY, 20, 20}; // posx, posy, sizex, sizey
                 SDL_SetRenderDrawColor(gRenderer, 255, 10, 10, 255); // Set color (r, g, b, a)
                 SDL_RenderFillRect(gRenderer, &rect); // Draw filled rectangle
