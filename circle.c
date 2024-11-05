@@ -13,6 +13,7 @@ const int SCREEN_HEIGHT = 750;
 int stepperX = 300; //both of these are used for user input movement
 int stepperY = 300;
 int r = 0, g = 0, b = 0, checker = 0; //used for background 
+int shapeSize = 10; //used for the shape of the size. ex. for circle radius
 
 
 // Texture wrapper structure to hold texture data and dimensions
@@ -79,7 +80,7 @@ void DrawFilledCircle(SDL_Renderer* renderer, int centerX, int centerY, int radi
     // Loop through the y-coordinates of the circle from the top to the bottom
     for (int y = -radius; y <= radius; y++) {
         // Calculate the width of each line at this y level (circle equation)
-        int dx = (int)sqrt(radius * radius - y * y);
+        int dx = (int)sqrt(radius * radius - y * y); //maybe implement fast inverse square root?
 
         // Draw a horizontal line for each row from left to right across the diameter
         SDL_RenderDrawLine(renderer, centerX - dx, centerY + y, centerX + dx, centerY + y);
@@ -371,10 +372,10 @@ int main(int argc, char* args[]) {
                 if (dash && moveDown) stepperY += 30;
 
                 //boundaries?? - HELL YEAH
-                if (stepperX >= SCREEN_WIDTH - 20) stepperX = SCREEN_WIDTH - 20; //right boundary
-                if (stepperX <= 0 ) stepperX = 0; //left boundary
-                if (stepperY <= 0) stepperY = 0; //top boundary
-                if (stepperY >= SCREEN_HEIGHT - 20) stepperY = SCREEN_HEIGHT - 20; //bottom boundary
+                if (stepperX >= SCREEN_WIDTH - shapeSize) stepperX = SCREEN_WIDTH - shapeSize; //right boundary
+                if (stepperX <= shapeSize) stepperX = shapeSize; //left boundary
+                if (stepperY <= shapeSize) stepperY = shapeSize; //top boundary
+                if (stepperY >= SCREEN_HEIGHT - shapeSize) stepperY = SCREEN_HEIGHT - shapeSize; //bottom boundary
 
 
 
@@ -413,17 +414,17 @@ int main(int argc, char* args[]) {
                 // SDL_RenderFillRect(gRenderer, &rect); // Draw filled rectangle
 
                 //circle
-                SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255); // Set color (r, g, b, a)
-                DrawFilledCircle(gRenderer, stepperX, stepperY, 60); //This will draw filled circle
-                DrawCircle(gRenderer, stepperX, stepperY, 60); //This will draw a circle that isn't filled
+                SDL_SetRenderDrawColor(gRenderer, 65, 107, 223, 255); // Set color (r, g, b, a)
+                DrawFilledCircle(gRenderer, stepperX, stepperY, shapeSize); //This will draw filled circle
+                // DrawCircle(gRenderer, stepperX, stepperY, 60); //This will draw a circle that isn't filled
 
 
 
 
 
 
-                //this for text
-                renderTexture(&gTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
+                //this is for text
+                renderTexture(&gTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dk, dk, dk,dk); 
 
                 SDL_RenderPresent(gRenderer); // Update screen
             }
