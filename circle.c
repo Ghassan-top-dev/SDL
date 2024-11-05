@@ -35,6 +35,58 @@ int getTextureHeight(LTexture* lTexture); // Returns texture height
 bool moveRight = false, moveLeft = false, moveUp = false, moveDown = false, dash = false; //here add the movements
 
 
+//circle functions:
+
+void DrawCircle(SDL_Renderer* renderer, int32_t centreX, int32_t centreY, int32_t radius)
+{
+    const int32_t diameter = (radius * 2);
+
+    int32_t x = (radius - 1);
+    int32_t y = 0;
+    int32_t tx = 1;
+    int32_t ty = 1;
+    int32_t error = (tx - diameter);
+
+    while (x >= y)
+    {
+        // Each of the following renders an octant of the circle
+        SDL_RenderDrawPoint(renderer, centreX + x, centreY - y);
+        SDL_RenderDrawPoint(renderer, centreX + x, centreY + y);
+        SDL_RenderDrawPoint(renderer, centreX - x, centreY - y);
+        SDL_RenderDrawPoint(renderer, centreX - x, centreY + y);
+        SDL_RenderDrawPoint(renderer, centreX + y, centreY - x);
+        SDL_RenderDrawPoint(renderer, centreX + y, centreY + x);
+        SDL_RenderDrawPoint(renderer, centreX - y, centreY - x);
+        SDL_RenderDrawPoint(renderer, centreX - y, centreY + x);
+
+        if (error <= 0)
+        {
+            ++y;
+            error += ty;
+            ty += 2;
+        }
+
+        if (error > 0)
+        {
+            --x;
+            tx += 2;
+            error += (tx - diameter);
+        }
+    }
+}
+
+void DrawFilledCircle(SDL_Renderer* renderer, int centerX, int centerY, int radius) {
+    // Loop through the y-coordinates of the circle from the top to the bottom
+    for (int y = -radius; y <= radius; y++) {
+        // Calculate the width of each line at this y level (circle equation)
+        int dx = (int)sqrt(radius * radius - y * y);
+
+        // Draw a horizontal line for each row from left to right across the diameter
+        SDL_RenderDrawLine(renderer, centerX - dx, centerY + y, centerX + dx, centerY + y);
+    }
+}
+
+
 // Global variables for the SDL window, renderer, font, and text texture
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
@@ -327,19 +379,23 @@ int main(int argc, char* args[]) {
 
 
                 //doesn't fully work
-                if (checker == 0 || r == 0 || g==0 || b==0)
-                {
-                    r++; g++; b++; 
-                } 
-                if (r == 255 || g==255 || b==255)
-                {
-                    checker = 1; 
+                // if (checker == 0 || r == 0 || g==0 || b==0)
+                // {
+                //     r+=5; g++; b++; 
+                // } 
+                // if (r == 255 || g==255 || b==255)
+                // {
+                //     checker = 1; 
                      
-                }
-                if (checker == 1)
-                {
-                    r--; g--; b--;
-                }
+                // }
+                // if (checker == 1)
+                // {
+                //     r-=5; g--; b--;
+                // }
+                // if (r == 0 || g==0 || b==0)
+                // {
+                //     checker = 0;  
+                // } 
                 
                 
                 
@@ -352,9 +408,14 @@ int main(int argc, char* args[]) {
                 //Maybe place shapes here?
 
                 //rect:
-                SDL_Rect rect = {stepperX, stepperY, 20, 20}; // posx, posy, sizex, sizey
-                SDL_SetRenderDrawColor(gRenderer, 255, 10, 10, 255); // Set color (r, g, b, a)
-                SDL_RenderFillRect(gRenderer, &rect); // Draw filled rectangle
+                // SDL_Rect rect = {stepperX, stepperY, 20, 20}; // posx, posy, sizex, sizey
+                // SDL_SetRenderDrawColor(gRenderer, 255, 10, 10, 255); // Set color (r, g, b, a)
+                // SDL_RenderFillRect(gRenderer, &rect); // Draw filled rectangle
+
+                //circle
+                SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255); // Set color (r, g, b, a)
+                DrawFilledCircle(gRenderer, stepperX, stepperY, 60); //This will draw filled circle
+                DrawCircle(gRenderer, stepperX, stepperY, 60); //This will draw a circle that isn't filled
 
 
 
