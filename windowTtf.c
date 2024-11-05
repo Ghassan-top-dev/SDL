@@ -17,8 +17,12 @@ This is in bs folder
 #include <stdbool.h>
 
 // Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1200;
+const int SCREEN_HEIGHT = 600;
+
+int stepperX = 0; //both of these are used to make the text move
+int stepperY = 0;
+
 
 // Texture wrapper structure to hold texture data and dimensions
 typedef struct {
@@ -95,7 +99,7 @@ bool loadMedia() {
     bool success = true;
 
     // Open the font file at size 28
-    gFont = TTF_OpenFont("/Users/ghassanmuradagha/Documents/fonts/open-sans/OpenSans-Bold.ttf", 10);
+    gFont = TTF_OpenFont("/Users/ghassanmuradagha/Documents/fonts/open-sans/OpenSans-Bold.ttf", 40); //font size
     if (gFont == NULL) {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
         success = false;
@@ -234,6 +238,12 @@ int main(int argc, char* args[]) {
                       if (e.key.keysym.sym == SDLK_ESCAPE) {
                           quit = true; // Exit on pressing the escape key
                       }
+
+
+                      if (e.key.keysym.sym == SDLK_SPACE) {
+                          stepperX +=10; 
+                          stepperY +=10; 
+                      }
                     }
                 }
 
@@ -241,12 +251,13 @@ int main(int argc, char* args[]) {
 
 
                 // Clear screen with white background
-                SDL_SetRenderDrawColor(gRenderer, 255, 120, 0, 255);
+                SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
                 SDL_RenderClear(gRenderer);
 
                 // Render centered text texture
             // renderTexture(&gTextTexture, (SCREEN_WIDTH - getTextureWidth(&gTextTexture)) / 2, (SCREEN_HEIGHT - getTextureHeight(&gTextTexture)) / 2, NULL, 0, NULL, SDL_FLIP_NONE);
-                renderTexture(&gTextTexture, (getTextureWidth(&gTextTexture)), (getTextureHeight(&gTextTexture)), NULL, 0, NULL, SDL_FLIP_NONE);
+                // renderTexture(&gTextTexture, (getTextureWidth(&gTextTexture)), (getTextureHeight(&gTextTexture)), NULL, 0, NULL, SDL_FLIP_NONE);
+                renderTexture(&gTextTexture, stepperX,stepperY, NULL, 0, NULL, SDL_FLIP_NONE);
 
                 SDL_RenderPresent(gRenderer); // Update screen
             }
@@ -256,3 +267,4 @@ int main(int argc, char* args[]) {
 
     return 0;
 }
+
