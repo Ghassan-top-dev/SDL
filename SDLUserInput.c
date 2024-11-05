@@ -31,7 +31,7 @@ void freeTexture(LTexture* lTexture); // Frees texture memory
 void renderTexture(LTexture* lTexture, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip); // Renders texture to screen
 int getTextureWidth(LTexture* lTexture); // Returns texture width
 int getTextureHeight(LTexture* lTexture); // Returns texture height
-bool moveRight = false, moveLeft = false, moveUp = false, moveDown = false;
+bool moveRight = false, moveLeft = false, moveUp = false, moveDown = false, dash = false; //here add the movements
 
 
 // Global variables for the SDL window, renderer, font, and text texture
@@ -55,7 +55,7 @@ bool init() {
         }
 
         // Create SDL window
-        gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        gWindow = SDL_CreateWindow("DOOM ETERNAL ULTIMATE", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         if (gWindow == NULL) {
             printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
             success = false;
@@ -267,6 +267,9 @@ int main(int argc, char* args[]) {
                             case SDLK_DOWN:
                                 moveDown = true;
                                 break;
+                            case SDLK_SPACE:
+                                dash = true;
+                                break;
                         }
                     
                     
@@ -288,16 +291,28 @@ int main(int argc, char* args[]) {
                             case SDLK_DOWN:
                                 moveDown = false;
                                 break;
+                            case SDLK_SPACE:
+                                dash = false;
+                                break;
                         }
                     }
                 }
 
-                
 
+                
+                //basic movement
                 if (moveRight) stepperX += 2;
                 if (moveLeft) stepperX -= 2;
                 if (moveUp) stepperY -= 2;
                 if (moveDown) stepperY += 2;
+
+                //dash functionality
+                if (dash && moveRight) stepperX += 30;
+                if (dash && moveLeft) stepperX -= 30;
+                if (dash && moveUp) stepperY -= 30;
+                if (dash && moveDown) stepperY += 30;
+
+
 
 
                 // Clear screen with white background
