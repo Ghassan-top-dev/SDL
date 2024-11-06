@@ -18,9 +18,12 @@ int shapeSize = 10; //used for the shape of the size. ex. for circle radius
 
 //PHYSICS
 float gravity = 1.2; 
-float velocity = 0; //This is a constant? not too sure. 
+float velocityY = 0; //This is a constant? not too sure. - no this is a dynamic velocity
+float velocityX = 0; 
 float position = 0; //This is the position
-float energyLoss = 0.7; //collision damping
+float energyLoss = 0.7; //collision damping 
+
+int balls[10]; 
 
 
 // Texture wrapper structure to hold texture data and dimensions
@@ -94,6 +97,21 @@ void DrawFilledCircle(SDL_Renderer* renderer, int centerX, int centerY, int radi
     }
 }
 
+
+//collision function
+
+// void collision(balls){
+
+
+
+    
+
+
+
+
+
+
+// }
 
 // Global variables for the SDL window, renderer, font, and text texture
 SDL_Window* gWindow = NULL;
@@ -303,16 +321,39 @@ int main(int argc, char* args[]) {
                 SDL_RenderClear(gRenderer);     
 
                 gravity+=0.01; //speed up as your going down - doesn't account for terminak velocity yet...
-                velocity += gravity; //velocity will always be dependant on gravity, gravity will always fight or help velocity
-                position += velocity; //position is dependant on velocity
+                velocityY += gravity; //velocity will always be dependant on gravity, gravity will always fight or help velocity
+                position += velocityY; //position is dependant on velocity
 
 
                 //boundaries?? - HELL YEAH
-                if (stepperX >= SCREEN_WIDTH - shapeSize) stepperX = SCREEN_WIDTH - shapeSize; //right boundary
-                if (stepperX <= shapeSize) stepperX = shapeSize; //left boundary
-                if (stepperY <= shapeSize) stepperY = shapeSize; //top boundary
+                // if (stepperX >= SCREEN_WIDTH - shapeSize) stepperX = SCREEN_WIDTH - shapeSize; //right boundary
+                // if (stepperX <= shapeSize) stepperX = shapeSize; //left boundary
+                // if (stepperY <= shapeSize) stepperY = shapeSize; //top boundary
+                // if (position >= SCREEN_HEIGHT - shapeSize){  //bottom boundary
+                //     velocityY *= -1 * energyLoss; //velocity goes in the other direction and apply energyLoss
+                //     position = SCREEN_HEIGHT - shapeSize; //This is a stupid hacky way of doing things - it works
+
+                // } 
+
+
+                if (position >= SCREEN_WIDTH - shapeSize){ //right boundary
+
+                    velocityX *= -1 * energyLoss; 
+                    position = SCREEN_HEIGHT - shapeSize; 
+                }
+                
+                if (position <= shapeSize){ //left boundary
+                    velocityX *= -1 * energyLoss; 
+                    velocityX = shapeSize; 
+                }
+                
+                if (position <= shapeSize){ //top boundary
+                    velocityY *= -1 * energyLoss; 
+                    velocityY = shapeSize; 
+                }
+
                 if (position >= SCREEN_HEIGHT - shapeSize){  //bottom boundary
-                    velocity *= -1 * energyLoss; //velocity goes in the other direction and apply energyLoss
+                    velocityY *= -1 * energyLoss; //velocity goes in the other direction and apply energyLoss
                     position = SCREEN_HEIGHT - shapeSize; //This is a stupid hacky way of doing things - it works
 
                 } 
