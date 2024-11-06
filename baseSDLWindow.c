@@ -1,3 +1,4 @@
+//this method causes screen tearing for some reason when rendering shapes...
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
