@@ -2,6 +2,8 @@
 #include <stdio.h>
 
 int isWithinBoundaries(SDL_Rect rect, int mouseX, int mouseY); //check if mouse is within boundaries
+int whereIsMyMouse(SDL_Rect rect, int mouseX, int mouseY); //check if mouse is within boundaries
+
 
 int main() {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -39,15 +41,26 @@ int main() {
             }
         
         }
+        // Get mouse position
+        int mouseX, mouseY;
+        SDL_GetMouseState(&mouseX, &mouseY);
+
+        // Check if the mouse is hovering over the button
+        int isHovered = whereIsMyMouse(buttonRect, mouseX, mouseY);
+
 
         // Render button
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Clear screen with black
         SDL_RenderClear(renderer);
 
-        // Set button color and render it
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Button color (red)
-        SDL_RenderFillRect(renderer, &buttonRect);
+        if (isHovered) {
+            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Hover color (green)
+        } else {
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Normal color (red)
+        }
 
+        // Set button color and render it
+        SDL_RenderFillRect(renderer, &buttonRect);
         SDL_RenderPresent(renderer);
     }
 
@@ -57,7 +70,7 @@ int main() {
     return 0;
 }
 
-int isWithinBoundaries(SDL_Rect rect, int mouseX, int mouseY){ //check if mouse is within boundaries
+int isWithinBoundaries(SDL_Rect rect, int mouseX, int mouseY){ //check if mouse is within boundaries (used for pressing)
 
     if (mouseX >= rect.x && mouseX <= rect.x + rect.w && mouseY >= rect.y && mouseY <= rect.y + rect.h) return 1; //make sure its in the y and x                                          
     
@@ -72,3 +85,27 @@ int isWithinBoundaries(SDL_Rect rect, int mouseX, int mouseY){ //check if mouse 
     //  }
 }
 
+int whereIsMyMouse(SDL_Rect rect, int mouseX, int mouseY){ //check if mouse is within boundaries (used for getting position)
+
+    return (mouseX >= rect.x && mouseX <= rect.x + rect.w && mouseY >= rect.y && mouseY <= rect.y + rect.h); 
+
+    // EX: have this outside event handler loop in while loop
+    // // Get mouse position
+    //     int mouseX, mouseY;
+    //     SDL_GetMouseState(&mouseX, &mouseY);
+
+    //     // Check if the mouse is hovering over the button
+    //     int isHovered = whereIsMyMouse(buttonRect, mouseX, mouseY);
+
+
+    //     // Render button
+    //     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Clear screen with black
+    //     SDL_RenderClear(renderer);
+
+    //     if (isHovered) {
+    //         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Hover color (green)
+    //     } else {
+    //         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Normal color (red)
+    //     }
+
+}
