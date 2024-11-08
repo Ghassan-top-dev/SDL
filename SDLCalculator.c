@@ -49,7 +49,9 @@ void grid();
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
 TTF_Font* gFont = NULL;
-LTexture gTextTexture, textX; // Texture to display text
+LTexture gTextTexture; // Texture to display text
+LTexture buttonText[NUM_BUTTONS]; // Texture to display text
+
 
 // Initializes SDL, creates window and renderer, sets up image and text libraries
 bool init() {
@@ -111,7 +113,7 @@ bool loadMedia() {
 
         // Render the text to create a texture
         if (!loadFromRenderedText(&gTextTexture, "Answer: ", textColor) || 
-        !loadFromRenderedText(&textX, "X", textColor)) {
+        !loadFromRenderedText(&buttonText[0], "X", textColor)) {
             printf("Failed to render text texture!\n");
             success = false;
         }
@@ -347,7 +349,7 @@ int main(int argc, char* args[]) {
 
                 
                 renderTexture(&gTextTexture, 0,60, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
-                renderTexture(&textX, (buttons[0].x) + BUTTON_MID_X,(buttons[0].y) + BUTTON_MID_Y, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
+                renderTexture(&buttonText[0], (buttons[0].x) + BUTTON_MID_X,(buttons[0].y) + BUTTON_MID_Y, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
 
                 SDL_RenderPresent(gRenderer); // Update screen
             }
