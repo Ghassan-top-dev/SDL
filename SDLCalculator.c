@@ -167,7 +167,7 @@ bool loadFromFile(LTexture* lTexture, const char* path) {
 bool loadFromRenderedText(LTexture* lTexture, const char* textureText, SDL_Color textColor) {
     freeTexture(lTexture); // Free existing texture
 
-    SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, textureText, textColor);
+    SDL_Surface* textSurface = TTF_RenderText_Blended(gFont, textureText, textColor);
     if (textSurface == NULL) {
         printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
     } else {
@@ -305,7 +305,7 @@ int main(int argc, char* args[]) {
 
             for (int c = 0; c < 6; c++)
             {
-                for (int i = 0; i < NUM_BUTTONS; i++)
+                for (int i = 0; i < 3; i++)
                 {
                     buttons[i+exactButton].w = BUTTON_WIDTH; 
                     buttons[i+exactButton].h = BUTTON_HEIGHT; 
@@ -316,7 +316,7 @@ int main(int argc, char* args[]) {
                 }
                 spacerHor = 0;
                 spacerVer+=66;
-                exactButton+=3; 
+                exactButton+=3;
             }
             
             
