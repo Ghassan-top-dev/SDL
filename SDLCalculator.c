@@ -10,9 +10,8 @@
 const int SCREEN_WIDTH = 249;  
 const int SCREEN_HEIGHT = 450;  
 const int BUTTON_WIDTH = 83; 
-const int BUTTON_HEIGHT = 66; 
+const int BUTTON_HEIGHT = 60; 
 const int NUM_BUTTONS = 18; 
-const int STROKE = 2; 
 
 
 //button width 83 (3 buttons horizontally)
@@ -99,7 +98,7 @@ bool loadMedia() {
     bool success = true;
 
     // Open the font file at size 28
-    gFont = TTF_OpenFont("/Users/ghassanmuradagha/Documents/pro/fonts/open-sans/OpenSans-Light.ttf", 40); //font size
+    gFont = TTF_OpenFont("/Users/ghassanmuradagha/Documents/pro/fonts/open-sans/OpenSans-Light.ttf", 20); //font size
     if (gFont == NULL) {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
         success = false;
@@ -107,7 +106,7 @@ bool loadMedia() {
         SDL_Color textColor = {0, 0, 0}; // Black text color
 
         // Render the text to create a texture
-        if (!loadFromRenderedText(&gTextTexture, "Lorem", textColor)) {
+        if (!loadFromRenderedText(&gTextTexture, "Answer: ", textColor)) {
             printf("Failed to render text texture!\n");
             success = false;
         }
@@ -249,32 +248,18 @@ void grid(){
 
     // int SDL_RenderDrawLine(SDL_Renderer * renderer, int x1, int y1, int x2, int y2);
 
-
     for (int i = 0; i < 3; i++)
     {
-
-        SDL_RenderDrawLine(gRenderer, BUTTON_WIDTH + spacer, SCREEN_HEIGHT, BUTTON_WIDTH + spacer, 54); 
-
+        SDL_RenderDrawLine(gRenderer, BUTTON_WIDTH + spacer, SCREEN_HEIGHT, BUTTON_WIDTH + spacer, 90); 
         spacer += BUTTON_WIDTH;
-
-
     }
-    spacer = 66; 
+    spacer = 60; 
 
     for (int i = 0; i < 6; i++)
     {
-
         SDL_RenderDrawLine(gRenderer, 0, SCREEN_HEIGHT - spacer, SCREEN_WIDTH, SCREEN_HEIGHT - spacer); 
-
         spacer += BUTTON_HEIGHT;
-
-
     }
-    
-
-
-
-
 }
 
 
@@ -297,7 +282,7 @@ int main(int argc, char* args[]) {
 
             SDL_Rect buttons[NUM_BUTTONS]; 
             int spacerHor = 0; //testing for now
-            int spacerVer = 66; 
+            int spacerVer = 60; 
             int exactButton = 0; //this is stupid but this gives memory to the inner for loop
 
 
@@ -315,7 +300,7 @@ int main(int argc, char* args[]) {
 
                 }
                 spacerHor = 0;
-                spacerVer+=66;
+                spacerVer+=60;
                 exactButton+=3;
             }
             
@@ -357,7 +342,7 @@ int main(int argc, char* args[]) {
                 
 
                 
-                renderTexture(&gTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
+                renderTexture(&gTextTexture, 0,60, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
                 SDL_RenderPresent(gRenderer); // Update screen
             }
         }
