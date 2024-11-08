@@ -12,6 +12,10 @@ const int SCREEN_HEIGHT = 450;
 const int BUTTON_WIDTH = 83; 
 const int BUTTON_HEIGHT = 60; 
 const int NUM_BUTTONS = 18; 
+const int BUTTON_MID_X = 35;
+const int BUTTON_MID_Y = 20;
+
+
 
 
 //button width 83 (3 buttons horizontally)
@@ -45,7 +49,7 @@ void grid();
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
 TTF_Font* gFont = NULL;
-LTexture gTextTexture; // Texture to display text
+LTexture gTextTexture, textX; // Texture to display text
 
 // Initializes SDL, creates window and renderer, sets up image and text libraries
 bool init() {
@@ -98,7 +102,7 @@ bool loadMedia() {
     bool success = true;
 
     // Open the font file at size 28
-    gFont = TTF_OpenFont("/Users/ghassanmuradagha/Documents/pro/fonts/open-sans/OpenSans-Light.ttf", 20); //font size
+    gFont = TTF_OpenFont("/Users/ghassanmuradagha/Documents/pro/fonts/open-sans/OpenSans-Bold.ttf", 20); //font size
     if (gFont == NULL) {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
         success = false;
@@ -106,7 +110,8 @@ bool loadMedia() {
         SDL_Color textColor = {0, 0, 0}; // Black text color
 
         // Render the text to create a texture
-        if (!loadFromRenderedText(&gTextTexture, "Answer: ", textColor)) {
+        if (!loadFromRenderedText(&gTextTexture, "Answer: ", textColor) || 
+        !loadFromRenderedText(&textX, "X", textColor)) {
             printf("Failed to render text texture!\n");
             success = false;
         }
@@ -228,7 +233,6 @@ int whereIsMyMouse(SDL_Rect rect, int mouseX, int mouseY){ //check if mouse is w
 
     return (mouseX >= rect.x && mouseX <= rect.x + rect.w && mouseY >= rect.y && mouseY <= rect.y + rect.h); 
 
-
 }
 
 
@@ -343,6 +347,8 @@ int main(int argc, char* args[]) {
 
                 
                 renderTexture(&gTextTexture, 0,60, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
+                renderTexture(&textX, (buttons[0].x) + BUTTON_MID_X,(buttons[0].y) + BUTTON_MID_Y, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
+
                 SDL_RenderPresent(gRenderer); // Update screen
             }
         }
