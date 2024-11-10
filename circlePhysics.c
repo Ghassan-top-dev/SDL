@@ -1,3 +1,5 @@
+//I am pausing this project on nov 5, it seems I need structs to work with many balls.
+//I'll get back to it soon after some knowledge in CIS-1300 :)
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
@@ -170,7 +172,7 @@ bool loadMedia() {
     bool success = true;
 
     // Open the font file at size 28
-    gFont = TTF_OpenFont("/Users/ghassanmuradagha/Documents/pro/fonts/open-sans/OpenSans-Light.ttf", 15); //font size
+    gFont = TTF_OpenFont("/Users/ghassanmuradagha/Documents/pro/fonts/open-sans/OpenSans-Bold.ttf", 15); //font size
     if (gFont == NULL) {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
         success = false;
