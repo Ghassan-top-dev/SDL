@@ -15,9 +15,6 @@ const int NUM_BUTTONS = 18;
 const int BUTTON_MID_X = 35;
 const int BUTTON_MID_Y = 20;
 
-
-
-
 //button width 83 (3 buttons horizontally)
 //button height 66 (6 buttons vertically) //18 buttons total
 
@@ -50,14 +47,14 @@ SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
 TTF_Font* gFont = NULL;
 LTexture gTextTexture; // Texture to display text
-LTexture buttonText[NUM_BUTTONS]; // Texture to display text
+// LTexture buttonText[NUM_BUTTONS]; // Texture to display text
 
 LTexture allOfTheButtonsTextTextures[NUM_BUTTONS];  // Array to store text textures
 const char* eachText[NUM_BUTTONS] = {
-    "Answer: ", "X", "Some other text", "Text 3", "Text 4", 
-    "Text 5", "Text 6", "Text 7", "Text 8", "Text 9",
-    "Text 10", "Text 11", "Text 12", "Text 13", "Text 14", 
-    "Text 15", "Text 16", "Text 17"
+    "X", "0", ".", "1", "2", 
+    "3", "4", "5", "6", "7",
+    "8", "9", "+", "-", "*", 
+    "%", "CE", "/"
 };
 
 
@@ -108,18 +105,7 @@ bool init() {
     return success;
 }
 
-bool chatGpt(SDL_Texture** texture, const char* text, SDL_Color color) {
-    SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, text, color);
-    if (textSurface == NULL) {
-        printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
-        return false;
-    }
 
-    *texture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
-    SDL_FreeSurface(textSurface);
-
-    return *texture != NULL;
-}
 
 // Loads the necessary media resources such as fonts and text textures
 bool loadMedia() {
@@ -327,9 +313,6 @@ int main(int argc, char* args[]) {
             int spacerHor = 0; //testing for now
             int spacerVer = 60; 
             int exactButton = 0; //this is stupid but this gives memory to the inner for loop
-
-
-
 
             for (int c = 0; c < 6; c++)
             {
