@@ -52,6 +52,14 @@ TTF_Font* gFont = NULL;
 LTexture gTextTexture; // Texture to display text
 LTexture buttonText[NUM_BUTTONS]; // Texture to display text
 
+LTexture* allOfTheButtonsTexts[NUM_BUTTONS];  // Array to store text textures
+const char* eachText[NUM_BUTTONS] = {
+    "Answer: ", "X", "Some other text", "Text 3", "Text 4", 
+    "Text 5", "Text 6", "Text 7", "Text 8", "Text 9",
+    "Text 10", "Text 11", "Text 12", "Text 13", "Text 14", 
+    "Text 15", "Text 16", "Text 17", "Text 18", "Text 19"
+};
+
 
 // Initializes SDL, creates window and renderer, sets up image and text libraries
 bool init() {
@@ -112,11 +120,19 @@ bool loadMedia() {
         SDL_Color textColor = {0, 0, 0}; // Black text color
 
         // Render the text to create a texture
-        if (!loadFromRenderedText(&gTextTexture, "Answer: ", textColor) || 
-        !loadFromRenderedText(&buttonText[0], "X", textColor)) {
+        if (!loadFromRenderedText(&gTextTexture, "Answer: ", textColor)) {
             printf("Failed to render text texture!\n");
             success = false;
         }
+
+        for (int i = 0; i < NUM_BUTTONS; i++) {
+            if (!loadFromRenderedText(&allOfTheButtonsTexts[i], eachText[i], textColor)) {
+                printf("Failed to render text texture!\n");
+                success = false;
+            }
+        }
+
+
     }
     return success;
 }
@@ -124,6 +140,10 @@ bool loadMedia() {
 // Frees up resources and shuts down SDL libraries
 void close() {
     freeTexture(&gTextTexture); // Free text texture
+
+    for (int i = 0; i < NUM_BUTTONS; i++) {
+        SDL_DestroyTexture(allOfTheButtonsTexts[i]);
+    }
 
     TTF_CloseFont(gFont); // Close font
     gFont = NULL;
@@ -349,7 +369,12 @@ int main(int argc, char* args[]) {
 
                 
                 renderTexture(&gTextTexture, 0,60, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
-                renderTexture(&buttonText[0], (buttons[0].x) + BUTTON_MID_X,(buttons[0].y) + BUTTON_MID_Y, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
+                // renderTexture(&buttonText[0], (buttons[0].x) + BUTTON_MID_X,(buttons[0].y) + BUTTON_MID_Y, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
+
+                for (int i = 0; i < NUM_BUTTONS; i++) {
+                SDL_Rect renderQuad = {0, i * 50, 200, 50}; // Positioning each text
+                SDL_RenderCopy(gRenderer, allOfTheButtonsTexts[i], NULL, &renderQuad);
+                }
 
                 SDL_RenderPresent(gRenderer); // Update screen
             }
