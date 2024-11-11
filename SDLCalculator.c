@@ -8,7 +8,8 @@
 
 // Screen dimension constants
 const int SCREEN_WIDTH = 249;  
-const int SCREEN_HEIGHT = 450;  
+const int SCREEN_HEIGHT = 450; 
+
 const int BUTTON_WIDTH = 83; 
 const int BUTTON_HEIGHT = 60; 
 const int NUM_BUTTONS = 18; 
@@ -40,6 +41,7 @@ int isWithinBoundaries(SDL_Rect rect, int mouseX, int mouseY); //check if mouse 
 int whereIsMyMouse(SDL_Rect rect, int mouseX, int mouseY); //check where mouse is 
 void buttonDrawer(SDL_Renderer* renderer, SDL_Rect buttons[], int count); 
 void grid(); 
+char whichButtonWasPressed(int buttonX, int buttonY); 
 
 
 // Global variables for the SDL window, renderer, font, and text texture
@@ -280,7 +282,7 @@ void buttonDrawer(SDL_Renderer* renderer, SDL_Rect buttons[], int count) {
     }
 }
 
-void grid(){
+void grid(){ //line grid
     int spacer = 0; 
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255); // Button color
 
@@ -301,6 +303,34 @@ void grid(){
 }
 
 
+char whichButtonWasPressed(int buttonX, int buttonY){
+
+
+    //This wil check which button is pressed by rows
+
+    //row 1 (very bottom)
+    if (buttonY >= 390 && buttonY < 450) 
+    {
+        if (buttonX > 0 && buttonX < 83)
+        {
+            return 'X'; 
+        }
+        
+        //etc etc 
+        
+    }
+
+    return -1; 
+    
+
+
+} 
+
+
+
+
+
+
 
 
 //This is where the magic happens...
@@ -319,7 +349,7 @@ int main(int argc, char* args[]) {
             int spacerHor = 0; //testing for now
             int spacerVer = 60; 
             int exactButton = 0; //this is stupid but this gives memory to the inner for loop
-            int holder[4][18], counterForHolder = 0; //This will hold the data for all buttons
+            int holder[2][18], counterForHolderRow = 0, counterForHolderCol = 0; //This will hold the data for all buttons
 
             for (int c = 0; c < 6; c++)
             {
@@ -327,15 +357,55 @@ int main(int argc, char* args[]) {
                 {
                     buttons[i+exactButton].w = BUTTON_WIDTH; 
                     buttons[i+exactButton].h = BUTTON_HEIGHT; 
+                
                     buttons[i+exactButton].y = SCREEN_HEIGHT - spacerVer; 
+                    holder[counterForHolderRow][counterForHolderCol] = buttons[i+exactButton].y; 
+                    counterForHolderRow++; 
+                    
                     buttons[i+exactButton].x = spacerHor; 
-                    spacerHor += 83; 
+                    holder[counterForHolderRow][counterForHolderCol] = buttons[i+exactButton].x; 
+                    
+                    counterForHolderRow = 0; 
+                    counterForHolderCol++; 
 
+                    spacerHor += 83; 
                 }
                 spacerHor = 0;
                 spacerVer+=60;
                 exactButton+=3;
+                
             }
+
+
+
+            //////////////////////////////////////////////////////////
+
+
+            for (int c = 0; c < 2; c++)
+            {
+                for (int i = 0; i < 18; i++)
+                {
+                    printf("%d ", holder[c][i]); 
+                
+                
+                
+                }
+
+                printf("\n"); 
+                
+                
+            }
+
+
+
+
+
+
+
+
+            //////////////////////////////////////////////////////////
+
+
             
             int mouseX = 0, mouseY = 0; //used for mouse hovering
             while (!quit) {
@@ -357,7 +427,16 @@ int main(int argc, char* args[]) {
                         case SDL_MOUSEBUTTONDOWN:
                             if (event.button.button == SDL_BUTTON_LEFT) {
                                 printf("Left button pressed at (%d, %d)\n", event.button.x, event.button.y);
-                                loadFromRenderedText(&inputLine, positionText, textColor);
+                                mouseX = event.button.x;
+                                mouseY = event.button.y;
+
+                                char button = whichButtonWasPressed(event.button.x, event.button.y);
+
+                                if (button != -1) { // Check if a valid button was pressed
+                                    char text[2] = { button, '\0' }; // Convert char to string format
+                                    loadFromRenderedText(&inputLine, text, textColor);
+                                }
+
 
 
 
@@ -368,7 +447,7 @@ int main(int argc, char* args[]) {
                             break;
                         case SDL_MOUSEBUTTONUP:
                             // mouseColorR = mouseColorG = mouseColorB = 0; // Reset color on release
-                            printf("Mouse button released at (%d, %d)\n", event.button.x, event.button.y);
+                            // printf("Mouse button released at (%d, %d)\n", event.button.x, event.button.y);
                             break;
                         case SDL_MOUSEMOTION:
                             mouseX = event.motion.x;
