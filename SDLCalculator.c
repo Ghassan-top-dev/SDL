@@ -303,28 +303,77 @@ void grid(){ //line grid
 }
 
 
-char whichButtonWasPressed(int buttonX, int buttonY){
-
-
-    //This wil check which button is pressed by rows
-
-    //row 1 (very bottom)
-    if (buttonY >= 390 && buttonY < 450) 
-    {
-        if (buttonX > 0 && buttonX < 83)
-        {
-            return 'X'; 
+char whichButtonWasPressed(int buttonX, int buttonY) {
+    // Row 1 (Y = 390, Characters: "X", "0", ".")
+    if (buttonY >= 390 && buttonY < 450) {
+        if (buttonX >= 0 && buttonX < 83) {
+            return 'X';
+        } else if (buttonX >= 83 && buttonX < 166) {
+            return '0';
+        } else if (buttonX >= 166 && buttonX < 249) {
+            return '.';
         }
-        
-        //etc etc 
-        
+    }
+    
+    // Row 2 (Y = 330, Characters: "1", "2", "3")
+    else if (buttonY >= 330 && buttonY < 390) {
+        if (buttonX >= 0 && buttonX < 83) {
+            return '1';
+        } else if (buttonX >= 83 && buttonX < 166) {
+            return '2';
+        } else if (buttonX >= 166 && buttonX < 249) {
+            return '3';
+        }
+    }
+    
+    // Row 3 (Y = 270, Characters: "4", "5", "6")
+    else if (buttonY >= 270 && buttonY < 330) {
+        if (buttonX >= 0 && buttonX < 83) {
+            return '4';
+        } else if (buttonX >= 83 && buttonX < 166) {
+            return '5';
+        } else if (buttonX >= 166 && buttonX < 249) {
+            return '6';
+        }
+    }
+    
+    // Row 4 (Y = 210, Characters: "7", "8", "9")
+    else if (buttonY >= 210 && buttonY < 270) {
+        if (buttonX >= 0 && buttonX < 83) {
+            return '7';
+        } else if (buttonX >= 83 && buttonX < 166) {
+            return '8';
+        } else if (buttonX >= 166 && buttonX < 249) {
+            return '9';
+        }
+    }
+    
+    // Row 5 (Y = 150, Characters: "+", "-", "*")
+    else if (buttonY >= 150 && buttonY < 210) {
+        if (buttonX >= 0 && buttonX < 83) {
+            return '+';
+        } else if (buttonX >= 83 && buttonX < 166) {
+            return '-';
+        } else if (buttonX >= 166 && buttonX < 249) {
+            return '*';
+        }
+    }
+    
+    // Row 6 (Y = 90, Characters: "%", "CE", "/")
+    else if (buttonY >= 90 && buttonY < 150) {
+        if (buttonX >= 0 && buttonX < 83) {
+            return '%';
+        } else if (buttonX >= 83 && buttonX < 166) {
+            return 'C'; // Assuming 'CE' can be returned as 'C'
+        } else if (buttonX >= 166 && buttonX < 249) {
+            return '/';
+        }
     }
 
-    return -1; 
-    
+    // If no button was pressed
+    return -1;
+}
 
-
-} 
 
 
 
@@ -378,32 +427,7 @@ int main(int argc, char* args[]) {
 
 
 
-            //////////////////////////////////////////////////////////
-
-
-            for (int c = 0; c < 2; c++)
-            {
-                for (int i = 0; i < 18; i++)
-                {
-                    printf("%d ", holder[c][i]); 
-                
-                
-                
-                }
-
-                printf("\n"); 
-                
-                
-            }
-
-
-
-
-
-
-
-
-            //////////////////////////////////////////////////////////
+            
 
 
             
