@@ -10,14 +10,14 @@
 const int SCREEN_WIDTH = 249;  
 const int SCREEN_HEIGHT = 450; 
 
-const int BUTTON_WIDTH = 83; 
-const int BUTTON_HEIGHT = 60; 
-const int NUM_BUTTONS = 18; 
-const int BUTTON_MID_X = 35;
+const int BUTTON_WIDTH = 83; //button width 83 (3 buttons horizontally)
+const int BUTTON_HEIGHT = 60; //button height 66 (6 buttons vertically) //18 buttons total
+
+const int NUM_BUTTONS = 18; //total buttons
+
+const int BUTTON_MID_X = 35; //used to place text in the middle of the button
 const int BUTTON_MID_Y = 20;
 
-//button width 83 (3 buttons horizontally)
-//button height 66 (6 buttons vertically) //18 buttons total
 
 
 // Texture wrapper structure to hold texture data and dimensions
@@ -27,7 +27,7 @@ typedef struct {
     int height;
 } LTexture;
 
-// Function declarations for initialization, media loading, cleanup, and texture operations
+// Function declarations for initialization, media loading, cleanup, texture operations, and logic
 bool init(); // Initializes SDL, window, and renderer
 bool loadMedia(); // Loads media (e.g., font and text)
 void close(); // Frees resources and shuts down SDL
@@ -377,11 +377,6 @@ char whichButtonWasPressed(int buttonX, int buttonY) {
 
 
 
-
-
-
-
-
 //This is where the magic happens...
 // Main function - sets up SDL, loads media, runs main loop, and cleans up
 int main(int argc, char* args[]) {
@@ -398,7 +393,6 @@ int main(int argc, char* args[]) {
             int spacerHor = 0; //testing for now
             int spacerVer = 60; 
             int exactButton = 0; //this is stupid but this gives memory to the inner for loop
-            int holder[2][18], counterForHolderRow = 0, counterForHolderCol = 0; //This will hold the data for all buttons
 
             for (int c = 0; c < 6; c++)
             {
@@ -406,16 +400,9 @@ int main(int argc, char* args[]) {
                 {
                     buttons[i+exactButton].w = BUTTON_WIDTH; 
                     buttons[i+exactButton].h = BUTTON_HEIGHT; 
-                
                     buttons[i+exactButton].y = SCREEN_HEIGHT - spacerVer; 
-                    holder[counterForHolderRow][counterForHolderCol] = buttons[i+exactButton].y; 
-                    counterForHolderRow++; 
-                    
                     buttons[i+exactButton].x = spacerHor; 
-                    holder[counterForHolderRow][counterForHolderCol] = buttons[i+exactButton].x; 
                     
-                    counterForHolderRow = 0; 
-                    counterForHolderCol++; 
 
                     spacerHor += 83; 
                 }
@@ -432,6 +419,7 @@ int main(int argc, char* args[]) {
 
             
             int mouseX = 0, mouseY = 0; //used for mouse hovering
+            char text[32] = "\0"; //what will be presented
             while (!quit) {
                 char positionText[50];
                 sprintf(positionText, "(%d, %d)", mouseX, mouseY); 
@@ -451,26 +439,38 @@ int main(int argc, char* args[]) {
                         case SDL_MOUSEBUTTONDOWN:
                             if (event.button.button == SDL_BUTTON_LEFT) {
                                 printf("Left button pressed at (%d, %d)\n", event.button.x, event.button.y);
-                                mouseX = event.button.x;
-                                mouseY = event.button.y;
 
                                 char button = whichButtonWasPressed(event.button.x, event.button.y);
-
-                                if (button != -1) { // Check if a valid button was pressed
-                                    char text[2] = { button, '\0' }; // Convert char to string format
-                                    loadFromRenderedText(&inputLine, text, textColor);
+                                
+                                
+                                if (button != 'X' && button != 'C')
+                                {
+                                    char temp[2] = { button, '\0' }; // Convert char to string format
+                                    strcat(text, temp);
                                 }
 
+                                if (button == 'C') text[0] = '\0'; //clears the text
 
+                                if (button == 'X') text[strlen(text) - 1] = '\0'; //deletes the final letter
 
+                                
+                        
+                                
+        
+                                
+                                
+                                
+                                
+                                if (button != -1) { // Check if a valid button was pressed and present it onto screen
+                                    loadFromRenderedText(&inputLine, text, textColor);
 
+                                }
 
                             } else if (event.button.button == SDL_BUTTON_RIGHT) {
                                 printf("Right button pressed at (%d, %d)\n", event.button.x, event.button.y);
                             }
                             break;
                         case SDL_MOUSEBUTTONUP:
-                            // mouseColorR = mouseColorG = mouseColorB = 0; // Reset color on release
                             // printf("Mouse button released at (%d, %d)\n", event.button.x, event.button.y);
                             break;
                         case SDL_MOUSEMOTION:
