@@ -47,6 +47,9 @@ SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
 TTF_Font* gFont = NULL;
 LTexture gTextTexture; // Texture to display text
+LTexture inputLine; // Texture to display text
+SDL_Color textColor = {0, 0, 0}; // Black text color
+
 // LTexture buttonText[NUM_BUTTONS]; // Texture to display text
 
 LTexture allOfTheButtonsTextTextures[NUM_BUTTONS];  // Array to store text textures
@@ -117,10 +120,14 @@ bool loadMedia() {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
         success = false;
     } else {
-        SDL_Color textColor = {0, 0, 0}; // Black text color
 
         // Render the text to create a texture
-        if (!loadFromRenderedText(&gTextTexture, "Answer: ", textColor)) {
+        if (!loadFromRenderedText(&gTextTexture, " ", textColor)) {
+            printf("Failed to render text texture!\n");
+            success = false;
+        }
+
+        if (!loadFromRenderedText(&inputLine, " ", textColor)) {
             printf("Failed to render text texture!\n");
             success = false;
         }
@@ -140,6 +147,8 @@ bool loadMedia() {
 // Frees up resources and shuts down SDL libraries
 void close() {
     freeTexture(&gTextTexture); // Free text texture
+    freeTexture(&inputLine); // Free text texture
+
 
     for (int i = 0; i < NUM_BUTTONS; i++) {
         freeTexture(&allOfTheButtonsTextTextures[i]); // Free text texture
@@ -304,15 +313,13 @@ int main(int argc, char* args[]) {
             printf("Failed to load media!\n");
         } else {
             int quit = 0; // Main loop flag
-            SDL_Event e; // Event handler
-
-
-
+            SDL_Event event; // Event handler
 
             SDL_Rect buttons[NUM_BUTTONS]; 
             int spacerHor = 0; //testing for now
             int spacerVer = 60; 
             int exactButton = 0; //this is stupid but this gives memory to the inner for loop
+            int holder[4][18], counterForHolder = 0; //This will hold the data for all buttons
 
             for (int c = 0; c < 6; c++)
             {
@@ -330,28 +337,49 @@ int main(int argc, char* args[]) {
                 exactButton+=3;
             }
             
-            
-
-            
-
-            
-
+            int mouseX = 0, mouseY = 0; //used for mouse hovering
             while (!quit) {
-                while (SDL_PollEvent(&e) != 0) { // Handle events
-
-                //place controls below...
-                    if (e.type == SDL_QUIT) {
-                        quit = 1; // User requests quit
-                    }
-
-                    if (e.type == SDL_KEYDOWN) {
-                      if (e.key.keysym.sym == SDLK_ESCAPE) {
-                          quit = true; // Exit on pressing the escape key
+                char positionText[50];
+                sprintf(positionText, "(%d, %d)", mouseX, mouseY); 
 
 
-                      }
+                while (SDL_PollEvent(&event) != 0) { // Handle events
+
+                    if (event.type == SDL_QUIT) quit = 1; // User requests quit
                     
+
+                    if (event.type == SDL_KEYDOWN) {
+                      if (event.key.keysym.sym == SDLK_ESCAPE) quit = true; // Exit on pressing the escape key
                     }
+
+                    //mouse stuff
+                    switch (event.type) {
+                        case SDL_MOUSEBUTTONDOWN:
+                            if (event.button.button == SDL_BUTTON_LEFT) {
+                                printf("Left button pressed at (%d, %d)\n", event.button.x, event.button.y);
+                                loadFromRenderedText(&inputLine, positionText, textColor);
+
+
+
+
+                            } else if (event.button.button == SDL_BUTTON_RIGHT) {
+                                printf("Right button pressed at (%d, %d)\n", event.button.x, event.button.y);
+                            }
+                            break;
+                        case SDL_MOUSEBUTTONUP:
+                            // mouseColorR = mouseColorG = mouseColorB = 0; // Reset color on release
+                            printf("Mouse button released at (%d, %d)\n", event.button.x, event.button.y);
+                            break;
+                        case SDL_MOUSEMOTION:
+                            mouseX = event.motion.x;
+                            mouseY = event.motion.y;
+                            printf("Mouse moved to (%d, %d)\n", mouseX, mouseY);
+                            loadFromRenderedText(&gTextTexture, positionText, textColor);
+                            break;
+                    }
+
+
+
                     
                 }
 
@@ -369,6 +397,8 @@ int main(int argc, char* args[]) {
 
                 
                 renderTexture(&gTextTexture, 0,60, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
+                renderTexture(&inputLine, 0,20, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
+
                 // renderTexture(&buttonText[0], (buttons[0].x) + BUTTON_MID_X,(buttons[0].y) + BUTTON_MID_Y, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
 
                 for (int i = 0; i < NUM_BUTTONS; i++) {
