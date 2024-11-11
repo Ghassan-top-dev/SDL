@@ -461,10 +461,12 @@ int main(int argc, char* args[]) {
                                 
                                 
                                 
-                                if (button != -1) { // Check if a valid button was pressed and present it onto screen
+                                if (button != -1 && strlen(text) > 0) { // Check if a valid button was pressed and present it onto screen
                                     loadFromRenderedText(&inputLine, text, textColor);
 
-                                }
+                                }else if(button != -1 && strlen(text) == 0) //used to handle X and C
+                                    loadFromRenderedText(&inputLine, " ", textColor); 
+
 
                             } else if (event.button.button == SDL_BUTTON_RIGHT) {
                                 printf("Right button pressed at (%d, %d)\n", event.button.x, event.button.y);
