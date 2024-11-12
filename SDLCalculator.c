@@ -59,7 +59,7 @@ const char* eachText[NUM_BUTTONS] = {
     "X", "0", ".", "1", "2", 
     "3", "4", "5", "6", "7",
     "8", "9", "+", "-", "*", 
-    "%", "CE", "/"
+    "=", "CE", "/"
 };
 
 
@@ -362,7 +362,7 @@ char whichButtonWasPressed(int buttonX, int buttonY) {
     // Row 6 (Y = 90, Characters: "%", "CE", "/")
     else if (buttonY >= 90 && buttonY < 150) {
         if (buttonX >= 0 && buttonX < 83) {
-            return '%';
+            return '=';
         } else if (buttonX >= 83 && buttonX < 166) {
             return 'C'; // Assuming 'CE' can be returned as 'C'
         } else if (buttonX >= 166 && buttonX < 249) {
@@ -418,11 +418,14 @@ int main(int argc, char* args[]) {
 
 
             
-            int mouseX = 0, mouseY = 0; //used for mouse hovering
-            char text[32] = "\0"; //what will be presented
+            char presented[32] = "\0"; //what will be presented
+            char presentedIfAnswer[32] = "\0"; 
+            float beforeOp; // the numbers before and after the operator
+            float afterOp;
+            float answer = 0; //answer for the 2 numbers 
+
+
             while (!quit) {
-                char positionText[50];
-                sprintf(positionText, "(%d, %d)", mouseX, mouseY); 
 
 
                 while (SDL_PollEvent(&event) != 0) { // Handle events
@@ -443,28 +446,71 @@ int main(int argc, char* args[]) {
                                 char button = whichButtonWasPressed(event.button.x, event.button.y);
                                 
                                 
-                                if (button != 'X' && button != 'C')
+                                if (button != 'X' && button != 'C' && button != '='  && button != '*'  
+                                    && button != '+'  && button != '-'  && button != '/')
                                 {
                                     char temp[2] = { button, '\0' }; // Convert char to string format
-                                    strcat(text, temp);
+                                    strcat(presented, temp);
                                 }
 
-                                if (button == 'C') text[0] = '\0'; //clears the text
+                                if (button == 'C') presented[0] = '\0'; //clears the text
 
-                                if (button == 'X') text[strlen(text) - 1] = '\0'; //deletes the final letter
+                                if (button == 'X') presented[strlen(presented) - 1] = '\0'; //deletes the final letter
+
+                                if (button == '*') //logic for multiplication
+                                {
+                                    strcat(presented, "*");
+
+                                    sscanf(presented, "%f*%f", &beforeOp, &afterOp); 
+
+                                    answer = beforeOp * afterOp; 
+
+                                    sprintf(presentedIfAnswer, "%f", answer); 
+
+
+                                    
+
+
+                                }
+                                
+
+                                if (button == '='){
+
+
+                                    int length = strlen(presented); 
+
+                                    for (int i = 0; i < length; i++)
+                                    {
+                                        if (presented[i] == '*')
+                                        {
+                                            sscanf(presented, "%f*%f", &beforeOp, &afterOp); 
+                                            answer = beforeOp * afterOp; 
+                                            sprintf(presentedIfAnswer, "%f", answer); 
+                                        }
+                                        
+                                    }
+
+
+
+                                    presented[0] = '\0';
+                                    
+                                    strcat(presented, presentedIfAnswer);
+                                }  
+
 
                                 
-                        
-                                
-        
                                 
                                 
-                                
-                                
-                                if (button != -1 && strlen(text) > 0) { // Check if a valid button was pressed and present it onto screen
-                                    loadFromRenderedText(&inputLine, text, textColor);
+                                if (button != -1 && strlen(presented) > 0){
 
-                                }else if(button != -1 && strlen(text) == 0) //used to handle X and C
+                                   
+                                    loadFromRenderedText(&inputLine, presented, textColor);
+
+
+
+                                }  // Check if a valid button was pressed and present it onto screen
+
+                                else if(button != -1 && strlen(presented) == 0) //used to handle X and C
                                     loadFromRenderedText(&inputLine, " ", textColor); 
 
 
@@ -476,10 +522,10 @@ int main(int argc, char* args[]) {
                             // printf("Mouse button released at (%d, %d)\n", event.button.x, event.button.y);
                             break;
                         case SDL_MOUSEMOTION:
-                            mouseX = event.motion.x;
-                            mouseY = event.motion.y;
-                            printf("Mouse moved to (%d, %d)\n", mouseX, mouseY);
-                            loadFromRenderedText(&gTextTexture, positionText, textColor);
+                            // mouseX = event.motion.x;
+                            // mouseY = event.motion.y;
+                            // printf("Mouse moved to (%d, %d)\n", mouseX, mouseY);
+                            loadFromRenderedText(&gTextTexture, "positionText", textColor);
                             break;
                     }
 
