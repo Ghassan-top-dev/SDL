@@ -1,3 +1,18 @@
+/*//////////////////////////////////////////////////////////////
+
+TO DO
+
+-Some bug fixes, if user enters + then - then = it does some funny stuff
+
+-perhaps present answer on line box below for gTextTexture
+
+
+
+//////////////////////////////////////////////////////////////*/
+
+
+
+
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
@@ -42,6 +57,7 @@ int whereIsMyMouse(SDL_Rect rect, int mouseX, int mouseY); //check where mouse i
 void buttonDrawer(SDL_Renderer* renderer, SDL_Rect buttons[], int count); 
 void grid(); 
 char whichButtonWasPressed(int buttonX, int buttonY); 
+void whichOperatorWasUsed(char * presented); 
 
 
 // Global variables for the SDL window, renderer, font, and text texture
@@ -374,6 +390,48 @@ char whichButtonWasPressed(int buttonX, int buttonY) {
     return -1;
 }
 
+void whichOperatorWasUsed(char * presented){
+
+    float beforeOp; // the numbers before and after the operator
+    float afterOp;
+    float answer = 0; //answer for the 2 numbers 
+
+    int length = strlen(presented); 
+
+    for (int i = 0; i < length; i++){
+        
+        if (presented[i] == '*'){
+            sscanf(presented, "%f*%f", &beforeOp, &afterOp); 
+            answer = beforeOp * afterOp; 
+            sprintf(presented, "%.2f", answer); 
+        }
+
+
+        else if (presented[i] == '+'){
+            sscanf(presented, "%f+%f", &beforeOp, &afterOp); 
+            answer = beforeOp + afterOp; 
+            sprintf(presented, "%.2f", answer); 
+        }
+
+
+        else if (presented[i] == '-'){
+            sscanf(presented, "%f-%f", &beforeOp, &afterOp); 
+            answer = beforeOp - afterOp; 
+            sprintf(presented, "%.2f", answer); 
+        }
+
+        else if (presented[i] == '/'){
+            sscanf(presented, "%f/%f", &beforeOp, &afterOp); 
+            answer = beforeOp / afterOp; 
+            sprintf(presented, "%.2f", answer); 
+        }
+                                        
+    }
+
+
+}
+
+
 
 
 
@@ -441,13 +499,10 @@ int main(int argc, char* args[]) {
                     switch (event.type) {
                         case SDL_MOUSEBUTTONDOWN:
                             if (event.button.button == SDL_BUTTON_LEFT) {
-                                printf("Left button pressed at (%d, %d)\n", event.button.x, event.button.y);
-
                                 char button = whichButtonWasPressed(event.button.x, event.button.y);
                                 
                                 
-                                if (button != 'X' && button != 'C' && button != '='  && button != '*'  
-                                    && button != '+'  && button != '-'  && button != '/')
+                                if (button != 'X' && button != 'C' && button != '=')
                                 {
                                     char temp[2] = { button, '\0' }; // Convert char to string format
                                     strcat(presented, temp);
@@ -457,44 +512,14 @@ int main(int argc, char* args[]) {
 
                                 if (button == 'X') presented[strlen(presented) - 1] = '\0'; //deletes the final letter
 
-                                if (button == '*') //logic for multiplication
-                                {
-                                    strcat(presented, "*");
-
-                                    sscanf(presented, "%f*%f", &beforeOp, &afterOp); 
-
-                                    answer = beforeOp * afterOp; 
-
-                                    sprintf(presentedIfAnswer, "%f", answer); 
-
-
-                                    
-
-
-                                }
+                                
                                 
 
                                 if (button == '='){
-
-
-                                    int length = strlen(presented); 
-
-                                    for (int i = 0; i < length; i++)
-                                    {
-                                        if (presented[i] == '*')
-                                        {
-                                            sscanf(presented, "%f*%f", &beforeOp, &afterOp); 
-                                            answer = beforeOp * afterOp; 
-                                            sprintf(presentedIfAnswer, "%f", answer); 
-                                        }
-                                        
-                                    }
-
-
-
-                                    presented[0] = '\0';
                                     
-                                    strcat(presented, presentedIfAnswer);
+                                    whichOperatorWasUsed(presented); 
+
+
                                 }  
 
 
@@ -503,11 +528,7 @@ int main(int argc, char* args[]) {
                                 
                                 if (button != -1 && strlen(presented) > 0){
 
-                                   
                                     loadFromRenderedText(&inputLine, presented, textColor);
-
-
-
                                 }  // Check if a valid button was pressed and present it onto screen
 
                                 else if(button != -1 && strlen(presented) == 0) //used to handle X and C
@@ -522,10 +543,7 @@ int main(int argc, char* args[]) {
                             // printf("Mouse button released at (%d, %d)\n", event.button.x, event.button.y);
                             break;
                         case SDL_MOUSEMOTION:
-                            // mouseX = event.motion.x;
-                            // mouseY = event.motion.y;
-                            // printf("Mouse moved to (%d, %d)\n", mouseX, mouseY);
-                            loadFromRenderedText(&gTextTexture, "positionText", textColor);
+                            // loadFromRenderedText(&gTextTexture, "positionText", textColor);
                             break;
                     }
 
