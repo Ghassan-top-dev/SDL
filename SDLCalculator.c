@@ -2,9 +2,13 @@
 
 TO DO
 
--Some bug fixes, if user enters + then - then = it does some funny stuff
+-Some bug fixes:
 
--calculator breaks whenever you do anything with negative numbers
+-if user enters + then - then = it does some funny stuff - fixed
+
+-if user enters * then /  or vice versa then = it does some funny stuff - fixed
+
+-calculator breaks whenever you do anything with negative numbers - fixed
 
 -perhaps present answer on line box below for gTextTexture
 
@@ -54,12 +58,10 @@ void freeTexture(LTexture* lTexture); // Frees texture memory
 void renderTexture(LTexture* lTexture, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip); // Renders texture to screen
 int getTextureWidth(LTexture* lTexture); // Returns texture width
 int getTextureHeight(LTexture* lTexture); // Returns texture height
-int isWithinBoundaries(SDL_Rect rect, int mouseX, int mouseY); //check if mouse is within boundaries of rect
-int whereIsMyMouse(SDL_Rect rect, int mouseX, int mouseY); //check where mouse is 
-void buttonDrawer(SDL_Renderer* renderer, SDL_Rect buttons[], int count); 
-void grid(); 
-char whichButtonWasPressed(int buttonX, int buttonY); 
-void whichOperatorWasUsed(char * presented); 
+void buttonDrawer(SDL_Renderer* renderer, SDL_Rect buttons[], int count); //draws the button on the screen
+void grid(); //used to draw the canvas of the calculator using lines
+char whichButtonWasPressed(int buttonX, int buttonY); //used to calculate where button was pressed and on which button
+void whichOperatorWasUsed(char * presented); //main meat and potatoes of the calculator logic
 
 
 // Global variables for the SDL window, renderer, font, and text texture
@@ -73,7 +75,7 @@ SDL_Color textColor = {0, 0, 0}; // Black text color
 // LTexture buttonText[NUM_BUTTONS]; // Texture to display text
 
 LTexture allOfTheButtonsTextTextures[NUM_BUTTONS];  // Array to store text textures
-const char* eachText[NUM_BUTTONS] = {
+const char* eachText[NUM_BUTTONS] = { //the content of each button
     "X", "0", ".", "1", "2", 
     "3", "4", "5", "6", "7",
     "8", "9", "+", "-", "*", 
@@ -274,23 +276,7 @@ int getTextureHeight(LTexture* lTexture) {
 }
 
 
-int isWithinBoundaries(SDL_Rect rect, int mouseX, int mouseY){ //check if mouse is within boundaries (used for pressing)
-
-    if (mouseX >= rect.x && mouseX <= rect.x + rect.w && mouseY >= rect.y && mouseY <= rect.y + rect.h) return 1; //make sure its in the y and x                                          
-    
-    else return 0;
-    
-    return -1;
-}
-
-int whereIsMyMouse(SDL_Rect rect, int mouseX, int mouseY){ //check if mouse is within boundaries (used for getting position)
-
-    return (mouseX >= rect.x && mouseX <= rect.x + rect.w && mouseY >= rect.y && mouseY <= rect.y + rect.h); 
-
-}
-
-
-void buttonDrawer(SDL_Renderer* renderer, SDL_Rect buttons[], int count) {
+void buttonDrawer(SDL_Renderer* renderer, SDL_Rect buttons[], int count) { //renders the buttons NOT DRAW THEM
     
     SDL_SetRenderDrawColor(renderer, 105, 105, 105, 255); // Button color
     for (int i = 0; i < count; i++) {
@@ -300,11 +286,9 @@ void buttonDrawer(SDL_Renderer* renderer, SDL_Rect buttons[], int count) {
     }
 }
 
-void grid(){ //line grid
+void grid(){ //line grid used for button outlines and canvas of the calculator
     int spacer = 0; 
-    SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255); // Button color
-
-    // int SDL_RenderDrawLine(SDL_Renderer * renderer, int x1, int y1, int x2, int y2);
+    SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255); // line color
 
     for (int i = 0; i < 3; i++)
     {
@@ -388,7 +372,7 @@ char whichButtonWasPressed(int buttonX, int buttonY) {
         }
     }
 
-    else if (buttonY >= 0 && buttonY < 90) {
+    else if (buttonY >= 0 && buttonY < 90) { //if no button was pressed but a left click was regestered
         if (buttonX >= 0 && buttonX < 249) {
             return '!'; //used to fix bug
         } 
@@ -398,16 +382,16 @@ char whichButtonWasPressed(int buttonX, int buttonY) {
     return -1;
 }
 
-void whichOperatorWasUsed(char * presented){
+void whichOperatorWasUsed(char * presented){ //main calculator logic, very basic, only works with 2 numbers, I'll
+                                            //need to figure out something different
 
     float beforeOp; // the numbers before and after the operator
     float afterOp;
     float answer = 0; //answer for the 2 numbers 
-
     int length = strlen(presented); 
 
-    for (int i = 0; i < length; i++){
-        
+    for (int i = 1; i < length; i++){
+    
         if (presented[i] == '*'){
             sscanf(presented, "%f*%f", &beforeOp, &afterOp); 
             answer = beforeOp * afterOp; 
@@ -421,8 +405,8 @@ void whichOperatorWasUsed(char * presented){
             sprintf(presented, "%.2f", answer); 
         }
 
-
         else if (presented[i] == '-'){
+            
             sscanf(presented, "%f-%f", &beforeOp, &afterOp); 
             answer = beforeOp - afterOp; 
             sprintf(presented, "%.2f", answer); 
@@ -433,7 +417,7 @@ void whichOperatorWasUsed(char * presented){
             answer = beforeOp / afterOp; 
             sprintf(presented, "%.2f", answer); 
         }
-                                        
+                                    
     }
 
 
@@ -460,7 +444,7 @@ int main(int argc, char* args[]) {
             int spacerVer = 60; 
             int exactButton = 0; //this is stupid but this gives memory to the inner for loop
 
-            for (int c = 0; c < 6; c++)
+            for (int c = 0; c < 6; c++) //this places the buttons in the correct positions with thee correct sizes
             {
                 for (int i = 0; i < 3; i++)
                 {
@@ -483,7 +467,7 @@ int main(int argc, char* args[]) {
             
 
 
-            
+            //these are used for calculator logic            
             char presented[32] = "\0"; //what will be presented
             char presentedIfAnswer[32] = "\0"; 
             float beforeOp; // the numbers before and after the operator
@@ -506,7 +490,10 @@ int main(int argc, char* args[]) {
                     switch (event.type) {
                         case SDL_MOUSEBUTTONDOWN:
                             if (event.button.button == SDL_BUTTON_LEFT) {
-                                char button = whichButtonWasPressed(event.button.x, event.button.y);
+
+                                //pretty simple and intuative code below
+
+                                char button = whichButtonWasPressed(event.button.x, event.button.y); 
                                 
                                 
                                 if (button != 'X' && button != 'C' && button != '=' && button != '!')
@@ -519,19 +506,14 @@ int main(int argc, char* args[]) {
 
                                 if (button == 'X') presented[strlen(presented) - 1] = '\0'; //deletes the final letter
 
-                                
-                                
 
-                                if (button == '='){
+                                if (button == '='){ //returns answer
                                     whichOperatorWasUsed(presented); 
 
                                 }  
-
-
                                 
                                 
-                                
-                                if (button != -1 && strlen(presented) > 0){
+                                if (button != -1 && strlen(presented) > 0){ //used to handle every button except X and CE
 
                                     loadFromRenderedText(&inputLine, presented, textColor);
                                 }  // Check if a valid button was pressed and present it onto screen
@@ -565,7 +547,7 @@ int main(int argc, char* args[]) {
                 //Maybe place shapes here?
                 //rect:
 
-                buttonDrawer(gRenderer, buttons, NUM_BUTTONS); 
+                buttonDrawer(gRenderer, buttons, NUM_BUTTONS); //this renders the buttons rather than draws them
                 grid(); //this will draw the grid
 
                 
@@ -574,9 +556,7 @@ int main(int argc, char* args[]) {
                 renderTexture(&gTextTexture, 0,60, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
                 renderTexture(&inputLine, 0,20, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
 
-                // renderTexture(&buttonText[0], (buttons[0].x) + BUTTON_MID_X,(buttons[0].y) + BUTTON_MID_Y, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
-
-                for (int i = 0; i < NUM_BUTTONS; i++) {
+                for (int i = 0; i < NUM_BUTTONS; i++) { //this draws the text of each button in the centre of each button
                     SDL_Rect quack = {buttons[i].x + BUTTON_MID_X, buttons[i].y + BUTTON_MID_Y, allOfTheButtonsTextTextures[i].width, allOfTheButtonsTextTextures[i].height};
                     renderTexture(&allOfTheButtonsTextTextures[i], quack.x, quack.y, NULL, 0, NULL, SDL_FLIP_NONE);
                 }
