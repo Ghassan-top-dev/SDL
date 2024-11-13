@@ -4,6 +4,8 @@ TO DO
 
 -Some bug fixes, if user enters + then - then = it does some funny stuff
 
+-calculator breaks whenever you do anything with negative numbers
+
 -perhaps present answer on line box below for gTextTexture
 
 
@@ -386,6 +388,12 @@ char whichButtonWasPressed(int buttonX, int buttonY) {
         }
     }
 
+    else if (buttonY >= 0 && buttonY < 90) {
+        if (buttonX >= 0 && buttonX < 249) {
+            return '!'; //used to fix bug
+        } 
+    }
+
     // If no button was pressed
     return -1;
 }
@@ -485,7 +493,6 @@ int main(int argc, char* args[]) {
 
             while (!quit) {
 
-
                 while (SDL_PollEvent(&event) != 0) { // Handle events
 
                     if (event.type == SDL_QUIT) quit = 1; // User requests quit
@@ -502,7 +509,7 @@ int main(int argc, char* args[]) {
                                 char button = whichButtonWasPressed(event.button.x, event.button.y);
                                 
                                 
-                                if (button != 'X' && button != 'C' && button != '=')
+                                if (button != 'X' && button != 'C' && button != '=' && button != '!')
                                 {
                                     char temp[2] = { button, '\0' }; // Convert char to string format
                                     strcat(presented, temp);
@@ -516,9 +523,7 @@ int main(int argc, char* args[]) {
                                 
 
                                 if (button == '='){
-                                    
                                     whichOperatorWasUsed(presented); 
-
 
                                 }  
 
@@ -533,6 +538,7 @@ int main(int argc, char* args[]) {
 
                                 else if(button != -1 && strlen(presented) == 0) //used to handle X and C
                                     loadFromRenderedText(&inputLine, " ", textColor); 
+                                
 
 
                             } else if (event.button.button == SDL_BUTTON_RIGHT) {
