@@ -39,6 +39,8 @@ const int NUM_BUTTONS = 18; //total buttons
 const int BUTTON_MID_X = 35; //used to place text in the middle of the button
 const int BUTTON_MID_Y = 20;
 
+int BUTTON_TO_CHANGE_COLOR; 
+
 
 
 // Texture wrapper structure to hold texture data and dimensions
@@ -62,6 +64,7 @@ void buttonDrawer(SDL_Renderer* renderer, SDL_Rect buttons[], int count); //draw
 void grid(); //used to draw the canvas of the calculator using lines
 char whichButtonWasPressed(int buttonX, int buttonY); //used to calculate where button was pressed and on which button
 void whichOperatorWasUsed(char * presented); //main meat and potatoes of the calculator logic
+// void colorChanger(int *buttonX, int *buttonY, SDL_Renderer* renderer, SDL_Rect buttons[]); 
 
 
 // Global variables for the SDL window, renderer, font, and text texture
@@ -277,6 +280,7 @@ int getTextureHeight(LTexture* lTexture) {
 
 
 void buttonDrawer(SDL_Renderer* renderer, SDL_Rect buttons[], int count) { //renders the buttons NOT DRAW THEM
+
     
     SDL_SetRenderDrawColor(renderer, 105, 105, 105, 255); // Button color
     for (int i = 0; i < count; i++) {
@@ -309,6 +313,7 @@ char whichButtonWasPressed(int buttonX, int buttonY) {
     // Row 1 (Y = 390, Characters: "X", "0", ".")
     if (buttonY >= 390 && buttonY < 450) {
         if (buttonX >= 0 && buttonX < 83) {
+            // BUTTON_TO_CHANGE_COLOR = 0; 
             return 'X';
         } else if (buttonX >= 83 && buttonX < 166) {
             return '0';
@@ -423,6 +428,86 @@ void whichOperatorWasUsed(char * presented){ //main calculator logic, very basic
 
 }
 
+void colorChanger(int buttonX, int buttonY, SDL_Renderer* renderer, SDL_Rect buttons[], int R, int G, int B){
+
+    SDL_SetRenderDrawColor(renderer, R, G, B, 255); // Button color
+
+
+    if (buttonY >= 390 && buttonY < 450) {
+        if (buttonX >= 0 && buttonX < 83) {
+            SDL_RenderFillRect(renderer, &buttons[0]); // Draw each button
+        } else if (buttonX >= 83 && buttonX < 166) {
+
+        } else if (buttonX >= 166 && buttonX < 249) {
+
+        }
+    }
+    
+    // Row 2 (Y = 330, Characters: "1", "2", "3")
+    else if (buttonY >= 330 && buttonY < 390) {
+        if (buttonX >= 0 && buttonX < 83) {
+
+        } else if (buttonX >= 83 && buttonX < 166) {
+
+        } else if (buttonX >= 166 && buttonX < 249) {
+
+        }
+    }
+    
+    // Row 3 (Y = 270, Characters: "4", "5", "6")
+    else if (buttonY >= 270 && buttonY < 330) {
+        if (buttonX >= 0 && buttonX < 83) {
+
+        } else if (buttonX >= 83 && buttonX < 166) {
+
+        } else if (buttonX >= 166 && buttonX < 249) {
+
+        }
+    }
+    
+    // Row 4 (Y = 210, Characters: "7", "8", "9")
+    else if (buttonY >= 210 && buttonY < 270) {
+        if (buttonX >= 0 && buttonX < 83) {
+
+        } else if (buttonX >= 83 && buttonX < 166) {
+
+        } else if (buttonX >= 166 && buttonX < 249) {
+
+        }
+    }
+    
+    // Row 5 (Y = 150, Characters: "+", "-", "*")
+    else if (buttonY >= 150 && buttonY < 210) {
+        if (buttonX >= 0 && buttonX < 83) {
+
+        } else if (buttonX >= 83 && buttonX < 166) {
+
+        } else if (buttonX >= 166 && buttonX < 249) {
+
+        }
+    }
+    
+    // Row 6 (Y = 90, Characters: "%", "CE", "/")
+    else if (buttonY >= 90 && buttonY < 150) {
+        if (buttonX >= 0 && buttonX < 83) {
+
+        } else if (buttonX >= 83 && buttonX < 166) {
+
+        } else if (buttonX >= 166 && buttonX < 249) {
+
+        }
+    }
+
+    else if (buttonY >= 0 && buttonY < 90) { //if no button was pressed but a left click was regestered
+        if (buttonX >= 0 && buttonX < 249) {
+            SDL_SetRenderDrawColor(renderer, 105, 105, 105, 255); // Button color
+
+        } 
+    }
+
+}
+
+
 
 
 
@@ -474,6 +559,10 @@ int main(int argc, char* args[]) {
             float afterOp;
             float answer = 0; //answer for the 2 numbers 
 
+            int mouseX = event.button.x;
+            int mouseY = event.button.y;
+            int R, G, B; 
+
 
             while (!quit) {
 
@@ -494,6 +583,11 @@ int main(int argc, char* args[]) {
                                 //pretty simple and intuative code below
 
                                 char button = whichButtonWasPressed(event.button.x, event.button.y); 
+                                mouseX = event.button.x;
+                                mouseY = event.button.y;
+                                R = G = B = 192;  
+
+                                
                                 
                                 
                                 if (button != 'X' && button != 'C' && button != '=' && button != '!')
@@ -528,6 +622,8 @@ int main(int argc, char* args[]) {
                             }
                             break;
                         case SDL_MOUSEBUTTONUP:
+                            R = G = B = 105;  
+
                             // printf("Mouse button released at (%d, %d)\n", event.button.x, event.button.y);
                             break;
                         case SDL_MOUSEMOTION:
@@ -548,6 +644,7 @@ int main(int argc, char* args[]) {
                 //rect:
 
                 buttonDrawer(gRenderer, buttons, NUM_BUTTONS); //this renders the buttons rather than draws them
+                colorChanger(mouseX, mouseY, gRenderer, buttons, R, G, B); 
                 grid(); //this will draw the grid
 
                 
@@ -562,7 +659,10 @@ int main(int argc, char* args[]) {
                 }
 
 
+
+
                 SDL_RenderPresent(gRenderer); // Update screen
+                
             }
         }
     }
