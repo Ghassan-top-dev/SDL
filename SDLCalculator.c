@@ -660,6 +660,13 @@ int main(int argc, char* args[]) {
 
                             break;
                         case SDL_MOUSEMOTION:
+                            mouseX = event.motion.x;
+                            mouseY = event.motion.y;
+                            char unnecessaryHolder = whichButtonWasPressed(event.motion.x, event.motion.y); 
+
+                            R = G = B = 72;  
+                            
+
                             break;
                     }
 
