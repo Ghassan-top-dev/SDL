@@ -39,7 +39,7 @@ const int NUM_BUTTONS = 18; //total buttons
 const int BUTTON_MID_X = 35; //used to place text in the middle of the button
 const int BUTTON_MID_Y = 20;
 
-int BUTTON_TO_CHANGE_COLOR; 
+int BUTTON_TO_CHANGE_COLOR = -1; 
 
 
 
@@ -313,75 +313,95 @@ char whichButtonWasPressed(int buttonX, int buttonY) {
     // Row 1 (Y = 390, Characters: "X", "0", ".")
     if (buttonY >= 390 && buttonY < 450) {
         if (buttonX >= 0 && buttonX < 83) {
-            // BUTTON_TO_CHANGE_COLOR = 0; 
+            BUTTON_TO_CHANGE_COLOR = 0; 
             return 'X';
         } else if (buttonX >= 83 && buttonX < 166) {
+            BUTTON_TO_CHANGE_COLOR = 1; 
             return '0';
         } else if (buttonX >= 166 && buttonX < 249) {
+            BUTTON_TO_CHANGE_COLOR = 2; 
             return '.';
         }
     }
-    
+
     // Row 2 (Y = 330, Characters: "1", "2", "3")
     else if (buttonY >= 330 && buttonY < 390) {
         if (buttonX >= 0 && buttonX < 83) {
+            BUTTON_TO_CHANGE_COLOR = 3; 
             return '1';
         } else if (buttonX >= 83 && buttonX < 166) {
+            BUTTON_TO_CHANGE_COLOR = 4; 
             return '2';
         } else if (buttonX >= 166 && buttonX < 249) {
+            BUTTON_TO_CHANGE_COLOR = 5; 
             return '3';
         }
     }
-    
+
     // Row 3 (Y = 270, Characters: "4", "5", "6")
     else if (buttonY >= 270 && buttonY < 330) {
         if (buttonX >= 0 && buttonX < 83) {
+            BUTTON_TO_CHANGE_COLOR = 6; 
             return '4';
         } else if (buttonX >= 83 && buttonX < 166) {
+            BUTTON_TO_CHANGE_COLOR = 7; 
             return '5';
         } else if (buttonX >= 166 && buttonX < 249) {
+            BUTTON_TO_CHANGE_COLOR = 8; 
             return '6';
         }
     }
-    
+
     // Row 4 (Y = 210, Characters: "7", "8", "9")
     else if (buttonY >= 210 && buttonY < 270) {
         if (buttonX >= 0 && buttonX < 83) {
+            BUTTON_TO_CHANGE_COLOR = 9; 
             return '7';
         } else if (buttonX >= 83 && buttonX < 166) {
+            BUTTON_TO_CHANGE_COLOR = 10; 
             return '8';
         } else if (buttonX >= 166 && buttonX < 249) {
+            BUTTON_TO_CHANGE_COLOR = 11; 
             return '9';
         }
     }
-    
+
     // Row 5 (Y = 150, Characters: "+", "-", "*")
     else if (buttonY >= 150 && buttonY < 210) {
         if (buttonX >= 0 && buttonX < 83) {
+            BUTTON_TO_CHANGE_COLOR = 12; 
             return '+';
         } else if (buttonX >= 83 && buttonX < 166) {
+            BUTTON_TO_CHANGE_COLOR = 13; 
             return '-';
         } else if (buttonX >= 166 && buttonX < 249) {
+            BUTTON_TO_CHANGE_COLOR = 14; 
             return '*';
         }
     }
-    
+
     // Row 6 (Y = 90, Characters: "%", "CE", "/")
     else if (buttonY >= 90 && buttonY < 150) {
         if (buttonX >= 0 && buttonX < 83) {
+            BUTTON_TO_CHANGE_COLOR = 15; 
             return '=';
         } else if (buttonX >= 83 && buttonX < 166) {
+            BUTTON_TO_CHANGE_COLOR = 16; 
             return 'C'; // Assuming 'CE' can be returned as 'C'
         } else if (buttonX >= 166 && buttonX < 249) {
+            BUTTON_TO_CHANGE_COLOR = 17; 
             return '/';
         }
     }
 
-    else if (buttonY >= 0 && buttonY < 90) { //if no button was pressed but a left click was regestered
+    // Row 7 (Y = 0-90, when no button was pressed but a left click was registered)
+    else if (buttonY >= 0 && buttonY < 90) {
         if (buttonX >= 0 && buttonX < 249) {
-            return '!'; //used to fix bug
+            BUTTON_TO_CHANGE_COLOR = -1; // Indicates no specific button
+            return '!'; // Used to fix bug
         } 
     }
+
 
     // If no button was pressed
     return -1;
@@ -428,82 +448,10 @@ void whichOperatorWasUsed(char * presented){ //main calculator logic, very basic
 
 }
 
-void colorChanger(int buttonX, int buttonY, SDL_Renderer* renderer, SDL_Rect buttons[], int R, int G, int B){
-
+// very dumb function with too many parameters just to change button color on press
+void colorChanger(int buttonX, int buttonY, SDL_Renderer* renderer, SDL_Rect buttons[], int R, int G, int B, int whichButton){
     SDL_SetRenderDrawColor(renderer, R, G, B, 255); // Button color
-
-
-    if (buttonY >= 390 && buttonY < 450) {
-        if (buttonX >= 0 && buttonX < 83) {
-            SDL_RenderFillRect(renderer, &buttons[0]); // Draw each button
-        } else if (buttonX >= 83 && buttonX < 166) {
-
-        } else if (buttonX >= 166 && buttonX < 249) {
-
-        }
-    }
-    
-    // Row 2 (Y = 330, Characters: "1", "2", "3")
-    else if (buttonY >= 330 && buttonY < 390) {
-        if (buttonX >= 0 && buttonX < 83) {
-
-        } else if (buttonX >= 83 && buttonX < 166) {
-
-        } else if (buttonX >= 166 && buttonX < 249) {
-
-        }
-    }
-    
-    // Row 3 (Y = 270, Characters: "4", "5", "6")
-    else if (buttonY >= 270 && buttonY < 330) {
-        if (buttonX >= 0 && buttonX < 83) {
-
-        } else if (buttonX >= 83 && buttonX < 166) {
-
-        } else if (buttonX >= 166 && buttonX < 249) {
-
-        }
-    }
-    
-    // Row 4 (Y = 210, Characters: "7", "8", "9")
-    else if (buttonY >= 210 && buttonY < 270) {
-        if (buttonX >= 0 && buttonX < 83) {
-
-        } else if (buttonX >= 83 && buttonX < 166) {
-
-        } else if (buttonX >= 166 && buttonX < 249) {
-
-        }
-    }
-    
-    // Row 5 (Y = 150, Characters: "+", "-", "*")
-    else if (buttonY >= 150 && buttonY < 210) {
-        if (buttonX >= 0 && buttonX < 83) {
-
-        } else if (buttonX >= 83 && buttonX < 166) {
-
-        } else if (buttonX >= 166 && buttonX < 249) {
-
-        }
-    }
-    
-    // Row 6 (Y = 90, Characters: "%", "CE", "/")
-    else if (buttonY >= 90 && buttonY < 150) {
-        if (buttonX >= 0 && buttonX < 83) {
-
-        } else if (buttonX >= 83 && buttonX < 166) {
-
-        } else if (buttonX >= 166 && buttonX < 249) {
-
-        }
-    }
-
-    else if (buttonY >= 0 && buttonY < 90) { //if no button was pressed but a left click was regestered
-        if (buttonX >= 0 && buttonX < 249) {
-            SDL_SetRenderDrawColor(renderer, 105, 105, 105, 255); // Button color
-
-        } 
-    }
+    SDL_RenderFillRect(renderer, &buttons[whichButton]); // Draw each button
 
 }
 
@@ -644,7 +592,7 @@ int main(int argc, char* args[]) {
                 //rect:
 
                 buttonDrawer(gRenderer, buttons, NUM_BUTTONS); //this renders the buttons rather than draws them
-                colorChanger(mouseX, mouseY, gRenderer, buttons, R, G, B); 
+                colorChanger(mouseX, mouseY, gRenderer, buttons, R, G, B, BUTTON_TO_CHANGE_COLOR); 
                 grid(); //this will draw the grid
 
                 
