@@ -64,7 +64,8 @@ void buttonDrawer(SDL_Renderer* renderer, SDL_Rect buttons[], int count); //draw
 void grid(); //used to draw the canvas of the calculator using lines
 char whichButtonWasPressed(int buttonX, int buttonY); //used to calculate where button was pressed and on which button
 void whichOperatorWasUsed(char * presented); //main meat and potatoes of the calculator logic
-// void colorChanger(int *buttonX, int *buttonY, SDL_Renderer* renderer, SDL_Rect buttons[]); 
+void colorChanger(int buttonX, int buttonY, SDL_Renderer* renderer, SDL_Rect buttons[], int R, int G, int B, int whichButton); //color change on press function
+void removeLetter(char * str, char charToRemove); // may cause out of bounds problems
 
 
 // Global variables for the SDL window, renderer, font, and text texture
@@ -402,13 +403,11 @@ char whichButtonWasPressed(int buttonX, int buttonY) {
         } 
     }
 
-
     // If no button was pressed
     return -1;
 }
 
-void whichOperatorWasUsed(char * presented){ //main calculator logic, very basic, only works with 2 numbers, I'll
-                                            //need to figure out something different
+void whichOperatorWasUsed(char * presented){ // main calculator logic, very basic, only works with 2 numbers, I'll
 
     float beforeOp; // the numbers before and after the operator
     float afterOp;
@@ -454,6 +453,28 @@ void colorChanger(int buttonX, int buttonY, SDL_Renderer* renderer, SDL_Rect but
     SDL_RenderFillRect(renderer, &buttons[whichButton]); // Draw each button
 
 }
+
+void removeLetter(char * str, char charToRemove){
+
+    int length = strlen(str); 
+
+    for (int i = 0; i < length; i++)
+    {
+
+        if (str[i] == charToRemove)
+        {
+            for (int j = i; j < length; j++)
+            {
+                str[j] = str[j+1]; 
+            }
+        }
+        
+        str[length] = '\0'; 
+
+    }
+
+}
+
 
 
 
@@ -502,14 +523,26 @@ int main(int argc, char* args[]) {
 
             //these are used for calculator logic            
             char presented[32] = "\0"; //what will be presented
-            char presentedIfAnswer[32] = "\0"; 
             float beforeOp; // the numbers before and after the operator
             float afterOp;
             float answer = 0; //answer for the 2 numbers 
 
+            // used for changing color on mouse down
             int mouseX = event.button.x;
             int mouseY = event.button.y;
             int R, G, B; 
+
+
+            // these are for checking / and *
+            int mulWasUsed = -1; // these are for weather or not * && / were used
+            int posMul = -1; // these are for which was used last
+            int divWasUsed = -1; // these are for weather or not * && / were used
+            int posDiv = -1; // these are for which was used last
+
+            int mulTimes = 0; // these are for how many of * or / were used - so how many times to run the loop
+            int divTimes = 0; // these are for how many of * or / were used - so how many times to run the loop
+            // these are for checking / and *
+
 
 
             while (!quit) {
@@ -543,10 +576,54 @@ int main(int argc, char* args[]) {
                                     char temp[2] = { button, '\0' }; // Convert char to string format
                                     strcat(presented, temp);
                                 }
+                                
 
                                 if (button == 'C') presented[0] = '\0'; //clears the text
 
                                 if (button == 'X') presented[strlen(presented) - 1] = '\0'; //deletes the final letter
+
+
+                                // this below is stupid but its meant to check if user enters * and /
+                                for (int i = 0; i < 32; i++)
+                                {
+                                    if (presented[i] == '*')
+                                    {
+                                        mulWasUsed = 1; 
+                                        posMul = i;
+                                        mulTimes++;
+
+                                    }
+
+                                    if (presented[i] == '/')
+                                    {
+                                        divWasUsed = 1;  
+                                        posDiv = i;
+                                        divTimes++; 
+                                
+                                    }
+                                    
+                                    
+                                }
+
+                                if (posDiv > posMul)
+                                {
+
+                                    for (int i = 0; i < divTimes; i++)
+                                    {
+                                        removeLetter(presented, '*'); 
+                                    }
+                                    
+                                }
+                                else if (posDiv < posMul)
+                                {
+
+                                    for (int i = 0; i < mulTimes; i++)
+                                    {
+                                        removeLetter(presented, '/'); 
+                                    }
+                                }
+                                // this above is stupid but its meant to check if user enters * and /
+
 
 
                                 if (button == '='){ //returns answer
@@ -562,6 +639,14 @@ int main(int argc, char* args[]) {
 
                                 else if(button != -1 && strlen(presented) == 0) //used to handle X and C
                                     loadFromRenderedText(&inputLine, " ", textColor); 
+
+                                // reset the variables... there is got to be a better way to do this...
+                                mulWasUsed = -1;
+                                posMul = -1; 
+                                divWasUsed = -1;
+                                posDiv = - 1;
+                                mulTimes = 0;
+                                divTimes = 0;
                                 
 
 
@@ -571,11 +656,10 @@ int main(int argc, char* args[]) {
                             break;
                         case SDL_MOUSEBUTTONUP:
                             R = G = B = 105;  
+                            // change color again once the button is released
 
-                            // printf("Mouse button released at (%d, %d)\n", event.button.x, event.button.y);
                             break;
                         case SDL_MOUSEMOTION:
-                            // loadFromRenderedText(&gTextTexture, "positionText", textColor);
                             break;
                     }
 
