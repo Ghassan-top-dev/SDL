@@ -1,24 +1,3 @@
-/*//////////////////////////////////////////////////////////////
-
-TO DO
-
--Some bug fixes:
-
--if user enters + then - then = it does some funny stuff - fixed
-
--if user enters * then /  or vice versa then = it does some funny stuff - fixed
-
--calculator breaks whenever you do anything with negative numbers - fixed
-
--perhaps present answer on line box below for gTextTexture
-
-
-
-//////////////////////////////////////////////////////////////*/
-
-
-
-
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
@@ -72,12 +51,8 @@ void removeLetter(char * str, char charToRemove); // may cause out of bounds pro
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
 TTF_Font* gFont = NULL;
-LTexture gTextTexture; // Texture to display text
 LTexture inputLine; // Texture to display text
 SDL_Color textColor = {0, 0, 0}; // Black text color
-
-// LTexture buttonText[NUM_BUTTONS]; // Texture to display text
-
 LTexture allOfTheButtonsTextTextures[NUM_BUTTONS];  // Array to store text textures
 const char* eachText[NUM_BUTTONS] = { //the content of each button
     "X", "0", ".", "1", "2", 
@@ -147,11 +122,6 @@ bool loadMedia() {
         success = false;
     } else {
 
-        // Render the text to create a texture
-        if (!loadFromRenderedText(&gTextTexture, " ", textColor)) {
-            printf("Failed to render text texture!\n");
-            success = false;
-        }
 
         if (!loadFromRenderedText(&inputLine, " ", textColor)) {
             printf("Failed to render text texture!\n");
@@ -172,7 +142,6 @@ bool loadMedia() {
 
 // Frees up resources and shuts down SDL libraries
 void close() {
-    freeTexture(&gTextTexture); // Free text texture
     freeTexture(&inputLine); // Free text texture
 
 
@@ -481,20 +450,22 @@ void removeLetter(char * str, char charToRemove){
 
 
 
-//This is where the magic happens...
+// This is where the magic happens...
 // Main function - sets up SDL, loads media, runs main loop, and cleans up
 int main(int argc, char* args[]) {
     if (!init()) { // Initialize SDL and create window
         printf("Failed to initialize!\n");
-    } else {
+    } 
+    else {
         if (!loadMedia()) { // Load media (text textures, fonts)
             printf("Failed to load media!\n");
-        } else {
+        } 
+        else {
             int quit = 0; // Main loop flag
             SDL_Event event; // Event handler
 
             SDL_Rect buttons[NUM_BUTTONS]; 
-            int spacerHor = 0; //testing for now
+            int spacerHor = 0; // these space the buttons
             int spacerVer = 60; 
             int exactButton = 0; //this is stupid but this gives memory to the inner for loop
 
@@ -626,16 +597,11 @@ int main(int argc, char* args[]) {
 
 
 
-                                if (button == '='){ //returns answer
+                                if (button == '=') //returns answer
                                     whichOperatorWasUsed(presented); 
 
-                                }  
-                                
-                                
-                                if (button != -1 && strlen(presented) > 0){ //used to handle every button except X and CE
-
+                                if (button != -1 && strlen(presented) > 0) //used to handle every button except X and CE
                                     loadFromRenderedText(&inputLine, presented, textColor);
-                                }  // Check if a valid button was pressed and present it onto screen
 
                                 else if(button != -1 && strlen(presented) == 0) //used to handle X and C
                                     loadFromRenderedText(&inputLine, " ", textColor); 
@@ -650,16 +616,14 @@ int main(int argc, char* args[]) {
                                 
 
 
-                            } else if (event.button.button == SDL_BUTTON_RIGHT) {
-                                printf("Right button pressed at (%d, %d)\n", event.button.x, event.button.y);
                             }
                             break;
                         case SDL_MOUSEBUTTONUP:
                             R = G = B = 105;  
                             // change color again once the button is released
-
                             break;
                         case SDL_MOUSEMOTION:
+                            // change button color on hover
                             mouseX = event.motion.x;
                             mouseY = event.motion.y;
                             char unnecessaryHolder = whichButtonWasPressed(event.motion.x, event.motion.y); 
@@ -679,26 +643,21 @@ int main(int argc, char* args[]) {
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
                 SDL_RenderClear(gRenderer);
 
-                //Maybe place shapes here?
-                //rect:
+        
 
                 buttonDrawer(gRenderer, buttons, NUM_BUTTONS); //this renders the buttons rather than draws them
-                colorChanger(mouseX, mouseY, gRenderer, buttons, R, G, B, BUTTON_TO_CHANGE_COLOR); 
-                grid(); //this will draw the grid
+                colorChanger(mouseX, mouseY, gRenderer, buttons, R, G, B, BUTTON_TO_CHANGE_COLOR); // this changes button color on press
+                grid(); // this will draw the grid of lines
 
                 
 
                 
-                renderTexture(&gTextTexture, 0,60, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
-                renderTexture(&inputLine, 0,20, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dw, dw, dw,dw); 
+                renderTexture(&inputLine, 0,20, NULL, 0, NULL, SDL_FLIP_NONE); //this is for user input text (dk, posx, posy, dw, dw, dw,dw); 
 
-                for (int i = 0; i < NUM_BUTTONS; i++) { //this draws the text of each button in the centre of each button
+                for (int i = 0; i < NUM_BUTTONS; i++) { // this draws the text of each button in the centre of each button
                     SDL_Rect quack = {buttons[i].x + BUTTON_MID_X, buttons[i].y + BUTTON_MID_Y, allOfTheButtonsTextTextures[i].width, allOfTheButtonsTextTextures[i].height};
                     renderTexture(&allOfTheButtonsTextTextures[i], quack.x, quack.y, NULL, 0, NULL, SDL_FLIP_NONE);
                 }
-
-
-
 
                 SDL_RenderPresent(gRenderer); // Update screen
                 
