@@ -57,6 +57,7 @@ SDL_Renderer* gRenderer = NULL;
 TTF_Font* gFont = NULL;
 LTexture inputLine; // Texture to display text
 SDL_Color textColor = {0, 0, 0}; // Black text color
+LTexture mewoText;  // Texture to display meow
 LTexture allOfTheButtonsTextTextures[NUM_BUTTONS];  // Array to store text textures
 const char* eachText[NUM_BUTTONS] = { //the content of each button
     "X", "0", ".", "1", "2", 
@@ -64,6 +65,7 @@ const char* eachText[NUM_BUTTONS] = { //the content of each button
     "8", "9", "+", "-", "*", 
     "=", "CE", "/"
 };
+
 
 
 
@@ -153,6 +155,12 @@ bool loadMedia() {
             success = false;
         }
 
+        if (!loadFromRenderedText(&mewoText, "ᓚᘏᗢ", textColor)) {
+            printf("Failed to render text texture!\n");
+            success = false;
+        }
+
+
         for (int i = 0; i < NUM_BUTTONS; i++) {
             if (!loadFromRenderedText(&allOfTheButtonsTextTextures[i], eachText[i], textColor)) {
                 printf("Failed to render text texture!\n");
@@ -168,7 +176,7 @@ bool loadMedia() {
 // Frees up resources and shuts down SDL libraries
 void close() {
     freeTexture(&inputLine); // Free text texture
-
+    freeTexture(&mewoText); // Free text texture
 
     for (int i = 0; i < NUM_BUTTONS; i++) {
         freeTexture(&allOfTheButtonsTextTextures[i]); // Free text texture
@@ -392,10 +400,10 @@ char whichButtonWasPressed(int buttonX, int buttonY) {
     }
 
     // Row 7 (Y = 0-90, when no button was pressed but a left click was registered)
-    else if (buttonY >= 0 && buttonY < 50) {
+    else if (buttonY >= 0 && buttonY < 51) {
         if (buttonX >= 0 && buttonX < 249) {
             BUTTON_TO_CHANGE_COLOR = -1; // Indicates no specific button
-            return '!'; // Used to fix bug
+            return -1; // Used to fix bug
         } 
     }
 
@@ -569,93 +577,101 @@ int main(int argc, char* args[]) {
                                 mouseY = event.button.y;
 
                                 //FOR THE MEWO
-                                if (mouseY >= 0 && mouseY < 90) {
-                                    if (mouseX >= 0 && mouseX < 249) {
-                                        
-                                        
+                                if (mouseY >= 51 && mouseY < 91) {
+                                    if (mouseX >= 0 && mouseX < SCREEN_WIDTH) {
+                                        if (Mix_PlayChannel(-1, soundEffect, 0) == -1) { // 0 = play once
+                                            printf("Mix_PlayChannel: %s\n", Mix_GetError());
+                                        }
                                     } 
+                                }
+                                else{
+
+                                        char button = whichButtonWasPressed(event.button.x, event.button.y); 
+
+                                    R = G = B = 192;  
+
+                                    
+                                    
+                                    
+                                    if (button != 'X' && button != 'C' && button != '=' && button != '!')
+                                    {
+                                        char temp[2] = { button, '\0' }; // Convert char to string format
+                                        strcat(presented, temp);
+                                    }
+                                    
+
+                                    if (button == 'C') presented[0] = '\0'; //clears the text
+
+                                    if (button == 'X') presented[strlen(presented) - 1] = '\0'; //deletes the final letter
+
+
+                                    // this below is stupid but its meant to check if user enters * and /
+                                    for (int i = 0; i < 32; i++)
+                                    {
+                                        if (presented[i] == '*')
+                                        {
+                                            mulWasUsed = 1; 
+                                            posMul = i;
+                                            mulTimes++;
+
+                                        }
+
+                                        if (presented[i] == '/')
+                                        {
+                                            divWasUsed = 1;  
+                                            posDiv = i;
+                                            divTimes++; 
+                                    
+                                        }
+                                        
+                                        
+                                    }
+
+                                    if (posDiv > posMul)
+                                    {
+
+                                        for (int i = 0; i < divTimes; i++)
+                                        {
+                                            removeLetter(presented, '*'); 
+                                        }
+                                        
+                                    }
+                                    else if (posDiv < posMul)
+                                    {
+
+                                        for (int i = 0; i < mulTimes; i++)
+                                        {
+                                            removeLetter(presented, '/'); 
+                                        }
+                                    }
+                                    // this above is stupid but its meant to check if user enters * and /
+
+
+
+                                    if (button == '=') //returns answer
+                                        whichOperatorWasUsed(presented); 
+
+                                    if (button != -1 && strlen(presented) > 0) //used to handle every button except X and CE
+                                        loadFromRenderedText(&inputLine, presented, textColor);
+
+                                    else if(button != -1 && strlen(presented) == 0) //used to handle X and C
+                                        loadFromRenderedText(&inputLine, " ", textColor); 
+
+                                    // reset the variables... there is got to be a better way to do this...
+                                    mulWasUsed = -1;
+                                    posMul = -1; 
+                                    divWasUsed = -1;
+                                    posDiv = - 1;
+                                    mulTimes = 0;
+                                divTimes = 0;
+
+
+
                                 }
 
                                 //pretty simple and intuative code below
 
-                                char button = whichButtonWasPressed(event.button.x, event.button.y); 
-
-                                R = G = B = 192;  
-
                                 
-                                
-                                
-                                if (button != 'X' && button != 'C' && button != '=' && button != '!')
-                                {
-                                    char temp[2] = { button, '\0' }; // Convert char to string format
-                                    strcat(presented, temp);
-                                }
-                                
-
-                                if (button == 'C') presented[0] = '\0'; //clears the text
-
-                                if (button == 'X') presented[strlen(presented) - 1] = '\0'; //deletes the final letter
-
-
-                                // this below is stupid but its meant to check if user enters * and /
-                                for (int i = 0; i < 32; i++)
-                                {
-                                    if (presented[i] == '*')
-                                    {
-                                        mulWasUsed = 1; 
-                                        posMul = i;
-                                        mulTimes++;
-
-                                    }
-
-                                    if (presented[i] == '/')
-                                    {
-                                        divWasUsed = 1;  
-                                        posDiv = i;
-                                        divTimes++; 
-                                
-                                    }
-                                    
-                                    
-                                }
-
-                                if (posDiv > posMul)
-                                {
-
-                                    for (int i = 0; i < divTimes; i++)
-                                    {
-                                        removeLetter(presented, '*'); 
-                                    }
-                                    
-                                }
-                                else if (posDiv < posMul)
-                                {
-
-                                    for (int i = 0; i < mulTimes; i++)
-                                    {
-                                        removeLetter(presented, '/'); 
-                                    }
-                                }
-                                // this above is stupid but its meant to check if user enters * and /
-
-
-
-                                if (button == '=') //returns answer
-                                    whichOperatorWasUsed(presented); 
-
-                                if (button != -1 && strlen(presented) > 0) //used to handle every button except X and CE
-                                    loadFromRenderedText(&inputLine, presented, textColor);
-
-                                else if(button != -1 && strlen(presented) == 0) //used to handle X and C
-                                    loadFromRenderedText(&inputLine, " ", textColor); 
-
-                                // reset the variables... there is got to be a better way to do this...
-                                mulWasUsed = -1;
-                                posMul = -1; 
-                                divWasUsed = -1;
-                                posDiv = - 1;
-                                mulTimes = 0;
-                                divTimes = 0;
                                 
 
 
@@ -689,7 +705,7 @@ int main(int argc, char* args[]) {
         
 
                 buttonDrawer(gRenderer, buttons, NUM_BUTTONS); //this renders the buttons rather than draws them
-                SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255); // mewo color
+                SDL_SetRenderDrawColor(gRenderer, 137, 207, 240, 255); // mewo color
                 SDL_RenderFillRect(gRenderer, &mewoButton); // Draw each mewo
 
 
@@ -700,7 +716,9 @@ int main(int argc, char* args[]) {
                 
 
                 
-                renderTexture(&inputLine, 0,20, NULL, 0, NULL, SDL_FLIP_NONE); //this is for user input text (dk, posx, posy, dw, dw, dw,dw); 
+                renderTexture(&inputLine, 0,20, NULL, 0, NULL, SDL_FLIP_NONE); //this is for user input text (the texture, posx, posy, dw, dw, dw,dw); 
+                renderTexture(&mewoText, 0,20, NULL, 0, NULL, SDL_FLIP_NONE); //this is for user input text (the texture, posx, posy, dw, dw, dw,dw); 
+
 
                 for (int i = 0; i < NUM_BUTTONS; i++) { // this draws the text of each button in the centre of each button
                     SDL_Rect quack = {buttons[i].x + BUTTON_MID_X, buttons[i].y + BUTTON_MID_Y, allOfTheButtonsTextTextures[i].width, allOfTheButtonsTextTextures[i].height};
