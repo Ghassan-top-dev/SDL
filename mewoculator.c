@@ -143,6 +143,7 @@ bool loadMedia() {
     // Open the font file at size 28
     
     gFont = TTF_OpenFont("/Users/ghassanmuradagha/Documents/pro/SDL_GENERAL/fonts/open-sans/OpenSans-Bold.ttf", 20); //font size
+    
     if (gFont == NULL) {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
         success = false;
@@ -155,7 +156,7 @@ bool loadMedia() {
             success = false;
         }
 
-        if (!loadFromRenderedText(&mewoText, "ᓚᘏᗢ", textColor)) {
+        if (!loadFromRenderedText(&mewoText, "(=^..^=)", textColor)) { //ᓚᘏᗢ
             printf("Failed to render text texture!\n");
             success = false;
         }
@@ -717,7 +718,7 @@ int main(int argc, char* args[]) {
 
                 
                 renderTexture(&inputLine, 0,20, NULL, 0, NULL, SDL_FLIP_NONE); //this is for user input text (the texture, posx, posy, dw, dw, dw,dw); 
-                renderTexture(&mewoText, 0,20, NULL, 0, NULL, SDL_FLIP_NONE); //this is for user input text (the texture, posx, posy, dw, dw, dw,dw); 
+                renderTexture(&mewoText, 100,51, NULL, 0, NULL, SDL_FLIP_NONE); //this is for user input text (the texture, posx, posy, dw, dw, dw,dw); 
 
 
                 for (int i = 0; i < NUM_BUTTONS; i++) { // this draws the text of each button in the centre of each button
