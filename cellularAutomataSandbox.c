@@ -6,10 +6,15 @@
 #include <string.h>
 #include <stdbool.h>
 
+
+
 // Screen dimension constants
 const int SCREEN_WIDTH = 1400;
 const int SCREEN_HEIGHT = 750;
 const int PIXEL_SIZE = 12; 
+
+#define GRID_HEIGHT (SCREEN_HEIGHT / PIXEL_SIZE)
+#define GRID_WIDTH (SCREEN_WIDTH / PIXEL_SIZE)
 
 // Texture wrapper structure to hold texture data and dimensions
 typedef struct {
@@ -32,7 +37,7 @@ typedef struct {
     PixelType type;          // Pixel type, e.g., EMPTY, SAND
     int lifetime;      // How long this pixel has existed
     int temperature;   // Temperature of the pixel (useful for fire)
-    int updatedYet;
+    bool updatedYet;
     SDL_Color color;   // Pixel color for rendering
 } Pixel;
 
@@ -257,22 +262,20 @@ int main(int argc, char* args[]) {
             int quit = 0; // Main loop flag
             SDL_Event event; // Event handler
 
-            for (int y = 0; y < SCREEN_HEIGHT; y++){
-                for (int x = 0; x < SCREEN_WIDTH; x++){
-                    GRID[x][y].type = EMPTY; 
+            Pixel sandPixel = {SAND, 0, 25, false, {194, 178, 128, 255}};
+            Pixel emptyPixel = {EMPTY, 0, 0, false, {0, 0, 0, 255}};
+
+
+            for (int y = 0; y < GRID_HEIGHT; y++) {
+                for (int x = 0; x < GRID_WIDTH; x++) {
+                    GRID[x][y] = emptyPixel;
                 }
             }
 
 
-            Pixel sandPixel = {SAND, 0, 25, 0, {194, 178, 128, 255}};
-            Pixel emptyPixel = {EMPTY, 0, 0, 0, {0, 0, 0, 255}};
+            bool upDated = true; 
 
 
-
-            
-            
-            
-            
             
             
             while (!quit) {
@@ -293,19 +296,9 @@ int main(int argc, char* args[]) {
                                 int y = event.button.y / PIXEL_SIZE;
 
                                 if (GRID[x][y].type == EMPTY){
-
                                     GRID[x][y].type = sandPixel.type; 
                                     GRID[x][y].color = sandPixel.color; 
                                 }
-
-
-                                
-
-                                
-
-                              
-                                
-
 
                             }
                             break;
@@ -320,80 +313,55 @@ int main(int argc, char* args[]) {
                 }
                 // Clear screen with black background
                 SDL_SetRenderDrawColor(gRenderer, 110, 110, 110, 255);
-                SDL_RenderClear(gRenderer);  
-
-
-                // for (int y = 0; y < SCREEN_HEIGHT; y++){
-                //     for (int x = 0; x < SCREEN_WIDTH; x++){
-                //        Pixel pixelRect = GRID[x][y];  // Get the pixel at this position
-
-
-                //         if (GRID[x][y].type != EMPTY && GRID[x][y+1].type == EMPTY) {
-                            
-                //             GRID[x][y].type = EMPTY; 
-                //             SDL_SetRenderDrawColor(gRenderer, GRID[x][y].color.r, GRID[x][y].color.g, GRID[x][y].color.b, GRID[x][y].color.a);
-                //             SDL_Rect rectToBeRendered = {x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE}; 
-                //             SDL_RenderFillRect(gRenderer, &rectToBeRendered);
-                //             setPixel(pixelRect, x, y+1); 
-
-                //         }
-
-                //     }
-                // }   
+                SDL_RenderClear(gRenderer); 
 
 
 
 
-                for (int y = 0; y < SCREEN_HEIGHT; y++){
-                    for (int x = 0; x < SCREEN_WIDTH; x++){
-                       Pixel pixelRect = GRID[x][y];  // Get the pixel at this position
-
-                        // If the pixel isn't EMPTY, render it
-                        if (GRID[x][y].type != EMPTY) {
-                            setPixel(pixelRect, x, y); 
+                if (upDated) {
+                    for (int y = GRID_HEIGHT - 1; y >= 0; y--) {
+                        for (int x = 0; x < GRID_WIDTH; x++) {
+                            // Check if the current cell is not EMPTY
+                            if (GRID[x][y].type != EMPTY) {
+                                // Ensure we're not at the bottom row
+                                if (y + 1< GRID_HEIGHT && GRID[x][y + 1].type == EMPTY) {
+                                    // Move the block down
+                                    GRID[x][y + 1] = GRID[x][y]; // Copy current cell to the cell below
+                                    GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
+                                }
+                            }
                         }
-
-                        // if (GRID[x][y].type != EMPTY && GRID[x][y+1].type == EMPTY) {
-                            
-                        //     GRID[x][y].type = emptyPixel.type; 
-                        //     GRID[x][y+1].type = sandPixel.type; 
-                        //     // SDL_SetRenderDrawColor(gRenderer, GRID[x][y].color.r, GRID[x][y].color.g, GRID[x][y].color.b, GRID[x][y].color.a);
-                        //     // SDL_SetRenderDrawColor(gRenderer, GRID[x][y+1].color.r, GRID[x][y+1].color.g, GRID[x][y+1].color.b, GRID[x][y+1].color.a);
-                        //     // SDL_Rect rectToBeRendered = {x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE}; 
-                        //     // SDL_RenderFillRect(gRenderer, &rectToBeRendered);
-                        //     setPixel(pixelRect, x, y+1); 
-
-                        // }
                     }
+
                 }
+
+
+
+
+
+
                 
+                for (int y = 0; y < GRID_HEIGHT; y++){
+                    for (int x = 0; x < GRID_WIDTH; x++){
+                        Pixel pixelRect = GRID[x][y]; 
+                        
+                        if (GRID[x][y].type != EMPTY ){
+                        
+                            pixelRect.type = sandPixel.type;
+                            setPixel(pixelRect, x, y);
+                        }                         
+                    }
+                } 
+
+                upDated = true; 
+                
+
+
                
 
                 //this is for text
                 renderTexture(&gTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dk, dk, dk,dk); 
-
                 SDL_RenderPresent(gRenderer); // Update screen
-
-
-                for (int y = 0; y < SCREEN_HEIGHT; y++){
-                    for (int x = 0; x < SCREEN_WIDTH; x++){
-                       Pixel pixelRect = GRID[x][y];  // Get the pixel at this position
-
-                        if (GRID[x][y].type != EMPTY && GRID[x][y+1].type == EMPTY) {
-                            
-                            GRID[x][y].type = emptyPixel.type; 
-                            GRID[x][y+1].type = sandPixel.type; 
-                            setPixel(pixelRect, x, y); 
-                            setPixel(pixelRect, x, y+1); 
-
-                        }
-                    }
-                }
-
-                SDL_RenderPresent(gRenderer); // Update screen
-
-
-                
             }
         }
     }
@@ -401,3 +369,85 @@ int main(int argc, char* args[]) {
 
     return 0;
 }
+
+
+
+
+
+
+
+                // // for (int y = 0; y < SCREEN_HEIGHT; y++){
+                // //     for (int x = 0; x < SCREEN_WIDTH; x++){
+                // //        Pixel pixelRect = GRID[x][y];  // Get the pixel at this position
+
+
+                // //         if (GRID[x][y].type != EMPTY && GRID[x][y+1].type == EMPTY) {
+                            
+                // //             GRID[x][y].type = EMPTY; 
+                // //             SDL_SetRenderDrawColor(gRenderer, GRID[x][y].color.r, GRID[x][y].color.g, GRID[x][y].color.b, GRID[x][y].color.a);
+                // //             SDL_Rect rectToBeRendered = {x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE}; 
+                // //             SDL_RenderFillRect(gRenderer, &rectToBeRendered);
+                // //             setPixel(pixelRect, x, y+1); 
+
+                // //         }
+
+                // //     }
+                // // }   
+
+
+
+
+                // for (int y = SCREEN_HEIGHT; y >= 0; y--){
+                //     for (int x = 0; x < SCREEN_WIDTH; x++){
+                //        Pixel pixelRect = GRID[x][y];  // Get the pixel at this position
+
+                //         // If the pixel isn't EMPTY, render it
+                //         if (GRID[x][y].type != EMPTY) {
+                //             pixelRect.type = sandPixel.type;
+                //             setPixel(pixelRect, x, y); 
+                //         }
+                //     }
+                // }
+
+
+                // for (int y = SCREEN_HEIGHT; y > 0; y--){
+                //     for (int x = 0; x < SCREEN_WIDTH; x++){
+                //        Pixel pixelRect = GRID[x][y];  // Get the pixel at this position
+
+                //         // If the pixel isn't EMPTY, render it
+                //         if (GRID[x][y].type != EMPTY) {
+
+                //             if (GRID[x][y+1].type == EMPTY)
+                //             {
+                //                 GRID[x][y].type = emptyPixel.type;
+                //                 GRID[x][y+1].type = emptyPixel.type;
+                //                 setPixel(pixelRect, x, y+1); 
+                //             }
+                            
+                            
+                //         }
+                //     }
+                // }
+
+                // // for (int y = SCREEN_HEIGHT; y < 0; y--){
+                // //     for (int x = SCREEN_WIDTH; x < SCREEN_WIDTH; x--){
+                // //        Pixel pixelRect = GRID[x][y];  // Get the pixel at this position
+
+                // //         if (GRID[x][y].type != EMPTY && GRID[x][y+1].type == EMPTY) {
+
+                // //             GRID[x][y].type = emptyPixel.type; 
+                // //             GRID[x][y+1].type = sandPixel.type; 
+                // //             setPixel(pixelRect, x, y); 
+                // //             setPixel(pixelRect, x, y+1); 
+                           
+                // //         }
+                // //     }
+                // // }
+
+                // // for (int y = 0; y < SCREEN_HEIGHT; y++){
+                // //     for (int x = 0; x < SCREEN_WIDTH; x++){
+                // //        Pixel pixelRect = GRID[x][y];  // Get the pixel at this position
+                // //        pixelRect.updatedYet = false; 
+                // //     }
+                // // }
+                
