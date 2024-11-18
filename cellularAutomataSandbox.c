@@ -341,11 +341,12 @@ int main(int argc, char* args[]) {
                                     GRID[x][y + 1] = GRID[x][y]; // Move the block down
                                     GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
                                 }
-                                // else{
-                                //     printf("X and y pos is: (%d , %d)", x, y); 
-                                // }
                                 else if(x + 1 < GRID_WIDTH && GRID[x-1][y+1].type == EMPTY && y != 61){
                                     GRID[x-1][y+1] = GRID[x][y]; // Move the block down
+                                    GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
+                                }
+                                else if(x + 1 < GRID_WIDTH && GRID[x+1][y+1].type == EMPTY && y != 61){
+                                    GRID[x+1][y+1] = GRID[x][y]; // Move the block down
                                     GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
                                 }
                             }
