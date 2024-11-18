@@ -7,7 +7,6 @@
 #include <stdbool.h>
 
 
-
 // Screen dimension constants
 const int SCREEN_WIDTH = 1392;
 const int SCREEN_HEIGHT = 744;
@@ -254,6 +253,8 @@ int main(int argc, char* args[]) {
             SDL_Event event; // Event handler
 
             bool pressed = false;
+            int mouseX = 0, mouseY = 0;  // Tracks the mouse's current position
+
 
 
             Pixel sandPixel = {SAND, 0, 25, false, {194, 178, 128, 255}};
@@ -262,7 +263,7 @@ int main(int argc, char* args[]) {
 
             for (int y = 0; y < GRID_HEIGHT; y++) {
                 for (int x = 0; x < GRID_WIDTH; x++) {
-                    GRID[x][y] = emptyPixel;
+                    GRID[x][y].type = emptyPixel.type;
                 }
             }
 
@@ -275,7 +276,7 @@ int main(int argc, char* args[]) {
             while (!quit) {
                 while (SDL_PollEvent(&event) != 0) { // Handle events
 
-                //place controls below...
+                    //place controls below...
                     if (event.type == SDL_QUIT) quit = 1; // User requests quit
                     if (event.type == SDL_KEYDOWN){
                         if (event.key.keysym.sym == SDLK_ESCAPE) quit = 1; // Exit on pressing the escape key
@@ -287,14 +288,6 @@ int main(int argc, char* args[]) {
                         {
                             pressed = true; 
 
-                            int x = event.button.x / PIXEL_SIZE;
-                            int y = event.button.y / PIXEL_SIZE;
-
-                                
-                            if (GRID[x][y].type == EMPTY){
-                                GRID[x][y].type = sandPixel.type; 
-                                GRID[x][y].color = sandPixel.color; 
-                            }
                         }
                         
                     }
@@ -306,30 +299,33 @@ int main(int argc, char* args[]) {
                         }
                     }
 
-                    if (event.type == SDL_MOUSEMOTION && pressed){
+                    if (event.type == SDL_MOUSEMOTION){
 
 
 
-                        int x = event.motion.x / PIXEL_SIZE;
-                        int y = event.motion.y / PIXEL_SIZE;
-
-                                
-                        if (x >= 0 && x < SCREEN_WIDTH && y >= 0 && y < SCREEN_HEIGHT){
-                            GRID[x][y].type = sandPixel.type; 
-                            GRID[x][y].color = sandPixel.color; 
-                        }
-                        
+                        mouseX = event.motion.x / PIXEL_SIZE;
+                        mouseY = event.motion.y / PIXEL_SIZE;
                         
                     }
 
                 }
+                
+                
+                
                 // Clear screen with black background
                 SDL_SetRenderDrawColor(gRenderer, 110, 110, 110, 255);
                 SDL_RenderClear(gRenderer); 
 
+                if (pressed)
+                {
+                    if (mouseX >= 0 && mouseX < SCREEN_WIDTH && mouseY >= 0 && mouseY < SCREEN_HEIGHT){
+                        GRID[mouseX][mouseY].type = sandPixel.type; 
+                        GRID[mouseX][mouseY].color = sandPixel.color; 
+                    }                
+                }
+                
 
-              
-
+                
 
                 if (upDated) {
                     for (int y = GRID_HEIGHT - 1; y >= 0; y--) {
@@ -341,11 +337,11 @@ int main(int argc, char* args[]) {
                                     GRID[x][y + 1] = GRID[x][y]; // Move the block down
                                     GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
                                 }
-                                else if(x + 1 < GRID_WIDTH && GRID[x-1][y+1].type == EMPTY && y != 61){
+                                else if(x + 1 < GRID_WIDTH && x - 1 >= 0 && GRID[x-1][y+1].type == EMPTY && y != 61){ //move the block left
                                     GRID[x-1][y+1] = GRID[x][y]; // Move the block down
                                     GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
                                 }
-                                else if(x + 1 < GRID_WIDTH && GRID[x+1][y+1].type == EMPTY && y != 61){
+                                else if(x + 1 < GRID_WIDTH && x + 1 >= 0 && GRID[x+1][y+1].type == EMPTY && y != 61){ //move the block right
                                     GRID[x+1][y+1] = GRID[x][y]; // Move the block down
                                     GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
                                 }
