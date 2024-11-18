@@ -9,8 +9,8 @@
 
 
 // Screen dimension constants
-const int SCREEN_WIDTH = 1400;
-const int SCREEN_HEIGHT = 750;
+const int SCREEN_WIDTH = 1392;
+const int SCREEN_HEIGHT = 744;
 const int PIXEL_SIZE = 12; 
 
 #define GRID_HEIGHT (SCREEN_HEIGHT / PIXEL_SIZE)
@@ -324,11 +324,10 @@ int main(int argc, char* args[]) {
                             // Check if the current cell is not EMPTY
                             if (GRID[x][y].type != EMPTY) {
                                 // Ensure we're not at the bottom row
-                                if (y + 1< GRID_HEIGHT && GRID[x][y + 1].type == EMPTY) {
-                                    // Move the block down
-                                    GRID[x][y + 1] = GRID[x][y]; // Copy current cell to the cell below
+                                if (y + 1 < GRID_HEIGHT && GRID[x][y + 1].type == EMPTY) {
+                                    GRID[x][y + 1] = GRID[x][y]; // Move the block down
                                     GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
-                                }
+                                } 
                             }
                         }
                     }
@@ -370,84 +369,3 @@ int main(int argc, char* args[]) {
     return 0;
 }
 
-
-
-
-
-
-
-                // // for (int y = 0; y < SCREEN_HEIGHT; y++){
-                // //     for (int x = 0; x < SCREEN_WIDTH; x++){
-                // //        Pixel pixelRect = GRID[x][y];  // Get the pixel at this position
-
-
-                // //         if (GRID[x][y].type != EMPTY && GRID[x][y+1].type == EMPTY) {
-                            
-                // //             GRID[x][y].type = EMPTY; 
-                // //             SDL_SetRenderDrawColor(gRenderer, GRID[x][y].color.r, GRID[x][y].color.g, GRID[x][y].color.b, GRID[x][y].color.a);
-                // //             SDL_Rect rectToBeRendered = {x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE}; 
-                // //             SDL_RenderFillRect(gRenderer, &rectToBeRendered);
-                // //             setPixel(pixelRect, x, y+1); 
-
-                // //         }
-
-                // //     }
-                // // }   
-
-
-
-
-                // for (int y = SCREEN_HEIGHT; y >= 0; y--){
-                //     for (int x = 0; x < SCREEN_WIDTH; x++){
-                //        Pixel pixelRect = GRID[x][y];  // Get the pixel at this position
-
-                //         // If the pixel isn't EMPTY, render it
-                //         if (GRID[x][y].type != EMPTY) {
-                //             pixelRect.type = sandPixel.type;
-                //             setPixel(pixelRect, x, y); 
-                //         }
-                //     }
-                // }
-
-
-                // for (int y = SCREEN_HEIGHT; y > 0; y--){
-                //     for (int x = 0; x < SCREEN_WIDTH; x++){
-                //        Pixel pixelRect = GRID[x][y];  // Get the pixel at this position
-
-                //         // If the pixel isn't EMPTY, render it
-                //         if (GRID[x][y].type != EMPTY) {
-
-                //             if (GRID[x][y+1].type == EMPTY)
-                //             {
-                //                 GRID[x][y].type = emptyPixel.type;
-                //                 GRID[x][y+1].type = emptyPixel.type;
-                //                 setPixel(pixelRect, x, y+1); 
-                //             }
-                            
-                            
-                //         }
-                //     }
-                // }
-
-                // // for (int y = SCREEN_HEIGHT; y < 0; y--){
-                // //     for (int x = SCREEN_WIDTH; x < SCREEN_WIDTH; x--){
-                // //        Pixel pixelRect = GRID[x][y];  // Get the pixel at this position
-
-                // //         if (GRID[x][y].type != EMPTY && GRID[x][y+1].type == EMPTY) {
-
-                // //             GRID[x][y].type = emptyPixel.type; 
-                // //             GRID[x][y+1].type = sandPixel.type; 
-                // //             setPixel(pixelRect, x, y); 
-                // //             setPixel(pixelRect, x, y+1); 
-                           
-                // //         }
-                // //     }
-                // // }
-
-                // // for (int y = 0; y < SCREEN_HEIGHT; y++){
-                // //     for (int x = 0; x < SCREEN_WIDTH; x++){
-                // //        Pixel pixelRect = GRID[x][y];  // Get the pixel at this position
-                // //        pixelRect.updatedYet = false; 
-                // //     }
-                // // }
-                
