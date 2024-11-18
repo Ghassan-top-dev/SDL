@@ -289,14 +289,15 @@ int main(int argc, char* args[]) {
                         case SDL_MOUSEBUTTONDOWN:
                             if (event.button.button == SDL_BUTTON_LEFT) {
 
-                                int X = event.button.x / PIXEL_SIZE;
-                                int Y = event.button.y / PIXEL_SIZE;
+                                int x = event.button.x / PIXEL_SIZE;
+                                int y = event.button.y / PIXEL_SIZE;
 
-                                if (GRID[X][Y].type == EMPTY){
+                                if (GRID[x][y].type == EMPTY){
 
-                                    GRID[X][Y].type = sandPixel.type; 
-                                    GRID[X][Y].color = sandPixel.color; 
+                                    GRID[x][y].type = sandPixel.type; 
+                                    GRID[x][y].color = sandPixel.color; 
                                 }
+
 
                                 
 
@@ -340,6 +341,9 @@ int main(int argc, char* args[]) {
                 //     }
                 // }   
 
+
+
+
                 for (int y = 0; y < SCREEN_HEIGHT; y++){
                     for (int x = 0; x < SCREEN_WIDTH; x++){
                        Pixel pixelRect = GRID[x][y];  // Get the pixel at this position
@@ -349,20 +353,19 @@ int main(int argc, char* args[]) {
                             setPixel(pixelRect, x, y); 
                         }
 
-                        if (GRID[x][y].type != EMPTY && GRID[x][y+1].type == EMPTY) {
+                        // if (GRID[x][y].type != EMPTY && GRID[x][y+1].type == EMPTY) {
                             
-                            GRID[x][y].type = emptyPixel.type; 
-                            GRID[x][y+1].type = sandPixel.type; 
-                            SDL_SetRenderDrawColor(gRenderer, GRID[x][y].color.r, GRID[x][y].color.g, GRID[x][y].color.b, GRID[x][y].color.a);
-                            SDL_SetRenderDrawColor(gRenderer, GRID[x][y+1].color.r, GRID[x][y+1].color.g, GRID[x][y+1].color.b, GRID[x][y+1].color.a);
-                            SDL_Rect rectToBeRendered = {x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE}; 
-                            SDL_RenderFillRect(gRenderer, &rectToBeRendered);
-                            // setPixel(pixelRect, x, y+1); 
+                        //     GRID[x][y].type = emptyPixel.type; 
+                        //     GRID[x][y+1].type = sandPixel.type; 
+                        //     // SDL_SetRenderDrawColor(gRenderer, GRID[x][y].color.r, GRID[x][y].color.g, GRID[x][y].color.b, GRID[x][y].color.a);
+                        //     // SDL_SetRenderDrawColor(gRenderer, GRID[x][y+1].color.r, GRID[x][y+1].color.g, GRID[x][y+1].color.b, GRID[x][y+1].color.a);
+                        //     // SDL_Rect rectToBeRendered = {x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE}; 
+                        //     // SDL_RenderFillRect(gRenderer, &rectToBeRendered);
+                        //     setPixel(pixelRect, x, y+1); 
 
-                        }
+                        // }
                     }
                 }
-
                 
                
 
@@ -370,6 +373,27 @@ int main(int argc, char* args[]) {
                 renderTexture(&gTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dk, dk, dk,dk); 
 
                 SDL_RenderPresent(gRenderer); // Update screen
+
+
+                for (int y = 0; y < SCREEN_HEIGHT; y++){
+                    for (int x = 0; x < SCREEN_WIDTH; x++){
+                       Pixel pixelRect = GRID[x][y];  // Get the pixel at this position
+
+                        if (GRID[x][y].type != EMPTY && GRID[x][y+1].type == EMPTY) {
+                            
+                            GRID[x][y].type = emptyPixel.type; 
+                            GRID[x][y+1].type = sandPixel.type; 
+                            setPixel(pixelRect, x, y); 
+                            setPixel(pixelRect, x, y+1); 
+
+                        }
+                    }
+                }
+
+                SDL_RenderPresent(gRenderer); // Update screen
+
+
+                
             }
         }
     }
