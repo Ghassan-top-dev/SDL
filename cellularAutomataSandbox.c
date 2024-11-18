@@ -55,7 +55,8 @@ void freeTexture(LTexture* lTexture); // Frees texture memory
 void renderTexture(LTexture* lTexture, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip); // Renders texture to screen
 int getTextureWidth(LTexture* lTexture); // Returns texture width
 int getTextureHeight(LTexture* lTexture); // Returns texture height
-// void setPixel(Pixel *cell, int type, x, y); 
+void setPixel(Pixel rect, int x, int y); 
+
 
 
 // Global variables for the SDL window, renderer, font, and text texture
@@ -238,16 +239,6 @@ void setPixel(Pixel rect, int x, int y) {
     SDL_RenderFillRect(gRenderer, &rectToBeRendered);
 }
 
-// void dropPixels(Pixel rect, int x, int y) {
-//     SDL_SetRenderDrawColor(gRenderer, rect.color.r, rect.color.g, rect.color.b, rect.color.a);
-//     SDL_Rect rectToBeRendered = {x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE}; 
-//     SDL_RenderFillRect(gRenderer, &rectToBeRendered);
-// }
-
-
-
-
-
 
 
 //This is where the magic happens...
@@ -261,6 +252,9 @@ int main(int argc, char* args[]) {
         } else {
             int quit = 0; // Main loop flag
             SDL_Event event; // Event handler
+
+            bool pressed = false;
+
 
             Pixel sandPixel = {SAND, 0, 25, false, {194, 178, 128, 255}};
             Pixel emptyPixel = {EMPTY, 0, 0, false, {0, 0, 0, 255}};
@@ -286,28 +280,46 @@ int main(int argc, char* args[]) {
                     if (event.type == SDL_KEYDOWN){
                         if (event.key.keysym.sym == SDLK_ESCAPE) quit = 1; // Exit on pressing the escape key
                     }
-                
 
-                    switch (event.type) {
-                        case SDL_MOUSEBUTTONDOWN:
-                            if (event.button.button == SDL_BUTTON_LEFT) {
 
-                                int x = event.button.x / PIXEL_SIZE;
-                                int y = event.button.y / PIXEL_SIZE;
+                    if (event.type == SDL_MOUSEBUTTONDOWN){
+                        if (event.button.button == SDL_BUTTON_LEFT)
+                        {
+                            pressed = true; 
 
-                                if (GRID[x][y].type == EMPTY){
-                                    GRID[x][y].type = sandPixel.type; 
-                                    GRID[x][y].color = sandPixel.color; 
-                                }
+                            int x = event.button.x / PIXEL_SIZE;
+                            int y = event.button.y / PIXEL_SIZE;
 
+                                
+                            if (GRID[x][y].type == EMPTY){
+                                GRID[x][y].type = sandPixel.type; 
+                                GRID[x][y].color = sandPixel.color; 
                             }
-                            break;
-                        case SDL_MOUSEBUTTONUP:
-                           
-                            break;
-                        case SDL_MOUSEMOTION:
-                            
-                            break;
+                        }
+                        
+                    }
+
+                    if (event.type == SDL_MOUSEBUTTONUP){
+                         if (event.button.button == SDL_BUTTON_LEFT)
+                        {
+                            pressed = false; 
+                        }
+                    }
+
+                    if (event.type == SDL_MOUSEMOTION && pressed){
+
+
+
+                        int x = event.motion.x / PIXEL_SIZE;
+                        int y = event.motion.y / PIXEL_SIZE;
+
+                                
+                        if (x >= 0 && x < SCREEN_WIDTH && y >= 0 && y < SCREEN_HEIGHT){
+                            GRID[x][y].type = sandPixel.type; 
+                            GRID[x][y].color = sandPixel.color; 
+                        }
+                        
+                        
                     }
 
                 }
@@ -316,6 +328,7 @@ int main(int argc, char* args[]) {
                 SDL_RenderClear(gRenderer); 
 
 
+              
 
 
                 if (upDated) {
@@ -338,6 +351,15 @@ int main(int argc, char* args[]) {
 
 
 
+                
+
+
+                
+
+
+
+
+
 
                 
                 for (int y = 0; y < GRID_HEIGHT; y++){
@@ -351,6 +373,9 @@ int main(int argc, char* args[]) {
                         }                         
                     }
                 } 
+                
+                
+                
 
                 upDated = true; 
                 
