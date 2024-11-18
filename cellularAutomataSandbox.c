@@ -23,6 +23,10 @@ typedef struct {
 } LTexture;
 
 
+SDL_Color textColor = {255, 255, 255}; // text color
+
+
+
 //Code for the sandbox
 typedef enum {
     EMPTY = 0,
@@ -120,10 +124,9 @@ bool loadMedia() {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
         success = false;
     } else {
-        SDL_Color textColor = {255, 255, 255}; // text color
 
         // Render the text to create a texture
-        if (!loadFromRenderedText(&gTextTexture, "CIRCLE", textColor)) {
+        if (!loadFromRenderedText(&gTextTexture, " ", textColor)) {
             printf("Failed to render text texture!\n");
             success = false;
         }
@@ -254,10 +257,13 @@ int main(int argc, char* args[]) {
 
             bool pressed = false;
             int mouseX = 0, mouseY = 0;  // Tracks the mouse's current position
+            int mode = 0; char modePresented[32];
+
 
 
 
             Pixel sandPixel = {SAND, 0, 25, false, {194, 178, 128, 255}};
+            Pixel waterPixel = {WATER, 0, 25, false, {15, 94, 156, 255}};
             Pixel emptyPixel = {EMPTY, 0, 0, false, {0, 0, 0, 255}};
 
 
@@ -280,6 +286,13 @@ int main(int argc, char* args[]) {
                     if (event.type == SDL_QUIT) quit = 1; // User requests quit
                     if (event.type == SDL_KEYDOWN){
                         if (event.key.keysym.sym == SDLK_ESCAPE) quit = 1; // Exit on pressing the escape key
+                        // these control which substance
+                        if (event.key.keysym.sym == SDLK_UP) mode+=1;
+                        if (event.key.keysym.sym == SDLK_DOWN) mode-=1;
+
+
+                        
+                        
                     }
 
 
@@ -300,9 +313,6 @@ int main(int argc, char* args[]) {
                     }
 
                     if (event.type == SDL_MOUSEMOTION){
-
-
-
                         mouseX = event.motion.x / PIXEL_SIZE;
                         mouseY = event.motion.y / PIXEL_SIZE;
                         
@@ -316,13 +326,28 @@ int main(int argc, char* args[]) {
                 SDL_SetRenderDrawColor(gRenderer, 110, 110, 110, 255);
                 SDL_RenderClear(gRenderer); 
 
+
                 if (pressed)
                 {
-                    if (mouseX >= 0 && mouseX < SCREEN_WIDTH && mouseY >= 0 && mouseY < SCREEN_HEIGHT){
-                        GRID[mouseX][mouseY].type = sandPixel.type; 
-                        GRID[mouseX][mouseY].color = sandPixel.color; 
-                    }                
+                    if (mode == 1)
+                    {
+                        if (mouseX >= 0 && mouseX < SCREEN_WIDTH && mouseY >= 0 && mouseY < SCREEN_HEIGHT){
+                            GRID[mouseX][mouseY].type = sandPixel.type; 
+                            GRID[mouseX][mouseY].color = sandPixel.color; 
+                        }    
+                    }
+
+                    if (mode == 2)
+                    {
+                        if (mouseX >= 0 && mouseX < SCREEN_WIDTH && mouseY >= 0 && mouseY < SCREEN_HEIGHT){
+                            GRID[mouseX][mouseY].type = waterPixel.type; 
+                            GRID[mouseX][mouseY].color = waterPixel.color; 
+                        }    
+                    }
+                                
                 }
+                sprintf(modePresented, "Mode: %d", mode); 
+                loadFromRenderedText(&gTextTexture, modePresented, textColor);
                 
 
                 
