@@ -9,7 +9,7 @@
 // Screen dimension constants
 const int SCREEN_WIDTH = 1400;
 const int SCREEN_HEIGHT = 750;
-const int PIXEL_SIZE = 2; 
+const int PIXEL_SIZE = 12; 
 
 // Texture wrapper structure to hold texture data and dimensions
 typedef struct {
@@ -30,12 +30,12 @@ typedef enum {
 
 typedef struct {
     PixelType type;          // Pixel type, e.g., EMPTY, SAND
-    // int lifetime;      // How long this pixel has existed
-    // int temperature;   // Temperature of the pixel (useful for fire)
+    int lifetime;      // How long this pixel has existed
+    int temperature;   // Temperature of the pixel (useful for fire)
+    int updatedYet;
     SDL_Color color;   // Pixel color for rendering
 } Pixel;
 
-Pixel emptyPixel = {EMPTY, 0, 0, {0, 0, 0, 255}};
 
 Pixel GRID[SCREEN_WIDTH][SCREEN_HEIGHT]; 
 
@@ -50,6 +50,8 @@ void freeTexture(LTexture* lTexture); // Frees texture memory
 void renderTexture(LTexture* lTexture, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip); // Renders texture to screen
 int getTextureWidth(LTexture* lTexture); // Returns texture width
 int getTextureHeight(LTexture* lTexture); // Returns texture height
+// void setPixel(Pixel *cell, int type, x, y); 
+
 
 // Global variables for the SDL window, renderer, font, and text texture
 SDL_Window* gWindow = NULL;
@@ -225,6 +227,24 @@ int getTextureHeight(LTexture* lTexture) {
 }
 
 
+void setPixel(Pixel rect, int x, int y) {
+    SDL_SetRenderDrawColor(gRenderer, rect.color.r, rect.color.g, rect.color.b, rect.color.a);
+    SDL_Rect rectToBeRendered = {x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE}; 
+    SDL_RenderFillRect(gRenderer, &rectToBeRendered);
+}
+
+// void dropPixels(Pixel rect, int x, int y) {
+//     SDL_SetRenderDrawColor(gRenderer, rect.color.r, rect.color.g, rect.color.b, rect.color.a);
+//     SDL_Rect rectToBeRendered = {x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE}; 
+//     SDL_RenderFillRect(gRenderer, &rectToBeRendered);
+// }
+
+
+
+
+
+
+
 //This is where the magic happens...
 // Main function - sets up SDL, loads media, runs main loop, and cleans up
 int main(int argc, char* args[]) {
@@ -244,7 +264,9 @@ int main(int argc, char* args[]) {
             }
 
 
-            Pixel sandPixel = {SAND, 0, 25, {194, 178, 128, 255}};
+            Pixel sandPixel = {SAND, 0, 25, 0, {194, 178, 128, 255}};
+            Pixel emptyPixel = {EMPTY, 0, 0, 0, {0, 0, 0, 255}};
+
 
 
             
@@ -270,11 +292,17 @@ int main(int argc, char* args[]) {
                                 int X = event.button.x / PIXEL_SIZE;
                                 int Y = event.button.y / PIXEL_SIZE;
 
-                                if (GRID[X][Y].type == EMPTY)
-                                {
+                                if (GRID[X][Y].type == EMPTY){
+
                                     GRID[X][Y].type = sandPixel.type; 
                                     GRID[X][Y].color = sandPixel.color; 
                                 }
+
+                                
+
+                                
+
+                              
                                 
 
 
@@ -290,8 +318,27 @@ int main(int argc, char* args[]) {
 
                 }
                 // Clear screen with black background
-                SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
-                SDL_RenderClear(gRenderer);     
+                SDL_SetRenderDrawColor(gRenderer, 110, 110, 110, 255);
+                SDL_RenderClear(gRenderer);  
+
+
+                // for (int y = 0; y < SCREEN_HEIGHT; y++){
+                //     for (int x = 0; x < SCREEN_WIDTH; x++){
+                //        Pixel pixelRect = GRID[x][y];  // Get the pixel at this position
+
+
+                //         if (GRID[x][y].type != EMPTY && GRID[x][y+1].type == EMPTY) {
+                            
+                //             GRID[x][y].type = EMPTY; 
+                //             SDL_SetRenderDrawColor(gRenderer, GRID[x][y].color.r, GRID[x][y].color.g, GRID[x][y].color.b, GRID[x][y].color.a);
+                //             SDL_Rect rectToBeRendered = {x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE}; 
+                //             SDL_RenderFillRect(gRenderer, &rectToBeRendered);
+                //             setPixel(pixelRect, x, y+1); 
+
+                //         }
+
+                //     }
+                // }   
 
                 for (int y = 0; y < SCREEN_HEIGHT; y++){
                     for (int x = 0; x < SCREEN_WIDTH; x++){
@@ -299,20 +346,24 @@ int main(int argc, char* args[]) {
 
                         // If the pixel isn't EMPTY, render it
                         if (GRID[x][y].type != EMPTY) {
-                            SDL_SetRenderDrawColor(gRenderer, pixelRect.color.r, pixelRect.color.g, pixelRect.color.b, pixelRect.color.a);
-
-                            // SDL_Rect rect = {stepperX, stepperY, 20, 20}; // posx, posy, sizex, sizey
-
-                            SDL_Rect rectToBeRendered = {x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE}; 
-
-                            // Render the pixel as a rectangle (you can adjust the size based on your grid size)
-                            SDL_RenderFillRect(gRenderer, &rectToBeRendered);
+                            setPixel(pixelRect, x, y); 
                         }
 
+                        if (GRID[x][y].type != EMPTY && GRID[x][y+1].type == EMPTY) {
+                            
+                            GRID[x][y].type = emptyPixel.type; 
+                            GRID[x][y+1].type = sandPixel.type; 
+                            SDL_SetRenderDrawColor(gRenderer, GRID[x][y].color.r, GRID[x][y].color.g, GRID[x][y].color.b, GRID[x][y].color.a);
+                            SDL_SetRenderDrawColor(gRenderer, GRID[x][y+1].color.r, GRID[x][y+1].color.g, GRID[x][y+1].color.b, GRID[x][y+1].color.a);
+                            SDL_Rect rectToBeRendered = {x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE}; 
+                            SDL_RenderFillRect(gRenderer, &rectToBeRendered);
+                            // setPixel(pixelRect, x, y+1); 
 
-
+                        }
                     }
                 }
+
+                
                
 
                 //this is for text
