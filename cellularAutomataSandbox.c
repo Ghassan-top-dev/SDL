@@ -295,10 +295,14 @@ RGB get_next_color(void) {
 // struct Pixel { int type; /* other properties */ };
 // enum { EMPTY, WATER, SAND, RAINBOW };
 
-void update_water(Pixel (*GRID)[1392][744], const Pixel emptyPixel) {
+void update_water(Pixel (*GRID)[SCREEN_WIDTH][SCREEN_HEIGHT], const Pixel emptyPixel) {
     // First pass: move particles down
-    for (int y = 744 - 2; y >= 0; --y) {
-        for (int x = 0; x < 1392; ++x) {
+    // for (int y = GRID_HEIGHT - 1; y >= 0; --y) {
+    //     for (int x = GRID_WIDTH -1; x >= 0; --x) {
+
+
+    for (int y = GRID_HEIGHT - 1; y >= 0; --y) {
+        for (int x = 0; x < GRID_WIDTH; ++x) {
             if ((*GRID)[x][y].type == WATER) {
                 // Try to move down
                 if ((*GRID)[x][y + 1].type == EMPTY) {
@@ -310,19 +314,19 @@ void update_water(Pixel (*GRID)[1392][744], const Pixel emptyPixel) {
     }
     
     // Second pass: handle horizontal spreading
-    for (int y = 744 - 1; y >= 0; --y) {
+    for (int y = GRID_HEIGHT - 1; y >= 0; --y) {
         // Alternate scanning direction each row for more natural spreading
         if (y % 2 == 0) {
             // Scan left to right
-            for (int x = 0; x < 1392; ++x) {
+            for (int x = 0; x < GRID_WIDTH; ++x) {
                 if ((*GRID)[x][y].type == WATER) {
-                    if (y + 1 >= 744 || (*GRID)[x][y + 1].type != EMPTY) {
+                    if (y + 1 >= GRID_WIDTH || (*GRID)[x][y + 1].type != EMPTY) {
                         // Try to spread randomly left or right first
                         int direction = (rand() % 2) * 2 - 1; // -1 or 1
                         
                         // First direction
                         int newX = x + direction;
-                        if (newX >= 0 && newX < 1392 && (*GRID)[newX][y].type == EMPTY) {
+                        if (newX >= 0 && newX < GRID_WIDTH && (*GRID)[newX][y].type == EMPTY) {
                             (*GRID)[newX][y] = (*GRID)[x][y];
                             (*GRID)[x][y] = emptyPixel;
                             continue;
@@ -330,14 +334,14 @@ void update_water(Pixel (*GRID)[1392][744], const Pixel emptyPixel) {
                         
                         // Try opposite direction
                         newX = x - direction;
-                        if (newX >= 0 && newX < 1392 && (*GRID)[newX][y].type == EMPTY) {
+                        if (newX >= 0 && newX < GRID_WIDTH && (*GRID)[newX][y].type == EMPTY) {
                             (*GRID)[newX][y] = (*GRID)[x][y];
                             (*GRID)[x][y] = emptyPixel;
                         }
                         
                         // Try diagonal movement if horizontal movement wasn't possible
-                        if (y + 1 < 744) {
-                            if (x + 1 < 1392 && (*GRID)[x + 1][y + 1].type == EMPTY) {
+                        if (y + 1 < GRID_HEIGHT) {
+                            if (x + 1 < GRID_WIDTH && (*GRID)[x + 1][y + 1].type == EMPTY) {
                                 (*GRID)[x + 1][y + 1] = (*GRID)[x][y];
                                 (*GRID)[x][y] = emptyPixel;
                             } else if (x - 1 >= 0 && (*GRID)[x - 1][y + 1].type == EMPTY) {
@@ -348,28 +352,29 @@ void update_water(Pixel (*GRID)[1392][744], const Pixel emptyPixel) {
                     }
                 }
             }
-        } else {
+        } 
+        else {
             // Scan right to left
-            for (int x = 1392 - 1; x >= 0; --x) {
+            for (int x = GRID_WIDTH - 1; x >= 0; --x) {
                 if ((*GRID)[x][y].type == WATER) {
-                    if (y + 1 >= 744 || (*GRID)[x][y + 1].type != EMPTY) {
+                    if (y + 1 >= GRID_HEIGHT || (*GRID)[x][y + 1].type != EMPTY) {
                         int direction = (rand() % 2) * 2 - 1;
                         
                         int newX = x + direction;
-                        if (newX >= 0 && newX < 1392 && (*GRID)[newX][y].type == EMPTY) {
+                        if (newX >= 0 && newX < GRID_WIDTH && (*GRID)[newX][y].type == EMPTY) {
                             (*GRID)[newX][y] = (*GRID)[x][y];
                             (*GRID)[x][y] = emptyPixel;
                             continue;
                         }
                         
                         newX = x - direction;
-                        if (newX >= 0 && newX < 1392 && (*GRID)[newX][y].type == EMPTY) {
+                        if (newX >= 0 && newX < GRID_WIDTH && (*GRID)[newX][y].type == EMPTY) {
                             (*GRID)[newX][y] = (*GRID)[x][y];
                             (*GRID)[x][y] = emptyPixel;
                         }
                         
-                        if (y + 1 < 744) {
-                            if (x + 1 < 1392 && (*GRID)[x + 1][y + 1].type == EMPTY) {
+                        if (y + 1 < GRID_HEIGHT) {
+                            if (x + 1 < GRID_WIDTH && (*GRID)[x + 1][y + 1].type == EMPTY) {
                                 (*GRID)[x + 1][y + 1] = (*GRID)[x][y];
                                 (*GRID)[x][y] = emptyPixel;
                             } else if (x - 1 >= 0 && (*GRID)[x - 1][y + 1].type == EMPTY) {
