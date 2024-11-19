@@ -349,31 +349,34 @@ int main(int argc, char* args[]) {
                 
                 
                 
-                for (int y = GRID_HEIGHT - 1; y >= 0; y--) {
-                    for (int x = GRID_WIDTH-1; x >= 0; x--) {
+                for (int y = GRID_HEIGHT - 1; y >= 0; --y) {
+                    for (int x = GRID_WIDTH -1; x >= 0; --x) {
                         // Check if the current cell is not EMPTY
 
                         if (GRID[x][y].type == WATER) {
-                            // Ensure we're not at the bottom row
+                            // Attempt to move down first
                             if (y + 1 < GRID_HEIGHT && GRID[x][y + 1].type == EMPTY) {
-                                GRID[x][y + 1] = GRID[x][y]; // Move the block down
-                                GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
+                                GRID[x][y + 1] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
                             }
-                            else if(x + 1 < GRID_WIDTH && x - 1 >= 0 && GRID[x-1][y+1].type == EMPTY && y != 61){ //move the block left
-                                GRID[x-1][y+1] = GRID[x][y]; // Move the block down
-                                GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
+                            // Try to move diagonally left if down isn't possible
+                            else if (x - 1 >= 0 && y + 1 < GRID_HEIGHT && GRID[x - 1][y + 1].type == EMPTY) {
+                                GRID[x - 1][y + 1] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
                             }
-                            else if(x + 1 < GRID_WIDTH && x + 1 >= 0 && GRID[x+1][y+1].type == EMPTY && y != 61){ //move the block right
-                                GRID[x+1][y+1] = GRID[x][y]; // Move the block down
-                                GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
+                            // Try to move diagonally right if down isn't possible
+                            else if (x + 1 < GRID_WIDTH && y + 1 < GRID_HEIGHT && GRID[x + 1][y + 1].type == EMPTY) {
+                                GRID[x + 1][y + 1] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
                             }
-                            else if(x + 1 < GRID_WIDTH && x + 1 >= 0 && GRID[x+1][y].type == EMPTY && y != 61){ //move the block right
-                                GRID[x+1][y] = GRID[x][y]; // Move the block down
-                                GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
+                            // Horizontal movement as a last resort
+                            else if (x - 1 >= 0 && GRID[x - 1][y].type == EMPTY) {
+                                GRID[x - 1][y] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
                             }
-                            else if(x + 1 < GRID_WIDTH && x - 1 >= 0 && GRID[x-1][y].type == EMPTY && y != 61){ //move the block left
-                                GRID[x-1][y] = GRID[x][y]; // Move the block down
-                                GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
+                            else if (x + 1 < GRID_WIDTH && GRID[x + 1][y].type == EMPTY) {
+                                GRID[x + 1][y] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
                             }
                         }
                         
