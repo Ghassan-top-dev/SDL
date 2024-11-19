@@ -10,7 +10,7 @@
 // Screen dimension constants
 const int SCREEN_WIDTH = 1392;
 const int SCREEN_HEIGHT = 744;
-const int PIXEL_SIZE = 8; 
+const int PIXEL_SIZE = 4; 
 
 #define GRID_HEIGHT (SCREEN_HEIGHT / PIXEL_SIZE)
 #define GRID_WIDTH (SCREEN_WIDTH / PIXEL_SIZE)
@@ -60,6 +60,8 @@ void renderTexture(LTexture* lTexture, int x, int y, SDL_Rect* clip, double angl
 int getTextureWidth(LTexture* lTexture); // Returns texture width
 int getTextureHeight(LTexture* lTexture); // Returns texture height
 void setPixel(Pixel rect, int x, int y); 
+void update_water(Pixel GRID[SCREEN_WIDTH][SCREEN_HEIGHT], const Pixel emptyPixel);
+void dropperSize(const Pixel pixelType, int mouseX, int mouseY, int sizeOfDropping); 
 
 
 
@@ -67,7 +69,10 @@ void setPixel(Pixel rect, int x, int y);
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
 TTF_Font* gFont = NULL;
-LTexture gTextTexture; // Texture to display text
+LTexture modeTextTexture; // Texture to display text
+LTexture SizeOfDropperTexture; // Texture to display text
+
+
 
 // Initializes SDL, creates window and renderer, sets up image and text libraries
 bool init() {
@@ -127,7 +132,13 @@ bool loadMedia() {
     } else {
 
         // Render the text to create a texture
-        if (!loadFromRenderedText(&gTextTexture, " ", textColor)) {
+        if (!loadFromRenderedText(&modeTextTexture, " ", textColor)) {
+            printf("Failed to render text texture!\n");
+            success = false;
+        }
+
+        // Render the text to create a texture
+        if (!loadFromRenderedText(&SizeOfDropperTexture, " ", textColor)) {
             printf("Failed to render text texture!\n");
             success = false;
         }
@@ -137,7 +148,7 @@ bool loadMedia() {
 
 // Frees up resources and shuts down SDL libraries
 void close() {
-    freeTexture(&gTextTexture); // Free text texture
+    freeTexture(&modeTextTexture); // Free text texture
 
     TTF_CloseFont(gFont); // Close font
     gFont = NULL;
@@ -295,19 +306,16 @@ RGB get_next_color(void) {
 // struct Pixel { int type; /* other properties */ };
 // enum { EMPTY, WATER, SAND, RAINBOW };
 
-void update_water(Pixel (*GRID)[SCREEN_WIDTH][SCREEN_HEIGHT], const Pixel emptyPixel) {
+void update_water(Pixel GRID[SCREEN_WIDTH][SCREEN_HEIGHT], const Pixel emptyPixel) {
     // First pass: move particles down
-    // for (int y = GRID_HEIGHT - 1; y >= 0; --y) {
-    //     for (int x = GRID_WIDTH -1; x >= 0; --x) {
-
 
     for (int y = GRID_HEIGHT - 1; y >= 0; --y) {
         for (int x = 0; x < GRID_WIDTH; ++x) {
-            if ((*GRID)[x][y].type == WATER) {
+            if (GRID[x][y].type == WATER) {
                 // Try to move down
-                if ((*GRID)[x][y + 1].type == EMPTY) {
-                    (*GRID)[x][y + 1] = (*GRID)[x][y];
-                    (*GRID)[x][y] = emptyPixel;
+                if (GRID[x][y + 1].type == EMPTY) {
+                    GRID[x][y + 1] = GRID[x][y];
+                    GRID[x][y] = emptyPixel;
                 }
             }
         }
@@ -319,34 +327,36 @@ void update_water(Pixel (*GRID)[SCREEN_WIDTH][SCREEN_HEIGHT], const Pixel emptyP
         if (y % 2 == 0) {
             // Scan left to right
             for (int x = 0; x < GRID_WIDTH; ++x) {
-                if ((*GRID)[x][y].type == WATER) {
-                    if (y + 1 >= GRID_WIDTH || (*GRID)[x][y + 1].type != EMPTY) {
+                if (GRID[x][y].type == WATER) {
+                    if (y + 1 >= GRID_WIDTH || GRID[x][y + 1].type != EMPTY) {
                         // Try to spread randomly left or right first
+                        
                         int direction = (rand() % 2) * 2 - 1; // -1 or 1
                         
                         // First direction
                         int newX = x + direction;
-                        if (newX >= 0 && newX < GRID_WIDTH && (*GRID)[newX][y].type == EMPTY) {
-                            (*GRID)[newX][y] = (*GRID)[x][y];
-                            (*GRID)[x][y] = emptyPixel;
+                        if (newX >= 0 && newX < GRID_WIDTH && GRID[newX][y].type == EMPTY) {
+                            GRID[newX][y] = GRID[x][y];
+                            GRID[x][y] = emptyPixel;
                             continue;
                         }
                         
                         // Try opposite direction
                         newX = x - direction;
-                        if (newX >= 0 && newX < GRID_WIDTH && (*GRID)[newX][y].type == EMPTY) {
-                            (*GRID)[newX][y] = (*GRID)[x][y];
-                            (*GRID)[x][y] = emptyPixel;
+                        if (newX >= 0 && newX < GRID_WIDTH && GRID[newX][y].type == EMPTY) {
+                            GRID[newX][y] = GRID[x][y];
+                            GRID[x][y] = emptyPixel;
                         }
                         
                         // Try diagonal movement if horizontal movement wasn't possible
                         if (y + 1 < GRID_HEIGHT) {
-                            if (x + 1 < GRID_WIDTH && (*GRID)[x + 1][y + 1].type == EMPTY) {
-                                (*GRID)[x + 1][y + 1] = (*GRID)[x][y];
-                                (*GRID)[x][y] = emptyPixel;
-                            } else if (x - 1 >= 0 && (*GRID)[x - 1][y + 1].type == EMPTY) {
-                                (*GRID)[x - 1][y + 1] = (*GRID)[x][y];
-                                (*GRID)[x][y] = emptyPixel;
+                            if (x + 1 < GRID_WIDTH && GRID[x + 1][y + 1].type == EMPTY) {
+                                GRID[x + 1][y + 1] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
+                            } 
+                            else if (x - 1 >= 0 && GRID[x - 1][y + 1].type == EMPTY) {
+                                GRID[x - 1][y + 1] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
                             }
                         }
                     }
@@ -356,30 +366,32 @@ void update_water(Pixel (*GRID)[SCREEN_WIDTH][SCREEN_HEIGHT], const Pixel emptyP
         else {
             // Scan right to left
             for (int x = GRID_WIDTH - 1; x >= 0; --x) {
-                if ((*GRID)[x][y].type == WATER) {
-                    if (y + 1 >= GRID_HEIGHT || (*GRID)[x][y + 1].type != EMPTY) {
-                        int direction = (rand() % 2) * 2 - 1;
+                if (GRID[x][y].type == WATER) {
+                    if (y + 1 >= GRID_HEIGHT || GRID[x][y + 1].type != EMPTY) {
                         
+                        int direction = (rand() % 2) * 2 - 1;
+
                         int newX = x + direction;
-                        if (newX >= 0 && newX < GRID_WIDTH && (*GRID)[newX][y].type == EMPTY) {
-                            (*GRID)[newX][y] = (*GRID)[x][y];
-                            (*GRID)[x][y] = emptyPixel;
+                        if (newX >= 0 && newX < GRID_WIDTH && GRID[newX][y].type == EMPTY) {
+                            GRID[newX][y] = GRID[x][y];
+                            GRID[x][y] = emptyPixel;
                             continue;
                         }
                         
                         newX = x - direction;
-                        if (newX >= 0 && newX < GRID_WIDTH && (*GRID)[newX][y].type == EMPTY) {
-                            (*GRID)[newX][y] = (*GRID)[x][y];
-                            (*GRID)[x][y] = emptyPixel;
+                        if (newX >= 0 && newX < GRID_WIDTH && GRID[newX][y].type == EMPTY) {
+                            GRID[newX][y] = GRID[x][y];
+                            GRID[x][y] = emptyPixel;
                         }
                         
                         if (y + 1 < GRID_HEIGHT) {
-                            if (x + 1 < GRID_WIDTH && (*GRID)[x + 1][y + 1].type == EMPTY) {
-                                (*GRID)[x + 1][y + 1] = (*GRID)[x][y];
-                                (*GRID)[x][y] = emptyPixel;
-                            } else if (x - 1 >= 0 && (*GRID)[x - 1][y + 1].type == EMPTY) {
-                                (*GRID)[x - 1][y + 1] = (*GRID)[x][y];
-                                (*GRID)[x][y] = emptyPixel;
+                            if (x + 1 < GRID_WIDTH && GRID[x + 1][y + 1].type == EMPTY) {
+                                GRID[x + 1][y + 1] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
+                            } 
+                            else if (x - 1 >= 0 && GRID[x - 1][y + 1].type == EMPTY) {
+                                GRID[x - 1][y + 1] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
                             }
                         }
                     }
@@ -387,6 +399,23 @@ void update_water(Pixel (*GRID)[SCREEN_WIDTH][SCREEN_HEIGHT], const Pixel emptyP
             }
         }
     }
+}
+
+
+void dropperSize(const Pixel pixelType, int mouseX, int mouseY, int sizeOfDropping){
+
+    if (mouseX >= 0 && mouseX < SCREEN_WIDTH && mouseY >= 0 && mouseY < SCREEN_HEIGHT){                  
+        for (int dx = 0; dx < sizeOfDropping; dx++)
+        {
+            int commonality = (rand() % 2) * 2 - 1; // -1 or 1
+            int changeInX = mouseX;
+            changeInX+= commonality; 
+
+            GRID[changeInX+dx][mouseY].type = pixelType.type; 
+            GRID[changeInX+dx][mouseY].color = pixelType.color; 
+            changeInX+= commonality; 
+        } 
+    }   
 }
 
 
@@ -404,7 +433,8 @@ int main(int argc, char* args[]) {
 
             bool pressed = false;
             int mouseX = 0, mouseY = 0;  // Tracks the mouse's current position
-            int mode = 0; char modePresented[32];
+            int mode = 0; char modePresented[32]; //which substance
+            int sizeOfDropping = 1; 
 
 
 
@@ -429,8 +459,19 @@ int main(int argc, char* args[]) {
                     if (event.type == SDL_KEYDOWN){
                         if (event.key.keysym.sym == SDLK_ESCAPE) quit = 1; // Exit on pressing the escape key
                         // these control which substance
-                        if (event.key.keysym.sym == SDLK_UP) mode+=1;
-                        if (event.key.keysym.sym == SDLK_DOWN) mode-=1;
+                        if (event.key.keysym.sym == SDLK_RIGHT) mode+=1;
+                        if (event.key.keysym.sym == SDLK_LEFT) mode-=1;
+
+                        if (event.key.keysym.sym == SDLK_UP) sizeOfDropping+=1;
+                        if (event.key.keysym.sym == SDLK_DOWN && sizeOfDropping-1 > 0) sizeOfDropping-=1;
+                        if (event.key.keysym.sym == SDLK_c){
+                            for (int y = 0; y < GRID_HEIGHT; y++) {
+                                for (int x = 0; x < GRID_WIDTH; x++) {
+                                    GRID[x][y].type = emptyPixel.type;
+                                }
+                            }
+                        }
+
 
 
                         
@@ -463,8 +504,6 @@ int main(int argc, char* args[]) {
                 }
 
                 RGB color = get_next_color();
-
-                
                 Pixel rainbowPixel = {RAINBOW, 0, 25, false, {color.r, color.g, color.b, 255}};
 
 
@@ -478,39 +517,24 @@ int main(int argc, char* args[]) {
                 {
                     if (mode == 1)
                     {
-                        if (mouseX >= 0 && mouseX < SCREEN_WIDTH && mouseY >= 0 && mouseY < SCREEN_HEIGHT){
-                            GRID[mouseX][mouseY].type = sandPixel.type; 
-                            GRID[mouseX][mouseY].color = sandPixel.color; 
-                        }    
+                        dropperSize(sandPixel, mouseX, mouseY, sizeOfDropping); 
                     }
-
                     if (mode == 2)
                     {
-                        if (mouseX >= 0 && mouseX < SCREEN_WIDTH && mouseY >= 0 && mouseY < SCREEN_HEIGHT){
-                            GRID[mouseX][mouseY].type = waterPixel.type; 
-                            GRID[mouseX][mouseY].color = waterPixel.color; 
-                        }    
+                        dropperSize(waterPixel, mouseX, mouseY, sizeOfDropping); 
                     }
-
                     if (mode == 3)
                     {
-                        if (mouseX >= 0 && mouseX < SCREEN_WIDTH && mouseY >= 0 && mouseY < SCREEN_HEIGHT){
-                            GRID[mouseX][mouseY].type = rainbowPixel.type; 
-                            GRID[mouseX][mouseY].color = rainbowPixel.color; 
-                        }    
-                    }
-                                
+                        dropperSize(rainbowPixel, mouseX, mouseY, sizeOfDropping); 
+                    }           
                 }
+
                 sprintf(modePresented, "Mode: %d", mode); 
-                loadFromRenderedText(&gTextTexture, modePresented, textColor);
+                loadFromRenderedText(&modeTextTexture, modePresented, textColor);
+                sprintf(modePresented, "Dropper Size: %d", sizeOfDropping); 
+                loadFromRenderedText(&SizeOfDropperTexture, modePresented, textColor);
 
-
-                update_water(&GRID, emptyPixel);  // Handle all water movement
-
-                
-
-                
-                
+                update_water(GRID, emptyPixel);  // Handle all water movement
                 
                 for (int y = GRID_HEIGHT - 1; y >= 0; --y) {
                     for (int x = GRID_WIDTH -1; x >= 0; --x) {
@@ -549,35 +573,13 @@ int main(int argc, char* args[]) {
                         }
                     }
                 }
-                
-                
-                
-                
-               
-                
-                
-                
-
-
-
-
-
-                
-
-
-                
-
-
-
-
-
 
                 
                 for (int y = 0; y < GRID_HEIGHT; y++){
                     for (int x = 0; x < GRID_WIDTH; x++){
                         Pixel pixelRect = GRID[x][y]; 
                         
-                        if (GRID[x][y].type != EMPTY ){
+                        if (GRID[x][y].type != EMPTY){
                         
                             pixelRect.type = sandPixel.type;
                             setPixel(pixelRect, x, y);
@@ -593,7 +595,8 @@ int main(int argc, char* args[]) {
                
 
                 //this is for text
-                renderTexture(&gTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dk, dk, dk,dk); 
+                renderTexture(&modeTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dk, dk, dk,dk); 
+                renderTexture(&SizeOfDropperTexture, 80,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dk, dk, dk,dk); 
                 SDL_RenderPresent(gRenderer); // Update screen
             }
         }
