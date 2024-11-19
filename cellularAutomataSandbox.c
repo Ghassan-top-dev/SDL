@@ -328,7 +328,7 @@ void update_water(Pixel GRID[SCREEN_WIDTH][SCREEN_HEIGHT], const Pixel emptyPixe
             // Scan left to right
             for (int x = 0; x < GRID_WIDTH; ++x) {
                 if (GRID[x][y].type == WATER) {
-                    if (y + 1 >= GRID_WIDTH || GRID[x][y + 1].type != EMPTY) {
+                    if (y + 1 >= GRID_HEIGHT || GRID[x][y + 1].type != EMPTY) {
                         // Try to spread randomly left or right first
                         
                         int direction = (rand() % 2) * 2 - 1; // -1 or 1
@@ -394,6 +394,70 @@ void update_water(Pixel GRID[SCREEN_WIDTH][SCREEN_HEIGHT], const Pixel emptyPixe
                                 GRID[x][y] = emptyPixel;
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void updateSand(Pixel GRID[SCREEN_WIDTH][SCREEN_HEIGHT], const Pixel emptyPixel){
+
+    for (int y = GRID_HEIGHT - 1; y >= 0; --y) {
+        for (int x = 0; x < GRID_WIDTH; ++x) {
+            if (GRID[x][y].type == SAND) {
+                // Try to move down
+                if (GRID[x][y + 1].type == EMPTY) {
+                    GRID[x][y + 1] = GRID[x][y];
+                    GRID[x][y] = emptyPixel;
+                }
+            }
+        }
+    }
+
+    for (int y = GRID_HEIGHT - 1; y >= 0; --y) {
+        if (y % 2 == 0){
+            for (int x = GRID_WIDTH -1; x >= 0; --x) { //right to left
+                // Check if the current cell is not EMPTY
+                if (GRID[x][y].type == SAND) {
+
+
+                    int direction = (rand() % 2) * 2 - 1; // -1 or 1
+                    // First direction
+                    int newX = x + direction;
+
+
+                    // Ensure we're not at the bottom row
+                    if (y + 1 < GRID_HEIGHT && GRID[x][y + 1].type == EMPTY) {
+                        GRID[x][y + 1] = GRID[x][y]; // Move the block down
+                        GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
+                    }
+                    else if(x + 1 < GRID_WIDTH && x - 1 >= 0 && GRID[x-1][y+1].type == EMPTY && y != 61){ //move the block left
+                        GRID[x-1][y+1] = GRID[x][y]; // Move the block down
+                        GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
+                    }
+                    else if(x + 1 < GRID_WIDTH && x + 1 >= 0 && GRID[x+1][y+1].type == EMPTY && y != 61){ //move the block right
+                        GRID[x+1][y+1] = GRID[x][y]; // Move the block down
+                        GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
+                    }
+                }
+            }
+        }
+        else{
+            for (int x = 0; x < GRID_WIDTH; ++x) { //right to left
+                if (GRID[x][y].type == RAINBOW) {
+                    // Ensure we're not at the bottom row
+                    if (y + 1 < GRID_HEIGHT && GRID[x][y + 1].type == EMPTY) {
+                        GRID[x][y + 1] = GRID[x][y]; // Move the block down
+                        GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
+                    }
+                    else if(x + 1 < GRID_WIDTH && x + 1 >= 0 && GRID[x+1][y+1].type == EMPTY && y != 61){ //move the block right
+                        GRID[x+1][y+1] = GRID[x][y]; // Move the block down
+                        GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
+                    }
+                    else if(x + 1 < GRID_WIDTH && x - 1 >= 0 && GRID[x-1][y+1].type == EMPTY && y != 61){ //move the block left
+                        GRID[x-1][y+1] = GRID[x][y]; // Move the block down
+                        GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
                     }
                 }
             }
