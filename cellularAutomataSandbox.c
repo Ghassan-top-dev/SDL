@@ -350,7 +350,7 @@ int main(int argc, char* args[]) {
                 
                 
                 for (int y = GRID_HEIGHT - 1; y >= 0; y--) {
-                    for (int x = 0; x < GRID_WIDTH; x++) {
+                    for (int x = GRID_WIDTH-1; x >= 0; x--) {
                         // Check if the current cell is not EMPTY
 
                         if (GRID[x][y].type == WATER) {
