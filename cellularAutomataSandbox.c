@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <time.h>
 
 // Screen dimension constants
 const int SCREEN_WIDTH = 1392;
@@ -478,6 +479,26 @@ void dropperSize(const Pixel pixelType, int mouseX, int mouseY, int sizeOfDroppi
     }   
 }
 
+void randSand(int randSandNum, int *s1, int *s2, int *s3) {
+    if (randSandNum == 1) {
+        *s1 = 234; *s2 = 225; *s3 = 176;
+    }
+    else if (randSandNum == 2) {
+        *s1 = 229; *s2 = 216; *s3 = 144;
+    }
+    else if (randSandNum == 3) {
+        *s1 = 195; *s2 = 184; *s3 = 124;
+    }
+    else if (randSandNum == 4) {
+        *s1 = 255; *s2 = 200; *s3 = 20;
+    }
+    else {
+        *s1 = 207; *s2 = 224; *s3 = 227;
+    }
+}
+
+
+
 
 //This is where the magic happens...
 // Main function - sets up SDL, loads media, runs main loop, and cleans up
@@ -491,6 +512,11 @@ int main(int argc, char* args[]) {
             int quit = 0; // Main loop flag
             SDL_Event event; // Event handler
 
+            // sand color
+            int s1, s2, s3; 
+
+
+            srand(time(NULL));
             bool pressed = false;
             int mouseX = 0, mouseY = 0;  // Tracks the mouse's current position
             int mode = 0; char modePresented[32]; //which substance
@@ -498,18 +524,16 @@ int main(int argc, char* args[]) {
 
 
 
-            Pixel sandPixel = {SAND, 0, 25, false, {194, 178, 128, 255}};
             Pixel waterPixel = {WATER, 0, 25, false, {15, 94, 156, 255}};
             Pixel emptyPixel = {EMPTY, 0, 0, false, {0, 0, 0, 255}};
 
-
+            // set all pixels to empty to begin with
             for (int y = 0; y < GRID_HEIGHT; y++) {
                 for (int x = 0; x < GRID_WIDTH; x++) {
                     GRID[x][y].type = emptyPixel.type;
                 }
             }
 
-            
             
             while (!quit) {
                 while (SDL_PollEvent(&event) != 0) { // Handle events
@@ -561,6 +585,13 @@ int main(int argc, char* args[]) {
 
                 RGB color = get_next_color();
                 Pixel rainbowPixel = {RAINBOW, 0, 25, false, {color.r, color.g, color.b, 255}};
+                
+                int s1, s2, s3; 
+                int randSandNum = rand() % 4 + 1;
+                randSand(randSandNum, &s1, &s2, &s3); 
+
+                Pixel sandPixel = {SAND, 0, 25, false, {s1, s2, s3, 255}};
+
 
 
                 
@@ -619,13 +650,6 @@ int main(int argc, char* args[]) {
                         }                         
                     }
                 } 
-                
-                
-
-                
-
-
-               
 
                 //this is for text
                 renderTexture(&modeTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dk, dk, dk,dk); 
