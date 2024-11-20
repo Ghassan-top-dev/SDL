@@ -10,7 +10,7 @@
 // Screen dimension constants
 const int SCREEN_WIDTH = 1392;
 const int SCREEN_HEIGHT = 744;
-const int PIXEL_SIZE = 4; 
+const int PIXEL_SIZE = 2; 
 
 #define GRID_HEIGHT (SCREEN_HEIGHT / PIXEL_SIZE)
 #define GRID_WIDTH (SCREEN_WIDTH / PIXEL_SIZE)
@@ -150,6 +150,7 @@ bool loadMedia() {
 // Frees up resources and shuts down SDL libraries
 void close() {
     freeTexture(&modeTextTexture); // Free text texture
+    freeTexture(&SizeOfDropperTexture); 
 
     TTF_CloseFont(gFont); // Close font
     gFont = NULL;
@@ -512,6 +513,8 @@ int main(int argc, char* args[]) {
             int quit = 0; // Main loop flag
             SDL_Event event; // Event handler
 
+
+
             // sand color
             int s1, s2, s3; 
 
@@ -652,6 +655,9 @@ int main(int argc, char* args[]) {
                         }                         
                     }
                 } 
+
+
+
 
                 //this is for text
                 renderTexture(&modeTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dk, dk, dk,dk); 
