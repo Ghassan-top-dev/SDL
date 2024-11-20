@@ -666,5 +666,4 @@ int main(int argc, char* args[]) {
     close(); // Free resources and close SDL
 
     return 0;
-}
-
+} 
