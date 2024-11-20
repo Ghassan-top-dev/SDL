@@ -431,7 +431,7 @@ void updateSand(Pixel GRID[SCREEN_WIDTH][SCREEN_HEIGHT], const Pixel emptyPixel,
                             GRID[x-1][y+1] = GRID[x][y]; // Move the block down
                             GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
                         }
-                        else if(x + 1 < GRID_WIDTH && x + 1 >= 0 && GRID[x+1][y+1].type == EMPTY && y != 61){ //move the block right
+                        else if(x + 1 < GRID_WIDTH && x - 1 >= 0 && GRID[x+1][y+1].type == EMPTY && y != 61){ //move the block right
                             GRID[x+1][y+1] = GRID[x][y]; // Move the block down
                             GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
                         }
@@ -445,7 +445,7 @@ void updateSand(Pixel GRID[SCREEN_WIDTH][SCREEN_HEIGHT], const Pixel emptyPixel,
 
                     if (y + 1 >= GRID_HEIGHT || GRID[x][y + 1].type != EMPTY) {
 
-                        if(x + 1 < GRID_WIDTH && x + 1 >= 0 && GRID[x+1][y+1].type == EMPTY && y != 61){ //move the block right
+                        if(x + 1 < GRID_WIDTH && x - 1 >= 0 && GRID[x+1][y+1].type == EMPTY && y != 61){ //move the block right
                             GRID[x+1][y+1] = GRID[x][y]; // Move the block down
                             GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
                         }
@@ -520,7 +520,7 @@ int main(int argc, char* args[]) {
             bool pressed = false;
             int mouseX = 0, mouseY = 0;  // Tracks the mouse's current position
             int mode = 0; char modePresented[32]; //which substance
-            int sizeOfDropping = 1; 
+            int sizeOfDropping = 66; 
 
 
 
@@ -576,8 +576,13 @@ int main(int argc, char* args[]) {
                     }
 
                     if (event.type == SDL_MOUSEMOTION){
+
+
                         mouseX = event.motion.x / PIXEL_SIZE;
                         mouseY = event.motion.y / PIXEL_SIZE;
+
+                        printf("Mouse Position: x = %d, y = %d\n", event.motion.x, event.motion.y);
+
                         
                     }
 
@@ -630,7 +635,7 @@ int main(int argc, char* args[]) {
                                 GRID[x-1][y+1] = GRID[x][y]; // Move the block down
                                 GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
                             }
-                            else if(x + 1 < GRID_WIDTH && x + 1 >= 0 && GRID[x+1][y+1].type == EMPTY && y != 61){ //move the block right
+                            else if(x + 1 < GRID_WIDTH && x - 1 >= 0 && GRID[x+1][y+1].type == EMPTY && y != 61){ //move the block right
                                 GRID[x+1][y+1] = GRID[x][y]; // Move the block down
                                 GRID[x][y] = emptyPixel;    // Set current cell to EMPTY
                             }
