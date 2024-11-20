@@ -465,7 +465,7 @@ void updateSand(Pixel GRID[SCREEN_WIDTH][SCREEN_HEIGHT], const Pixel emptyPixel,
 
 void dropperSize(const Pixel pixelType, int mouseX, int mouseY, int sizeOfDropping){
 
-    if (mouseX >= 0 && mouseX < SCREEN_WIDTH && mouseY >= 0 && mouseY < SCREEN_HEIGHT){                  
+    if (mouseX  > 0 && mouseX < SCREEN_WIDTH && mouseY >= 0 && mouseY < SCREEN_HEIGHT){                  
         for (int dx = 0; dx < sizeOfDropping; dx++)
         {
             int commonality = (rand() % 2) * 2 - 1; // -1 or 1
@@ -580,9 +580,6 @@ int main(int argc, char* args[]) {
 
                         mouseX = event.motion.x / PIXEL_SIZE;
                         mouseY = event.motion.y / PIXEL_SIZE;
-
-                        printf("Mouse Position: x = %d, y = %d\n", event.motion.x, event.motion.y);
-
                         
                     }
 
