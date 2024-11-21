@@ -577,7 +577,7 @@ int main(int argc, char* args[]) {
                             pressed = false; 
                         }
                     }
-
+ 
                     if (event.type == SDL_MOUSEMOTION){
 
 
