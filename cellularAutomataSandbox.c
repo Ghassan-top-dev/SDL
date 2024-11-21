@@ -7,7 +7,7 @@
 #include <stdbool.h>
 #include <time.h>
 
-// Screen dimension constants
+// Screen dimension constant
 const int SCREEN_WIDTH = 1392;
 const int SCREEN_HEIGHT = 744;
 const int PIXEL_SIZE = 2; 
