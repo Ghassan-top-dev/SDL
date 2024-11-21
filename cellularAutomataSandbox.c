@@ -523,7 +523,7 @@ int main(int argc, char* args[]) {
             bool pressed = false;
             int mouseX = 0, mouseY = 0;  // Tracks the mouse's current position
             int mode = 0; char modePresented[32]; //which substance
-            int sizeOfDropping = 66; 
+            int sizeOfDropping = 25; 
 
 
 
