@@ -35,7 +35,7 @@ typedef enum {
     RAINBOW = 3,
     WOOD = 4,
     FIRE = 5
-} PixelType;
+} PixelType; 
 
 typedef struct {
     PixelType type;          // Pixel type, e.g., EMPTY, SAND
