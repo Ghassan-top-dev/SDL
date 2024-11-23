@@ -22,7 +22,7 @@ typedef struct {
     int height;
 } LTexture;
 
-
+ 
 SDL_Color textColor = {255, 255, 255}; // text color
 
 
