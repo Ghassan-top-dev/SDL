@@ -16,7 +16,7 @@ const int PIXEL_SIZE = 2;
 #define GRID_WIDTH (SCREEN_WIDTH / PIXEL_SIZE)
  
 // Texture wrapper structure to hold texture data and dimensions
-typedef struct {
+typedef struct { 
     SDL_Texture* texture;
     int width;
     int height;
