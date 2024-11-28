@@ -68,7 +68,7 @@ void dropperSize(const Pixel pixelType, int mouseX, int mouseY, int sizeOfDroppi
 
 // Global variables for the SDL window, renderer, font, and text texture
 SDL_Window* gWindow = NULL;
-SDL_Renderer* gRenderer = NULL;
+SDL_Renderer* gRenderer = NULL; 
 TTF_Font* gFont = NULL;
 LTexture modeTextTexture; // Texture to display text
 LTexture SizeOfDropperTexture; // Texture to display text
