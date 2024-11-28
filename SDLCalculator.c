@@ -47,7 +47,7 @@ GitHub: https://github.com/Ghassan-top-dev
 
 
 ///////////////////////////////////////////////////*/
-
+ 
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
