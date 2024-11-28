@@ -96,7 +96,7 @@ void whichOperatorWasUsed(char * presented); //main meat and potatoes of the cal
 void colorChanger(int buttonX, int buttonY, SDL_Renderer* renderer, SDL_Rect buttons[], int R, int G, int B, int whichButton); //color change on press function
 void removeLetter(char * str, char charToRemove); // may cause out of bounds problems
 
-
+ 
 // Global variables for the SDL window, renderer, font, and text texture
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
