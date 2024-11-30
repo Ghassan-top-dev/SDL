@@ -9,7 +9,7 @@
 #include <stdbool.h>
 
 // Screen dimension constants
-const int SCREEN_WIDTH = 1400; 
+const int SCREEN_WIDTH = 1400;  
 const int SCREEN_HEIGHT = 750;
 
 int stepperX = 300; //both of these are used for user input movement
