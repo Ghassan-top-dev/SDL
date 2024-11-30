@@ -34,7 +34,7 @@ typedef struct {
     int width;
     int height;
 } LTexture;
-
+ 
 // Function declarations for initialization, media loading, cleanup, and texture operations
 bool init(); // Initializes SDL, window, and renderer
 bool loadMedia(); // Loads media (e.g., font and text)
