@@ -1,8 +1,8 @@
 #include <SDL2/SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
-#include <stdlib.h> 
+#include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
@@ -14,15 +14,15 @@ const int PIXEL_SIZE = 2;
 
 #define GRID_HEIGHT (SCREEN_HEIGHT / PIXEL_SIZE)
 #define GRID_WIDTH (SCREEN_WIDTH / PIXEL_SIZE)
- 
+
 // Texture wrapper structure to hold texture data and dimensions
-typedef struct { 
+typedef struct {
     SDL_Texture* texture;
     int width;
     int height;
 } LTexture;
 
- 
+
 SDL_Color textColor = {255, 255, 255}; // text color
 
 
@@ -35,7 +35,7 @@ typedef enum {
     RAINBOW = 3,
     WOOD = 4,
     FIRE = 5
-} PixelType; 
+} PixelType;
 
 typedef struct {
     PixelType type;          // Pixel type, e.g., EMPTY, SAND
@@ -68,7 +68,7 @@ void dropperSize(const Pixel pixelType, int mouseX, int mouseY, int sizeOfDroppi
 
 // Global variables for the SDL window, renderer, font, and text texture
 SDL_Window* gWindow = NULL;
-SDL_Renderer* gRenderer = NULL; 
+SDL_Renderer* gRenderer = NULL;
 TTF_Font* gFont = NULL;
 LTexture modeTextTexture; // Texture to display text
 LTexture SizeOfDropperTexture; // Texture to display text
@@ -577,7 +577,7 @@ int main(int argc, char* args[]) {
                             pressed = false; 
                         }
                     }
- 
+
                     if (event.type == SDL_MOUSEMOTION){
 
 
