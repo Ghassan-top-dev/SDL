@@ -556,8 +556,8 @@ int main(int argc, char* args[]) {
                     if (event.type == SDL_KEYDOWN){
                         if (event.key.keysym.sym == SDLK_ESCAPE) quit = 1; // Exit on pressing the escape key
                         // these control which substance
-                        if (event.key.keysym.sym == SDLK_RIGHT) mode+=1;
-                        if (event.key.keysym.sym == SDLK_LEFT) mode-=1;
+                        if (event.key.keysym.sym == SDLK_RIGHT && mode+1 <= 3) mode+=1;
+                        if (event.key.keysym.sym == SDLK_LEFT && mode-1 >= 0) mode-=1;
 
                         if (event.key.keysym.sym == SDLK_UP) sizeOfDropping+=1;
                         if (event.key.keysym.sym == SDLK_DOWN && sizeOfDropping-1 > 0) sizeOfDropping-=1;
