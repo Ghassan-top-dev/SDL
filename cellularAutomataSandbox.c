@@ -480,6 +480,7 @@ void dropperSize(const Pixel pixelType, int mouseX, int mouseY, int sizeOfDroppi
     }   
 }
 
+// this function is for rainbow color
 void randSand(int randSandNum, int *s1, int *s2, int *s3) {
     if (randSandNum == 1) {
         *s1 = 234; *s2 = 225; *s3 = 176;
@@ -536,6 +537,15 @@ int main(int argc, char* args[]) {
                     GRID[x][y].type = emptyPixel.type;
                 }
             }
+
+            int lastMode = -1;
+
+            const char *lookUpOfSubstanceNames[] = {
+                "Choose a Substance", 
+                "Sand", 
+                "Water",
+                "Rainbow"
+            };
 
             
             while (!quit) {
@@ -604,17 +614,24 @@ int main(int argc, char* args[]) {
                 SDL_SetRenderDrawColor(gRenderer, 110, 110, 110, 255);
                 SDL_RenderClear(gRenderer); 
 
-                //add the different substances here (this is where the grid will be inichalized with each pixel)
-                if (pressed)
-                {
+                if (pressed){
                     if (mode == 1) dropperSize(sandPixel, mouseX, mouseY, sizeOfDropping);                    
                     if (mode == 2) dropperSize(waterPixel, mouseX, mouseY, sizeOfDropping);       
                     if (mode == 3) dropperSize(rainbowPixel, mouseX, mouseY, sizeOfDropping); 
-                 
+                
                 }
 
-                sprintf(modePresented, "Mode: %d", mode); 
-                loadFromRenderedText(&modeTextTexture, modePresented, textColor);
+                // this chooses the mode and presents it
+                if (mode != lastMode)
+                {
+                    const char *whichText = (mode >= 1 && mode <= 3) ? lookUpOfSubstanceNames[mode] : lookUpOfSubstanceNames[0];
+                    loadFromRenderedText(&modeTextTexture, whichText, textColor);
+                    lastMode = mode; 
+                }
+                
+
+
+                
                 sprintf(modePresented, "Dropper Size: %d", sizeOfDropping); 
                 loadFromRenderedText(&SizeOfDropperTexture, modePresented, textColor);
 
@@ -660,8 +677,8 @@ int main(int argc, char* args[]) {
 
 
                 //this is for text
-                renderTexture(&modeTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dk, dk, dk,dk); 
-                renderTexture(&SizeOfDropperTexture, 80,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dk, dk, dk,dk); 
+                renderTexture(&modeTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); 
+                renderTexture(&SizeOfDropperTexture, 200,0, NULL, 0, NULL, SDL_FLIP_NONE); 
                 SDL_RenderPresent(gRenderer); // Update screen
             }
         }
