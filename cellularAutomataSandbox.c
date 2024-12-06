@@ -465,18 +465,24 @@ void updateSand(Pixel GRID[SCREEN_WIDTH][SCREEN_HEIGHT], const Pixel emptyPixel,
 
 
 void dropperSize(const Pixel pixelType, int mouseX, int mouseY, int sizeOfDropping){
-
+    
+    int dropRange = (sizeOfDropping / 2);          
     if (mouseX  > 0 && mouseX < SCREEN_WIDTH && mouseY >= 0 && mouseY < SCREEN_HEIGHT){        
-        int dropRange = (sizeOfDropping / 2);          
         for (int i = -dropRange; i < dropRange; i++)
         {
             int commonality = (rand() % 2) * 2 - 1; // -1 or 1
             int changeInX = mouseX;
             changeInX+= commonality;
 
-            GRID[changeInX+i][mouseY].type = pixelType.type; 
-            GRID[changeInX+i][mouseY].color = pixelType.color; 
-            changeInX+= commonality; 
+            if (changeInX+i  > 0 && changeInX+i < SCREEN_WIDTH){   
+
+                GRID[changeInX+i][mouseY].type = pixelType.type; 
+                GRID[changeInX+i][mouseY].color = pixelType.color; 
+                changeInX+= commonality;      
+
+            }   
+
+            
         } 
     }   
 }
