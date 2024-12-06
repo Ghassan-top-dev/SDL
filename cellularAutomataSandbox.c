@@ -466,15 +466,16 @@ void updateSand(Pixel GRID[SCREEN_WIDTH][SCREEN_HEIGHT], const Pixel emptyPixel,
 
 void dropperSize(const Pixel pixelType, int mouseX, int mouseY, int sizeOfDropping){
 
-    if (mouseX  > 0 && mouseX < SCREEN_WIDTH && mouseY >= 0 && mouseY < SCREEN_HEIGHT){                  
-        for (int dx = 0; dx < sizeOfDropping; dx++)
+    if (mouseX  > 0 && mouseX < SCREEN_WIDTH && mouseY >= 0 && mouseY < SCREEN_HEIGHT){        
+        int dropRange = (sizeOfDropping / 2);          
+        for (int i = -dropRange; i < dropRange; i++)
         {
             int commonality = (rand() % 2) * 2 - 1; // -1 or 1
             int changeInX = mouseX;
-            changeInX+= commonality; 
+            changeInX+= commonality;
 
-            GRID[changeInX+dx][mouseY].type = pixelType.type; 
-            GRID[changeInX+dx][mouseY].color = pixelType.color; 
+            GRID[changeInX+i][mouseY].type = pixelType.type; 
+            GRID[changeInX+i][mouseY].color = pixelType.color; 
             changeInX+= commonality; 
         } 
     }   
@@ -561,7 +562,8 @@ int main(int argc, char* args[]) {
 
                         if (event.key.keysym.sym == SDLK_UP) sizeOfDropping+=1;
                         if (event.key.keysym.sym == SDLK_DOWN && sizeOfDropping-1 > 0) sizeOfDropping-=1;
-                        if (event.key.keysym.sym == SDLK_c){
+                        
+                        if (event.key.keysym.sym == SDLK_c){ // clear the canvas
                             for (int y = 0; y < GRID_HEIGHT; y++) {
                                 for (int x = 0; x < GRID_WIDTH; x++) {
                                     GRID[x][y].type = emptyPixel.type;
