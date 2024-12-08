@@ -8,9 +8,9 @@
 #include <time.h>
 
 // Screen dimension constants
-const int SCREEN_WIDTH = 1392;
-const int SCREEN_HEIGHT = 744;
-const int PIXEL_SIZE = 2; 
+#define SCREEN_WIDTH 1392
+#define SCREEN_HEIGHT 744
+#define PIXEL_SIZE 2
 
 #define GRID_HEIGHT (SCREEN_HEIGHT / PIXEL_SIZE)
 #define GRID_WIDTH (SCREEN_WIDTH / PIXEL_SIZE)
