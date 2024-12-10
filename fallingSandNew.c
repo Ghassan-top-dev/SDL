@@ -288,46 +288,46 @@ void setPixel(int x, int y) {
 
 
 void update_sand() {
+    // Temporary grid for the next state
     Pixel next_grid[GRID_WIDTH][GRID_HEIGHT] = {0};
 
-    for (int y = GRID_HEIGHT - 1; y >= 0; y--){
-        for (int x = 0; x < GRID_WIDTH; x++){
+    for (int y = GRID_HEIGHT - 1; y >= 0; y--) {
+        for (int x = 0; x < GRID_WIDTH; x++) {
+            // Skip empty cells
+            if (!GRID[x][y].exists) continue;
 
-
-
-            if (!GRID[x][y].exists) continue; // Skip empty cells
-
+            // Calculate new position
             float new_velocity = GRID[x][y].velocity + GRAVITY;
             int new_y = y + (int)new_velocity;
 
-            // Ensure the particle doesn't go below the grid
+            // Clamp new_y within valid range
             if (new_y >= GRID_HEIGHT) {
-                new_y = GRID_HEIGHT - PIXEL_SIZE; // Clamp to bottom row
+                new_y = GRID_HEIGHT - 1;
             }
 
-            // Check if the spot directly below is empty
+            // Attempt to move vertically
             if (!GRID[x][new_y].exists) {
                 next_grid[x][new_y] = GRID[x][y];
                 next_grid[x][new_y].velocity = new_velocity;
             }
-            // If the spot below is occupied, try moving diagonally
+            // Attempt diagonal movements
             else {
                 bool moved = false;
 
-                // Try moving diagonally left
+                // Try left diagonal
                 if (x > 0 && new_y < GRID_HEIGHT && !GRID[x - 1][new_y].exists) {
                     next_grid[x - 1][new_y] = GRID[x][y];
                     next_grid[x - 1][new_y].velocity = new_velocity;
                     moved = true;
                 }
-                // Try moving diagonally right
+                // Try right diagonal
                 else if (x < GRID_WIDTH - 1 && new_y < GRID_HEIGHT && !GRID[x + 1][new_y].exists) {
                     next_grid[x + 1][new_y] = GRID[x][y];
                     next_grid[x + 1][new_y].velocity = new_velocity;
                     moved = true;
                 }
 
-                // If no movement is possible, settle the particle in place
+                // If no movement, settle particle
                 if (!moved) {
                     next_grid[x][y] = GRID[x][y];
                     next_grid[x][y].velocity = 0; // Reset velocity
@@ -336,9 +336,10 @@ void update_sand() {
         }
     }
 
-    // Copy the updated grid back to the main grid
+    // Copy updated grid back to the main grid
     memcpy(GRID, next_grid, sizeof(next_grid));
 }
+
 
 
 
