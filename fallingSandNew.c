@@ -15,7 +15,7 @@
 
 
 #define GRID_HEIGHT (SCREEN_HEIGHT / PIXEL_SIZE)
-#define GRID_WIDTH (SCREEN_WIDTH / PIXEL_SIZE)
+#define GRID_WIDTH (SCREEN_WIDTH / PIXEL_SIZE) 
 
 // Texture wrapper structure to hold texture data and dimensions
 typedef struct {
