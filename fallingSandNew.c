@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <time.h>
+#include <time.h> 
 
 // Screen dimension constants
 #define SCREEN_WIDTH 1392
