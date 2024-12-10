@@ -11,7 +11,7 @@
 #define SCREEN_WIDTH 1392
 #define SCREEN_HEIGHT 744
 #define PIXEL_SIZE 2
-#define GRAVITY 0.1f
+#define GRAVITY 0.1f 
 
 
 #define GRID_HEIGHT (SCREEN_HEIGHT / PIXEL_SIZE)
