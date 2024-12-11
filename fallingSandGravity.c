@@ -5,7 +5,7 @@
 #include <string.h>
 #include <time.h>
 
-#define SCREEN_WIDTH 800
+#define SCREEN_WIDTH 800 
 #define SCREEN_HEIGHT 600
 #define GRID_WIDTH 200
 #define GRID_HEIGHT 450
