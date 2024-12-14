@@ -1,21 +1,21 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
-#include <stdio.h> 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <time.h> 
+#include <time.h>
 
 // Screen dimension constants
 #define SCREEN_WIDTH 1392
 #define SCREEN_HEIGHT 744
 #define PIXEL_SIZE 2
-#define GRAVITY 0.1f 
+#define GRAVITY 0.1f
 
 
 #define GRID_HEIGHT (SCREEN_HEIGHT / PIXEL_SIZE)
-#define GRID_WIDTH (SCREEN_WIDTH / PIXEL_SIZE) 
+#define GRID_WIDTH (SCREEN_WIDTH / PIXEL_SIZE)
 
 // Texture wrapper structure to hold texture data and dimensions
 typedef struct {
@@ -262,7 +262,7 @@ void instantiateSubstance(int x, int y) {
             int pixelBlockY = (y / PIXEL_SIZE) + dy;
             
 
-            if (pixelBlockX  > 0 && pixelBlockX < GRID_WIDTH && pixelBlockY >= 0 && pixelBlockY < GRID_HEIGHT && rand() % 100 < 75){
+            if (pixelBlockX  >= 0 && pixelBlockX < GRID_WIDTH && pixelBlockY >= 0 && pixelBlockY < GRID_HEIGHT && rand() % 100 < 75){
                 // Only add if not already exists
                 if (!GRID[pixelBlockX][pixelBlockY].exists) {
                     
@@ -287,61 +287,35 @@ void setPixel(int x, int y) {
 }
 
 
-void update_sand() {
-    // Temporary grid for the next state
-    Pixel next_grid[GRID_WIDTH][GRID_HEIGHT] = {0};
+void render() {
+    // Clear screen
+    SDL_SetRenderDrawColor(gRenderer, 110, 110, 110, 255);
+    SDL_RenderClear(gRenderer);
 
-    for (int y = GRID_HEIGHT - 1; y >= 0; y--) {
-        for (int x = 0; x < GRID_WIDTH; x++) {
-            // Skip empty cells
-            if (!GRID[x][y].exists) continue;
+    // Render particles
+    for (int x = 0; x < GRID_WIDTH; x++) {
+        for (int y = 0; y < GRID_HEIGHT; y++) {
+            if (GRID[x][y].exists) {
+                SDL_Rect particle_rect = {
+                    x * PIXEL_SIZE, 
+                    y * PIXEL_SIZE, 
+                    PIXEL_SIZE, 
+                    PIXEL_SIZE
+                };
 
-            // Calculate new position
-            float new_velocity = GRID[x][y].velocity + GRAVITY;
-            int new_y = y + (int)new_velocity;
-
-            // Clamp new_y within valid range
-            if (new_y >= GRID_HEIGHT) {
-                new_y = GRID_HEIGHT - 1;
-            }
-
-            // Attempt to move vertically
-            if (!GRID[x][new_y].exists) {
-                next_grid[x][new_y] = GRID[x][y];
-                next_grid[x][new_y].velocity = new_velocity;
-            }
-            // Attempt diagonal movements
-            else {
-                bool moved = false;
-
-                // Try left diagonal
-                if (x > 0 && new_y < GRID_HEIGHT && !GRID[x - 1][new_y].exists) {
-                    next_grid[x - 1][new_y] = GRID[x][y];
-                    next_grid[x - 1][new_y].velocity = new_velocity;
-                    moved = true;
-                }
-                // Try right diagonal
-                else if (x < GRID_WIDTH - 1 && new_y < GRID_HEIGHT && !GRID[x + 1][new_y].exists) {
-                    next_grid[x + 1][new_y] = GRID[x][y];
-                    next_grid[x + 1][new_y].velocity = new_velocity;
-                    moved = true;
-                }
-
-                // If no movement, settle particle
-                if (!moved) {
-                    next_grid[x][y] = GRID[x][y];
-                    next_grid[x][y].velocity = 0; // Reset velocity
-                }
+                SDL_SetRenderDrawColor(gRenderer, 
+                    GRID[x][y].color.r, 
+                    GRID[x][y].color.g, 
+                    GRID[x][y].color.b, 
+                    GRID[x][y].color.a);
+                SDL_RenderFillRect(gRenderer, &particle_rect);
             }
         }
     }
 
-    // Copy updated grid back to the main grid
-    memcpy(GRID, next_grid, sizeof(next_grid));
+    // Update screen
+    SDL_RenderPresent(gRenderer);
 }
-
-
-
 
 
 
@@ -359,11 +333,6 @@ int main(int argc, char* args[]) {
             SDL_Event event; // Event handler
 
             bool pressed = false;
-
-
-
-           
-
             
             while (!quit) {
                 while (SDL_PollEvent(&event) != 0) { // Handle events
@@ -396,13 +365,7 @@ int main(int argc, char* args[]) {
 
                 }
 
-               
-
-
-                
-                // Clear screen with grey background
-                SDL_SetRenderDrawColor(gRenderer, 110, 110, 110, 255);
-                SDL_RenderClear(gRenderer); 
+                render(); 
 
 
                 for (int y = 0; y < GRID_HEIGHT; y++){
@@ -415,13 +378,12 @@ int main(int argc, char* args[]) {
                     }
                 } 
 
-                update_sand();
+                // //this is for text
+                // renderTexture(&modeTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); 
+                // renderTexture(&SizeOfDropperTexture, 200,0, NULL, 0, NULL, SDL_FLIP_NONE); 
+                // SDL_RenderPresent(gRenderer); // Update screen
 
 
-                //this is for text
-                renderTexture(&modeTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); 
-                renderTexture(&SizeOfDropperTexture, 200,0, NULL, 0, NULL, SDL_FLIP_NONE); 
-                SDL_RenderPresent(gRenderer); // Update screen
             }
         }
     }
