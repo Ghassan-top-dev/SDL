@@ -9,11 +9,13 @@
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
+#include <math.h>
+
 
 // Screen dimension constants
 #define SCREEN_WIDTH 1392
 #define SCREEN_HEIGHT 744
-#define PIXEL_SIZE 4
+#define PIXEL_SIZE 2
 #define GRAVITY 0.5f
 #define MAX_VELOCITY 10.0f
 
@@ -44,7 +46,7 @@ typedef struct {
     SDL_Color color;   // Pixel color for rendering
 } Pixel;
 
-Pixel GRID[GRID_WIDTH][GRID_HEIGHT]; 
+Pixel GRID[SCREEN_WIDTH][SCREEN_HEIGHT]; 
 
 Pixel emptyPixel = {EMPTY, false, 0, false, {0, 0, 0, 255}};
 Pixel sandPixel = {SAND, true, 0, false, {255, 100, 100, 255}};
@@ -293,7 +295,7 @@ void updateSandPhysics() {
                     GRID[x][y].velocity = MAX_VELOCITY;
                 }
 
-                int newY = y + (int)GRID[x][y].velocity;
+                int newY = y + floor(GRID[x][y].velocity);
                 
                 // Check if can fall straight down
                 if (newY < GRID_HEIGHT && !GRID[x][newY].exists) {
