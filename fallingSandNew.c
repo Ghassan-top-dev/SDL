@@ -38,17 +38,19 @@ typedef enum {
 
 typedef struct {
     PixelType type;          // Pixel type, e.g., EMPTY, SAND
-    int lifetime;      // How long this pixel has existed
-    int temperature;   // Temperature of the pixel (useful for fire)
     bool exists;
     float velocity;
+    bool updated;
     SDL_Color color;   // Pixel color for rendering
 } Pixel;
 
 
 Pixel GRID[SCREEN_WIDTH][SCREEN_HEIGHT]; 
 
-Pixel emptyPixel = {EMPTY, 0, 0, false, 0, {0, 0, 0, 255}};
+Pixel emptyPixel = {EMPTY, false, 0, false, {0, 0, 0, 255}};
+
+Pixel sandPixel = {SAND, true, 0, false, {255, 100, 100, 255}};
+
 
 
 
@@ -266,13 +268,7 @@ void instantiateSubstance(int x, int y) {
                 // Only add if not already exists
                 if (!GRID[pixelBlockX][pixelBlockY].exists) {
                     
-                    GRID[pixelBlockX][pixelBlockY].exists = true;
-                    GRID[pixelBlockX][pixelBlockY].velocity = 0;
-                    
-                    GRID[pixelBlockX][pixelBlockY].color.r = 200 + rand() % 55;
-                    GRID[pixelBlockX][pixelBlockY].color.g = 150 + rand() % 55;
-                    GRID[pixelBlockX][pixelBlockY].color.b = 100 + rand() % 55;
-                    GRID[pixelBlockX][pixelBlockY].color.a = 255;
+                    GRID[pixelBlockX][pixelBlockY] = sandPixel;
                 }
             }
         }
@@ -364,6 +360,10 @@ int main(int argc, char* args[]) {
                     }
 
                 }
+
+             
+
+
 
                 render(); 
 
