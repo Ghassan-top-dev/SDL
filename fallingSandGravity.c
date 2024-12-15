@@ -315,8 +315,6 @@ void updateSandPhysics() {
                     GRID[x][y] = emptyPixel;
                     GRID[x][y + fallDistance].updated = true;
                     
-                    // Slightly reduce velocity to simulate friction
-                    GRID[x][y + fallDistance].velocity *= 0.9;
                 }
                 // If can't fall straight, try diagonal
                 else {
