@@ -1,3 +1,6 @@
+// gcc -I src/include -L src/lib -o main new2.c -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer
+
+// claude code
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -10,7 +13,7 @@
 // Screen dimension constants
 #define SCREEN_WIDTH 1392
 #define SCREEN_HEIGHT 744
-#define PIXEL_SIZE 2
+#define PIXEL_SIZE 4
 #define GRAVITY 0.5f
 #define MAX_VELOCITY 10.0f
 
@@ -63,9 +66,6 @@ SDL_Renderer* gRenderer = NULL;
 TTF_Font* gFont = NULL;
 LTexture modeTextTexture;
 LTexture SizeOfDropperTexture;
-
-// Initialization, media loading, and cleanup functions remain the same as in the original code
-
 
 // Initializes SDL, creates window and renderer, sets up image and text libraries
 bool init() {
@@ -241,13 +241,6 @@ int getTextureHeight(LTexture* lTexture) {
 }
 
 
-void setPixel(int x, int y) {
-    SDL_SetRenderDrawColor(gRenderer, GRID[x][y].color.r, GRID[x][y].color.g, GRID[x][y].color.b, 255);
-    SDL_Rect rectToBeRendered = {x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE}; 
-    SDL_RenderFillRect(gRenderer, &rectToBeRendered);
-}
-
-
 void render() {
     // Clear screen
     SDL_SetRenderDrawColor(gRenderer, 110, 110, 110, 255);
@@ -314,13 +307,11 @@ void updateSandPhysics() {
                     int fallDirection = (rand() % 2 == 0) ? -1 : 1;
                     int newX = x + fallDirection;
                     
-                    if (newX >= 0 && newX < GRID_WIDTH && 
-                        newY < GRID_HEIGHT && 
-                        !GRID[newX][newY].exists) {
+                    if (newX >= 0 && newX < GRID_WIDTH && y < GRID_HEIGHT && !GRID[newX][y+1].exists) {
                         // Move pixel diagonally
-                        GRID[newX][newY] = GRID[x][y];
+                        GRID[newX][y+1] = GRID[x][y];
                         GRID[x][y] = emptyPixel;
-                        GRID[newX][newY].updated = true;
+                        GRID[newX][y+1].updated = true;
                     }
                     else {
                         // If can't fall, reset velocity
@@ -340,9 +331,7 @@ void instantiateSubstance(int x, int y) {
             int pixelBlockX = (x / PIXEL_SIZE) + dx;
             int pixelBlockY = (y / PIXEL_SIZE) + dy;
             
-            if (pixelBlockX >= 0 && pixelBlockX < GRID_WIDTH && 
-                pixelBlockY >= 0 && pixelBlockY < GRID_HEIGHT && 
-                rand() % 100 < 75) {
+            if (pixelBlockX >= 0 && pixelBlockX < GRID_WIDTH && pixelBlockY >= 0 && pixelBlockY < GRID_HEIGHT && rand() % 100 < 75) {
                 if (!GRID[pixelBlockX][pixelBlockY].exists) {
                     Pixel newSandPixel = sandPixel;
                     newSandPixel.velocity = 0; // Initialize with zero velocity
@@ -403,7 +392,7 @@ int main(int argc, char* args[]) {
                 render();
 
                 // Optional: Add a small delay to control simulation speed
-                SDL_Delay(10);
+                SDL_Delay(16);
             }
         }
     }
