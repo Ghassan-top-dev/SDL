@@ -15,8 +15,8 @@
 // Screen dimension constants
 #define SCREEN_WIDTH 1392
 #define SCREEN_HEIGHT 744
-#define PIXEL_SIZE 2
-#define GRAVITY 0.5f
+#define PIXEL_SIZE 4
+#define GRAVITY 0.9f
 #define MAX_VELOCITY 10.0f
 
 #define GRID_HEIGHT (SCREEN_HEIGHT / PIXEL_SIZE)
@@ -295,29 +295,52 @@ void updateSandPhysics() {
                     GRID[x][y].velocity = MAX_VELOCITY;
                 }
 
-                int newY = y + floor(GRID[x][y].velocity);
+                // Find maximum falling distance
+                int maxFallDistance = (int)GRID[x][y].velocity;
+                int fallDistance = 0;
                 
-                // Check if can fall straight down
-                if (newY < GRID_HEIGHT && !GRID[x][newY].exists) {
-                    // Move pixel down
-                    GRID[x][newY] = GRID[x][y];
-                    GRID[x][y] = emptyPixel;
-                    GRID[x][newY].updated = true;
+                // Check falling distance
+                for (int dy = 1; dy <= maxFallDistance; dy++) {
+                    if (y + dy < GRID_HEIGHT && !GRID[x][y + dy].exists) {
+                        fallDistance = dy;
+                    } else {
+                        break;
+                    }
                 }
-                // Check diagonal falling (with some randomness)
-                else if (newY < GRID_HEIGHT) {
+
+                // If we can fall
+                if (fallDistance > 0) {
+                    // Move pixel down
+                    GRID[x][y + fallDistance] = GRID[x][y];
+                    GRID[x][y] = emptyPixel;
+                    GRID[x][y + fallDistance].updated = true;
+                    
+                    // Slightly reduce velocity to simulate friction
+                    GRID[x][y + fallDistance].velocity *= 0.9;
+                }
+                // If can't fall straight, try diagonal
+                else {
                     int fallDirection = (rand() % 2 == 0) ? -1 : 1;
                     int newX = x + fallDirection;
                     
-                    if (newX >= 0 && newX < GRID_WIDTH && y < GRID_HEIGHT && !GRID[newX][y+1].exists) {
+                    // Check diagonal falling
+                    if (newX >= 0 && newX < GRID_WIDTH && 
+                        y + 1 < GRID_HEIGHT && 
+                        !GRID[newX][y + 1].exists) {
                         // Move pixel diagonally
-                        GRID[newX][y+1] = GRID[x][y];
+                        GRID[newX][y + 1] = GRID[x][y];
                         GRID[x][y] = emptyPixel;
-                        GRID[newX][y+1].updated = true;
+                        GRID[newX][y + 1].updated = true;
+                        
+                        // Reduce velocity when falling diagonally
+                        GRID[newX][y + 1].velocity *= 0.7;
                     }
                     else {
-                        // If can't fall, reset velocity
-                        GRID[x][y].velocity = 0;
+                        // If can't fall, reduce velocity
+                        GRID[x][y].velocity *= 0.5;
+                        if (GRID[x][y].velocity < 0.1) {
+                            GRID[x][y].velocity = 0;
+                        }
                     }
                 }
             }
