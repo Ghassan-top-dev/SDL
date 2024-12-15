@@ -1,6 +1,5 @@
 // gcc -I src/include -L src/lib -o main new2.c -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer
 
-// claude code
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -401,13 +400,14 @@ int main(int argc, char* args[]) {
                         }
                     }
 
-                    if (pressed) {
-                        int mouseX, mouseY;
-                        SDL_GetMouseState(&mouseX, &mouseY);
-                        instantiateSubstance(mouseX, mouseY);
-                    }
+                    
                 }
-
+                
+                if (pressed) {
+                    int mouseX, mouseY;
+                    SDL_GetMouseState(&mouseX, &mouseY);
+                    instantiateSubstance(mouseX, mouseY);
+                }
                 // Update sand physics
                 updateSandPhysics();
 
