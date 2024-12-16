@@ -298,7 +298,7 @@ void render() {
 
 
 // New function to update sand pixels with physics
-void updateSandPhysics() {
+void updatePhysics() {
     // Reset update flags
     for (int x = 0; x < GRID_WIDTH; x++) {
         for (int y = 0; y < GRID_HEIGHT; y++) {
@@ -458,7 +458,6 @@ int main(int argc, char* args[]) {
                         }
                     }
 
-                    
                 }
                 
                 if (pressed) {
@@ -481,7 +480,7 @@ int main(int argc, char* args[]) {
                 randColor(&s1, &s2, &s3, 1); 
 
                 // Update sand physics
-                updateSandPhysics();
+                updatePhysics();
 
                 // Render
                 render();
