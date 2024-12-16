@@ -308,86 +308,17 @@ void updatePhysics() {
         }
     }
     
+    
+    
     // Update from bottom to top to simulate gravity
     for (int y = GRID_HEIGHT - 1; y >= 0; y--) {
-        
+
         if (y % 2 == 0) // Scan left to right
         {
-            for (int x = 0; x < GRID_WIDTH; ++x) {
+            for (int x = 0; x < GRID_WIDTH; x++) {
 
-                if (GRID[x][y].type == waterPixel.type){ // water
-                    if (GRID[x][y].exists && !GRID[x][y].updated) {
-                        // Apply gravity
-                        GRID[x][y].velocity += GRAVITY;
-                        
-                        // Cap maximum velocity
-                        if (GRID[x][y].velocity > MAX_VELOCITY) GRID[x][y].velocity = MAX_VELOCITY;
 
-                        // Find maximum falling distance
-                        int maxFallDistance = (int)GRID[x][y].velocity;
-                        int fallDistance = 0;
-                        
-                        // Check falling distance
-                        for (int dy = 1; dy <= maxFallDistance; dy++) {
-                            if (y + dy < GRID_HEIGHT && !GRID[x][y + dy].exists) {
-                                fallDistance = dy;
-                            } else {
-                                break;
-                            }
-                        }
-
-                        // If we can fall
-                        if (fallDistance > 0) {
-                            // Move pixel down
-                            GRID[x][y + fallDistance] = GRID[x][y];
-                            GRID[x][y] = emptyPixel;
-                            GRID[x][y + fallDistance].updated = true;
-                            
-                        }
-                        // If can't fall straight, try diagonal
-                        else {
-                            //int fallDirection = (rand() % 2 == 0) ? -1 : 1; NOT FROM OG
-                            int fallDirection = (rand() % 2) * 2 - 1; // -1 or 1
-
-                            int newX = x + fallDirection;
-                            
-                            if (newX >= 0 && newX < GRID_WIDTH && !GRID[newX][y].exists) {
-                                GRID[newX][y] = GRID[x][y];
-                                GRID[x][y] = emptyPixel;
-                            }
-                            
-                            // Try opposite direction
-                            newX = x - fallDirection;
-                            if (newX >= 0 && newX < GRID_WIDTH && !GRID[newX][y].exists) {
-                                GRID[newX][y] = GRID[x][y];
-                                GRID[x][y] = emptyPixel;
-                            }
-                            
-                            // Try diagonal movement if horizontal movement wasn't possible
-                            if (y + 1 < GRID_HEIGHT) {
-                                if (x + 1 < GRID_WIDTH && !GRID[x + 1][y + 1].exists) {
-                                    GRID[x + 1][y + 1] = GRID[x][y];
-                                    GRID[x][y] = emptyPixel;
-                                } 
-                                else if (x - 1 >= 0 && !GRID[x - 1][y + 1].exists) {
-                                    GRID[x - 1][y + 1] = GRID[x][y];
-                                    GRID[x][y] = emptyPixel;
-                                }
-                            }
-                            else {
-                            
-                                // If can't fall, reduce velocity
-                                GRID[x][y].velocity *= 0.5;
-                                if (GRID[x][y].velocity < 0.1) {
-                                    GRID[x][y].velocity = 0;
-                                }
-
-                            }
-                        }
-                    }
-                }
-
-                else if (GRID[x][y].type == sandPixel.type)
+                if (GRID[x][y].type == sandPixel.type)
                 {
                     if (GRID[x][y].exists && !GRID[x][y].updated) {
                         // Apply gravity
@@ -395,6 +326,7 @@ void updatePhysics() {
                         
                         // Cap maximum velocity
                         if (GRID[x][y].velocity > MAX_VELOCITY) GRID[x][y].velocity = MAX_VELOCITY;
+
 
                         // Find maximum falling distance
                         int maxFallDistance = (int)GRID[x][y].velocity;
@@ -445,84 +377,8 @@ void updatePhysics() {
                     }
                 }
 
-                
-            }
-        }
-        
-        else {
-            // Scan right to left
-            for (int x = GRID_WIDTH - 1; x >= 0; --x) {
-                if (GRID[x][y].type == waterPixel.type){ // water
-                    if (GRID[x][y].exists && !GRID[x][y].updated) {
-                        // Apply gravity
-                        GRID[x][y].velocity += GRAVITY;
-                        
-                        // Cap maximum velocity
-                        if (GRID[x][y].velocity > MAX_VELOCITY) GRID[x][y].velocity = MAX_VELOCITY;
 
-                        // Find maximum falling distance
-                        int maxFallDistance = (int)GRID[x][y].velocity;
-                        int fallDistance = 0;
-                        
-                        // Check falling distance
-                        for (int dy = 1; dy <= maxFallDistance; dy++) {
-                            if (y + dy < GRID_HEIGHT && !GRID[x][y + dy].exists) {
-                                fallDistance = dy;
-                            } else {
-                                break;
-                            }
-                        }
 
-                        // If we can fall
-                        if (fallDistance > 0) {
-                            // Move pixel down
-                            GRID[x][y + fallDistance] = GRID[x][y];
-                            GRID[x][y] = emptyPixel;
-                            GRID[x][y + fallDistance].updated = true;
-                            
-                        }
-                        // If can't fall straight, try diagonal
-                        else {
-                            //int fallDirection = (rand() % 2 == 0) ? -1 : 1; NOT FROM OG
-                            int fallDirection = (rand() % 2) * 2 - 1; // -1 or 1
-
-                            int newX = x + fallDirection;
-                            
-                            if (newX >= 0 && newX < GRID_WIDTH && !GRID[newX][y].exists) {
-                                GRID[newX][y] = GRID[x][y];
-                                GRID[x][y] = emptyPixel;
-                            }
-                            
-                            // Try opposite direction
-                            newX = x - fallDirection;
-                            if (newX >= 0 && newX < GRID_WIDTH && !GRID[newX][y].exists) {
-                                GRID[newX][y] = GRID[x][y];
-                                GRID[x][y] = emptyPixel;
-                            }
-                            
-                            // Try diagonal movement if horizontal movement wasn't possible
-                            if (y + 1 < GRID_HEIGHT) {
-                                if (x + 1 < GRID_WIDTH && !GRID[x + 1][y + 1].exists) {
-                                    GRID[x + 1][y + 1] = GRID[x][y];
-                                    GRID[x][y] = emptyPixel;
-                                } 
-                                else if (x - 1 >= 0 && !GRID[x - 1][y + 1].exists) {
-                                    GRID[x - 1][y + 1] = GRID[x][y];
-                                    GRID[x][y] = emptyPixel;
-                                }
-                            }
-                            else {
-                            
-                                // If can't fall, reduce velocity
-                                GRID[x][y].velocity *= 0.5;
-                                if (GRID[x][y].velocity < 0.1) {
-                                    GRID[x][y].velocity = 0;
-                                }
-
-                            }
-                        }
-                    }
-                }
 
 
                 else if (GRID[x][y].type == waterPixel.type){ // water
@@ -561,7 +417,7 @@ void updatePhysics() {
 
                             int newX = x + fallDirection;
                             
-                            if (newX >= 0 && newX < GRID_WIDTH && !GRID[newX][y].exists) {
+                        if (newX >= 0 && newX < GRID_WIDTH && !GRID[newX][y].exists) {
                                 GRID[newX][y] = GRID[x][y];
                                 GRID[x][y] = emptyPixel;
                             }
@@ -597,7 +453,21 @@ void updatePhysics() {
                     }
                 }
 
-                else if (GRID[x][y].type == sandPixel.type)
+
+            } 
+            
+
+
+
+
+
+        }
+        else{ // Scan right to left
+
+            for (int x = GRID_WIDTH - 1; x >= 0; --x) {
+
+
+                if (GRID[x][y].type == sandPixel.type)
                 {
                     if (GRID[x][y].exists && !GRID[x][y].updated) {
                         // Apply gravity
@@ -605,6 +475,7 @@ void updatePhysics() {
                         
                         // Cap maximum velocity
                         if (GRID[x][y].velocity > MAX_VELOCITY) GRID[x][y].velocity = MAX_VELOCITY;
+
 
                         // Find maximum falling distance
                         int maxFallDistance = (int)GRID[x][y].velocity;
@@ -647,24 +518,88 @@ void updatePhysics() {
                             else {
                                 // If can't fall, reduce velocity
                                 GRID[x][y].velocity *= 0.5;
-                                if (GRID[x][y].velocity < 0.1) {
-                                    GRID[x][y].velocity = 0;
-                                }
+                                if (GRID[x][y].velocity < 0.1) GRID[x][y].velocity = 0;
+
                             }
                         }
                     }
                 }
 
-                
+
+
+
+
+                else if (GRID[x][y].type == waterPixel.type){ // water
+                    if (GRID[x][y].exists && !GRID[x][y].updated) {
+                        // Apply gravity
+                        GRID[x][y].velocity += GRAVITY;
+                        
+                        // Cap maximum velocity
+                        if (GRID[x][y].velocity > MAX_VELOCITY) GRID[x][y].velocity = MAX_VELOCITY;
+
+                        // Find maximum falling distance
+                        int maxFallDistance = (int)GRID[x][y].velocity;
+                        int fallDistance = 0;
+                        
+                        // Check falling distance
+                        for (int dy = 1; dy <= maxFallDistance; dy++) {
+                            if (y + dy < GRID_HEIGHT && !GRID[x][y + dy].exists) fallDistance = dy;
+                            
+                            else break;
+                        }
+
+                        // If we can fall
+                        if (fallDistance > 0) {
+                            // Move pixel down
+                            GRID[x][y + fallDistance] = GRID[x][y];
+                            GRID[x][y] = emptyPixel;
+                            GRID[x][y + fallDistance].updated = true;
+                            
+                        }
+                        // If can't fall straight, try diagonal
+                        else {
+                            //int fallDirection = (rand() % 2 == 0) ? -1 : 1; NOT FROM OG
+                            int fallDirection = (rand() % 2) * 2 - 1; // -1 or 1
+
+                            int newX = x + fallDirection;
+                            
+                            if (newX >= 0 && newX < GRID_WIDTH && !GRID[newX][y].exists) {
+                                GRID[newX][y] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
+                            }
+                            
+                            // Try opposite direction
+                            newX = x - fallDirection;
+                            if (newX >= 0 && newX < GRID_WIDTH && !GRID[newX][y].exists) {
+                                GRID[newX][y] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
+                            }
+                            
+                            // Try diagonal movement if horizontal movement wasn't possible
+                            if (y + 1 < GRID_HEIGHT) {
+                                if (x + 1 < GRID_WIDTH && !GRID[x + 1][y + 1].exists) {
+                                    GRID[x + 1][y + 1] = GRID[x][y];
+                                    GRID[x][y] = emptyPixel;
+                                } 
+                                else if (x - 1 >= 0 && !GRID[x - 1][y + 1].exists) {
+                                    GRID[x - 1][y + 1] = GRID[x][y];
+                                    GRID[x][y] = emptyPixel;
+                                }
+                            }
+                            else {
+                            
+                                // If can't fall, reduce velocity
+                                GRID[x][y].velocity *= 0.5;
+                                if (GRID[x][y].velocity < 0.1)  GRID[x][y].velocity = 0;
+
+                            }
+                        }
+                    }
+                }
             }
         }
-        
-
-
-
     }
 }
-
 
 // Modified instantiate substance to reset velocity
 void instantiateSubstance(int x, int y, int dropperSize, int substanceMode) { 
