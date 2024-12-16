@@ -10,12 +10,11 @@
 #include <time.h>
 #include <math.h>
 
-
 // Screen dimension constants
 #define SCREEN_WIDTH 1392
 #define SCREEN_HEIGHT 744
 #define PIXEL_SIZE 4
-#define GRAVITY 0.9f
+#define GRAVITY 0.5f
 #define MAX_VELOCITY 10.0f
 
 #define GRID_HEIGHT (SCREEN_HEIGHT / PIXEL_SIZE)
@@ -38,17 +37,43 @@ typedef enum {
 } PixelType;
 
 typedef struct {
+    int r; // Red component
+    int g; // Green component
+    int b; // Blue component
+    int a; // Alpha component
+} Color;
+
+typedef struct {
     PixelType type;          // Pixel type, e.g., EMPTY, SAND
     bool exists;
     float velocity;
     bool updated;
-    SDL_Color color;   // Pixel color for rendering
+    Color colour;   // Pixel color for rendering
 } Pixel;
 
-Pixel GRID[SCREEN_WIDTH][SCREEN_HEIGHT]; 
+const Color colors[] = {
+    {234, 225, 176, 255}, // Sand color 1
+    {229, 216, 144, 255}, // Sand color 2
+    {195, 184, 124, 255}, // Sand color 3
+    {225, 200, 20, 255},  // Sand color 4
+    {207, 224, 227, 255}  // Sand color 5
 
+};
+
+Pixel GRID[GRID_WIDTH][GRID_HEIGHT]; 
+// this is for clearing the screen
+Pixel EMPTY_GRID[GRID_WIDTH][GRID_HEIGHT];
+
+/* COLOR VARIABLES */
+
+int s1 = 0, s2 = 0, s3 = 0; // sand colors
+
+// substances
 Pixel emptyPixel = {EMPTY, false, 0, false, {0, 0, 0, 255}};
-Pixel sandPixel = {SAND, true, 0, false, {255, 100, 100, 255}};
+Pixel sandPixel = {SAND, true, 0, false, {100, 100, 100, 255}};
+
+
+
 
 // Function declarations (same as before)
 bool init();
@@ -259,10 +284,10 @@ void render() {
                 };
 
                 SDL_SetRenderDrawColor(gRenderer, 
-                    GRID[x][y].color.r, 
-                    GRID[x][y].color.g, 
-                    GRID[x][y].color.b, 
-                    GRID[x][y].color.a);
+                    GRID[x][y].colour.r, 
+                    GRID[x][y].colour.g, 
+                    GRID[x][y].colour.b, 
+                    GRID[x][y].colour.a);
                 SDL_RenderFillRect(gRenderer, &particle_rect);
             }
         }
@@ -355,14 +380,25 @@ void instantiateSubstance(int x, int y) {
             
             if (pixelBlockX >= 0 && pixelBlockX < GRID_WIDTH && pixelBlockY >= 0 && pixelBlockY < GRID_HEIGHT && rand() % 100 < 75) {
                 if (!GRID[pixelBlockX][pixelBlockY].exists) {
-                    Pixel newSandPixel = sandPixel;
-                    newSandPixel.velocity = 0; // Initialize with zero velocity
-                    GRID[pixelBlockX][pixelBlockY] = newSandPixel;
+                    
+                    GRID[pixelBlockX][pixelBlockY] = sandPixel;
                 }
             }
         }
     }
 }
+
+// this is a function that takes a random integer and that decides which color will be used 
+// from a predefined set of colors. it also takes the 3 variables that will change the color
+// of the substance. lastly it takes the current mode and that will decide which set of colors to choose from
+// This color stuff is complicated
+// 'colors' is the constant array. 'colour' is the variable. 'Color' is the typdef for the struct
+void randColor(int *v1, int *v2, int *v3, int subMode) {
+    int randSandNum = rand() % 5;  // Random index (0 to 4)
+    sandPixel.colour = colors[randSandNum];
+}
+
+
 
 // Rest of the rendering functions remain the same
 
@@ -386,7 +422,16 @@ int main(int argc, char* args[]) {
                     if (event.type == SDL_QUIT) quit = 1;
                     if (event.type == SDL_KEYDOWN) {
                         if (event.key.keysym.sym == SDLK_ESCAPE) quit = 1;
+                        if (event.key.keysym.sym == SDLK_c) memcpy(GRID, EMPTY_GRID, sizeof(GRID));
+
+                        // mode for which substance will be dropped
+                        if (event.key.keysym.sym == SDLK_RIGHT && mode+1 <= 3) mode+=1;
+                        if (event.key.keysym.sym == SDLK_LEFT && mode-1 >= 0) mode-=1;
+
                     }
+
+    
+
 
                     if (event.type == SDL_MOUSEBUTTONDOWN) {
                         if (event.button.button == SDL_BUTTON_LEFT) {
@@ -408,14 +453,25 @@ int main(int argc, char* args[]) {
                     SDL_GetMouseState(&mouseX, &mouseY);
                     instantiateSubstance(mouseX, mouseY);
                 }
+
+                randColor(&s1, &s2, &s3, 1); 
+
+
                 // Update sand physics
                 updateSandPhysics();
 
                 // Render
                 render();
 
+                
+                //this is for text
+                renderTexture(&modeTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); 
+                renderTexture(&SizeOfDropperTexture, 200,0, NULL, 0, NULL, SDL_FLIP_NONE); 
+                SDL_RenderPresent(gRenderer); // Update screen
+
                 // Optional: Add a small delay to control simulation speed
                 SDL_Delay(16);
+
             }
         }
     }
