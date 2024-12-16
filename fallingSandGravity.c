@@ -61,9 +61,13 @@ const Color colors[] = {
 
 };
 
+// Main grid
 Pixel GRID[GRID_WIDTH][GRID_HEIGHT]; 
 // this is for clearing the screen
 Pixel EMPTY_GRID[GRID_WIDTH][GRID_HEIGHT];
+// This is used to swap pixels locations
+Pixel TEMP_GRID[GRID_WIDTH][GRID_HEIGHT];
+
 
 
 /* COLOR VARIABLES */
@@ -332,8 +336,10 @@ void updatePhysics() {
                         int fallDistance = 0;
                         
                         // Check falling distance
+                        // ADD OTHER SUBSTANCES THAT INTERACT WITH SAND HERE FOR GOING STRAIGHT DOWN
                         for (int dy = 1; dy <= maxFallDistance; dy++) {
-                            if (y + dy < GRID_HEIGHT && !GRID[x][y + dy].exists) fallDistance = dy;
+                            if (y + dy < GRID_HEIGHT && (GRID[x][y + dy].type == emptyPixel.type || GRID[x][y + dy].type == waterPixel.type) ) fallDistance = dy;
+                            
                             else break;
 
                         }
@@ -341,8 +347,9 @@ void updatePhysics() {
                         // If we can fall
                         if (fallDistance > 0) {
                             // Move pixel down
+                            GRID[x][y + fallDistance] = TEMP_GRID[x][y];
                             GRID[x][y + fallDistance] = GRID[x][y];
-                            GRID[x][y] = emptyPixel;
+                            GRID[x][y] = TEMP_GRID[x][y];
                             GRID[x][y + fallDistance].updated = true;
                             
                         }
@@ -463,7 +470,7 @@ void updatePhysics() {
                         
                         // Check falling distance
                         for (int dy = 1; dy <= maxFallDistance; dy++) {
-                            if (y + dy < GRID_HEIGHT && !GRID[x][y + dy].exists) fallDistance = dy;
+                            if (y + dy < GRID_HEIGHT && (GRID[x][y + dy].type == emptyPixel.type || GRID[x][y + dy].type == waterPixel.type) ) fallDistance = dy;
                             
                             else break;
 
@@ -472,8 +479,9 @@ void updatePhysics() {
                         // If we can fall
                         if (fallDistance > 0) {
                             // Move pixel down
+                            GRID[x][y + fallDistance] = TEMP_GRID[x][y];
                             GRID[x][y + fallDistance] = GRID[x][y];
-                            GRID[x][y] = emptyPixel;
+                            GRID[x][y] = TEMP_GRID[x][y];
                             GRID[x][y + fallDistance].updated = true;
                             
                         }
