@@ -1,5 +1,6 @@
 // gcc -I src/include -L src/lib -o main new2.c -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer
 
+// TO DO: I NEED TO IMPLEMENT WATER THE SAME WAY I DID IN OLD SIMULATOR. CHECK UPDATE_WATER
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -309,7 +310,7 @@ void updatePhysics() {
     // Update from bottom to top to simulate gravity
     for (int y = GRID_HEIGHT - 1; y >= 0; y--) {
         for (int x = 0; x < GRID_WIDTH; x++) {
-            if (GRID[x][y].type = sandPixel.type)
+            if (GRID[x][y].type == sandPixel.type)
             {
                 if (GRID[x][y].exists && !GRID[x][y].updated) {
                     // Apply gravity
@@ -372,7 +373,7 @@ void updatePhysics() {
 
 
 
-            else if (GRID[x][y].type = waterPixel.type){ // water
+            else if (GRID[x][y].type == waterPixel.type){ // water
                 if (GRID[x][y].exists && !GRID[x][y].updated) {
                     // Apply gravity
                     GRID[x][y].velocity += GRAVITY;
@@ -403,14 +404,14 @@ void updatePhysics() {
                     }
                     // If can't fall straight, try diagonal
                     else {
-                        int fallDirection = (rand() % 2 == 0) ? -1 : 1;
+                        //int fallDirection = (rand() % 2 == 0) ? -1 : 1; NOT FROM OG
+                        int fallDirection = (rand() % 2) * 2 - 1; // -1 or 1
+
                         int newX = x + fallDirection;
                         
-                        // Check diagonal falling
-                        if (newX >= 0 && newX < GRID_WIDTH && !GRID[newX][y].exists) {
+                       if (newX >= 0 && newX < GRID_WIDTH && !GRID[newX][y].exists) {
                             GRID[newX][y] = GRID[x][y];
                             GRID[x][y] = emptyPixel;
-                            continue;
                         }
                         
                         // Try opposite direction
@@ -418,19 +419,18 @@ void updatePhysics() {
                         if (newX >= 0 && newX < GRID_WIDTH && !GRID[newX][y].exists) {
                             GRID[newX][y] = GRID[x][y];
                             GRID[x][y] = emptyPixel;
-                            continue;
-
                         }
                         
-                        if (newX >= 0 && newX < GRID_WIDTH && y + 1 < GRID_HEIGHT && !GRID[newX][y + 1].exists) {
-                            
-                            // Move pixel diagonally
-                            GRID[newX][y + 1] = GRID[x][y];
-                            GRID[x][y] = emptyPixel;
-                            GRID[newX][y + 1].updated = true;
-                            
-                            // Reduce velocity when falling diagonally
-                            GRID[newX][y + 1].velocity *= 0.7;
+                        // Try diagonal movement if horizontal movement wasn't possible
+                        if (y + 1 < GRID_HEIGHT) {
+                            if (x + 1 < GRID_WIDTH && !GRID[x + 1][y + 1].exists) {
+                                GRID[x + 1][y + 1] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
+                            } 
+                            else if (x - 1 >= 0 && !GRID[x - 1][y + 1].exists) {
+                                GRID[x - 1][y + 1] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
+                            }
                         }
                         else {
                            
@@ -444,6 +444,9 @@ void updatePhysics() {
                     }
                 }
             }
+
+
+
         }
 
 
@@ -452,6 +455,7 @@ void updatePhysics() {
 
     }
 }
+
 
 // Modified instantiate substance to reset velocity
 void instantiateSubstance(int x, int y, int dropperSize, int substanceMode) { 
