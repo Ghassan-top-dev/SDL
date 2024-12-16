@@ -71,8 +71,7 @@ int s1 = 0, s2 = 0, s3 = 0; // sand colors
 // substances
 Pixel emptyPixel = {EMPTY, false, 0, false, {0, 0, 0, 255}};
 Pixel sandPixel = {SAND, true, 0, false, {100, 100, 100, 255}};
-
-
+Pixel waterPixel = {WATER, true, 0, false, {15, 94, 156, 255}};
 
 
 // Function declarations (same as before)
@@ -371,8 +370,8 @@ void updateSandPhysics() {
 }
 
 // Modified instantiate substance to reset velocity
-void instantiateSubstance(int x, int y) { 
-    int spawn_range = 2;
+void instantiateSubstance(int x, int y, int dropperSize, int substanceMode) { 
+    int spawn_range = dropperSize;
     for (int dx = -spawn_range; dx <= spawn_range; dx++) {
         for (int dy = -spawn_range; dy <= spawn_range; dy++) {
             int pixelBlockX = (x / PIXEL_SIZE) + dx;
@@ -417,6 +416,19 @@ int main(int argc, char* args[]) {
             SDL_Event event;
             bool pressed = false;
             
+            // text variables
+            int mode = 0; char modePresented[32], lastMode = -1;; //which substance
+            const char *lookUpOfSubstanceNames[] = {
+                "Choose a Substance", 
+                "Sand", 
+                "Water",
+                "Rainbow"
+            };
+            int sizeOfDropping = 2; 
+
+
+
+
             while (!quit) {
                 while (SDL_PollEvent(&event) != 0) {
                     if (event.type == SDL_QUIT) quit = 1;
@@ -428,10 +440,11 @@ int main(int argc, char* args[]) {
                         if (event.key.keysym.sym == SDLK_RIGHT && mode+1 <= 3) mode+=1;
                         if (event.key.keysym.sym == SDLK_LEFT && mode-1 >= 0) mode-=1;
 
+                        // this changes the size of the dropper
+                        if (event.key.keysym.sym == SDLK_UP) sizeOfDropping+=1;
+                        if (event.key.keysym.sym == SDLK_DOWN && sizeOfDropping-1 > 0) sizeOfDropping-=1;
+
                     }
-
-    
-
 
                     if (event.type == SDL_MOUSEBUTTONDOWN) {
                         if (event.button.button == SDL_BUTTON_LEFT) {
@@ -451,18 +464,27 @@ int main(int argc, char* args[]) {
                 if (pressed) {
                     int mouseX, mouseY;
                     SDL_GetMouseState(&mouseX, &mouseY);
-                    instantiateSubstance(mouseX, mouseY);
+                    if (mode != 0) instantiateSubstance(mouseX, mouseY, sizeOfDropping, mode);
+
+                }
+                // this chooses the mode and presents it
+                if (mode != lastMode)
+                {
+                    const char *whichText = (mode >= 1 && mode <= 3) ? lookUpOfSubstanceNames[mode] : lookUpOfSubstanceNames[0];
+                    loadFromRenderedText(&modeTextTexture, whichText, textColor);
+                    lastMode = mode; 
                 }
 
-                randColor(&s1, &s2, &s3, 1); 
+                sprintf(modePresented, "Dropper Size: %d", sizeOfDropping); 
+                loadFromRenderedText(&SizeOfDropperTexture, modePresented, textColor);
 
+                randColor(&s1, &s2, &s3, 1); 
 
                 // Update sand physics
                 updateSandPhysics();
 
                 // Render
                 render();
-
                 
                 //this is for text
                 renderTexture(&modeTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); 
