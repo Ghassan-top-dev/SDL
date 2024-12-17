@@ -34,7 +34,8 @@ SDL_Color textColor = {255, 255, 255}; // text color
 typedef enum {
     EMPTY = 0,
     SAND = 1,
-    WATER = 2
+    WATER = 2,
+    WOOD = 3
 } PixelType;
 
 typedef struct {
@@ -76,6 +77,8 @@ int s1 = 0, s2 = 0, s3 = 0; // sand colors
 Pixel emptyPixel = {EMPTY, false, 0, false, {0, 0, 0, 255}};
 Pixel sandPixel = {SAND, true, 0, false, {100, 100, 100, 255}};
 Pixel waterPixel = {WATER, true, 0, false, {15, 94, 156, 255}};
+Pixel woodPixel = {WOOD, true, 0, false, {222, 184, 135, 255}};
+
 
 
 // Function declarations (same as before)
@@ -626,18 +629,20 @@ void instantiateSubstance(int x, int y, int dropperSize, int substanceMode) {
             int pixelBlockX = (x / PIXEL_SIZE) + dx;
             int pixelBlockY = (y / PIXEL_SIZE) + dy;
             
-            if (pixelBlockX >= 0 && pixelBlockX < GRID_WIDTH && pixelBlockY >= 0 && pixelBlockY < GRID_HEIGHT && rand() % 100 < 75) {
+            if (pixelBlockX >= 0 && pixelBlockX < GRID_WIDTH && pixelBlockY >= 0 && pixelBlockY < GRID_HEIGHT) {
                 if (!GRID[pixelBlockX][pixelBlockY].exists) {
                     
-                    GRID[pixelBlockX][pixelBlockY] = sandPixel;
-
                     switch (substanceMode)
                     {
                     case 1:
-                        GRID[pixelBlockX][pixelBlockY] = sandPixel;
+                        if (rand() % 100 < 75) GRID[pixelBlockX][pixelBlockY] = sandPixel;
                         break;
                     case 2:
-                        GRID[pixelBlockX][pixelBlockY] = waterPixel;
+                        if (rand() % 100 < 75) GRID[pixelBlockX][pixelBlockY] = waterPixel;
+                        break;
+
+                    case 3:
+                        GRID[pixelBlockX][pixelBlockY] = woodPixel;
                         break;
                     
                     default:
@@ -676,7 +681,7 @@ int main(int argc, char* args[]) {
                 "Choose a Substance", 
                 "Sand", 
                 "Water",
-                "Rainbow"
+                "Wood"
             };
             int sizeOfDropping = 2; 
 
