@@ -607,11 +607,22 @@ void updatePhysics() {
     }
 }
 
+// this is a function that takes a random integer and that decides which color will be used 
+// from a predefined set of colors. it also takes the 3 variables that will change the color
+// of the substance. lastly it takes the current mode and that will decide which set of colors to choose from
+// This color stuff is complicated
+// 'colors' is the constant array. 'colour' is the variable. 'Color' is the typdef for the struct
+void randColor(int *v1, int *v2, int *v3, int subMode) {
+    int randSandNum = rand() % 5;  // Random index (0 to 4)
+    sandPixel.colour = colors[randSandNum];
+}
+
 // Modified instantiate substance to reset velocity
 void instantiateSubstance(int x, int y, int dropperSize, int substanceMode) { 
     int spawn_range = dropperSize;
     for (int dx = -spawn_range; dx <= spawn_range; dx++) {
         for (int dy = -spawn_range; dy <= spawn_range; dy++) {
+            randColor(&s1, &s2, &s3, 1); 
             int pixelBlockX = (x / PIXEL_SIZE) + dx;
             int pixelBlockY = (y / PIXEL_SIZE) + dy;
             
@@ -638,15 +649,7 @@ void instantiateSubstance(int x, int y, int dropperSize, int substanceMode) {
     }
 }
 
-// this is a function that takes a random integer and that decides which color will be used 
-// from a predefined set of colors. it also takes the 3 variables that will change the color
-// of the substance. lastly it takes the current mode and that will decide which set of colors to choose from
-// This color stuff is complicated
-// 'colors' is the constant array. 'colour' is the variable. 'Color' is the typdef for the struct
-void randColor(int *v1, int *v2, int *v3, int subMode) {
-    int randSandNum = rand() % 5;  // Random index (0 to 4)
-    sandPixel.colour = colors[randSandNum];
-}
+
 
 
 
@@ -724,8 +727,6 @@ int main(int argc, char* args[]) {
 
                 sprintf(modePresented, "Dropper Size: %d", sizeOfDropping); 
                 loadFromRenderedText(&SizeOfDropperTexture, modePresented, textColor);
-
-                randColor(&s1, &s2, &s3, 1); 
 
                 // Update physics
                 updatePhysics();
