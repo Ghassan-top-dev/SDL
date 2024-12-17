@@ -65,8 +65,6 @@ const Color colors[] = {
 Pixel GRID[GRID_WIDTH][GRID_HEIGHT]; 
 // this is for clearing the screen
 Pixel EMPTY_GRID[GRID_WIDTH][GRID_HEIGHT];
-// This is used to swap pixels locations
-Pixel TEMP_GRID[GRID_WIDTH][GRID_HEIGHT];
 
 
 
