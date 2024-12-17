@@ -345,13 +345,25 @@ void updatePhysics() {
                         }
 
                         // If we can fall
+                        // here add the other substances that sand can fall through
                         if (fallDistance > 0) {
-                            // Move pixel down
-                            GRID[x][y + fallDistance] = TEMP_GRID[x][y];
-                            GRID[x][y + fallDistance] = GRID[x][y];
-                            GRID[x][y] = TEMP_GRID[x][y];
+
+                            if (GRID[x][y + fallDistance].type == waterPixel.type) {
+                                // Swap sand and water
+                                Pixel temp = GRID[x][y + fallDistance];
+                                GRID[x][y + fallDistance] = GRID[x][y];
+                                GRID[x][y] = temp;
+                            } 
+                            else {
+                                // Move sand down
+                                GRID[x][y + fallDistance] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
+                            }
                             GRID[x][y + fallDistance].updated = true;
-                            
+                                                        
+
+
+                        
                         }
                         // If can't fall straight, try diagonal
                         else {
@@ -478,12 +490,23 @@ void updatePhysics() {
 
                         // If we can fall
                         if (fallDistance > 0) {
-                            // Move pixel down
-                            GRID[x][y + fallDistance] = TEMP_GRID[x][y];
-                            GRID[x][y + fallDistance] = GRID[x][y];
-                            GRID[x][y] = TEMP_GRID[x][y];
+
+                            if (GRID[x][y + fallDistance].type == waterPixel.type) {
+                                // Swap sand and water
+                                Pixel temp = GRID[x][y + fallDistance];
+                                GRID[x][y + fallDistance] = GRID[x][y];
+                                GRID[x][y] = temp;
+                            } 
+                            else {
+                                // Move sand down
+                                GRID[x][y + fallDistance] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
+                            }
                             GRID[x][y + fallDistance].updated = true;
-                            
+                                                        
+
+
+                        
                         }
                         // If can't fall straight, try diagonal
                         else {
