@@ -35,7 +35,9 @@ typedef enum {
     EMPTY = 0,
     SAND = 1,
     WATER = 2,
-    WOOD = 3
+    WOOD = 3,
+    FIRE = 4
+
 } PixelType;
 
 typedef struct {
@@ -50,6 +52,7 @@ typedef struct {
     bool exists;
     float velocity;
     bool updated;
+    int lifetime;
     Color colour;   // Pixel color for rendering
 } Pixel;
 
@@ -74,10 +77,12 @@ Pixel EMPTY_GRID[GRID_WIDTH][GRID_HEIGHT];
 int s1 = 0, s2 = 0, s3 = 0; // sand colors
 
 // substances
-Pixel emptyPixel = {EMPTY, false, 0, false, {0, 0, 0, 255}};
-Pixel sandPixel = {SAND, true, 0, false, {100, 100, 100, 255}};
-Pixel waterPixel = {WATER, true, 0, false, {15, 94, 156, 255}};
-Pixel woodPixel = {WOOD, true, 0, false, {222, 184, 135, 255}};
+Pixel emptyPixel = {EMPTY, false, 0, false, -1, {0, 0, 0, 255}};
+Pixel sandPixel = {SAND, true, 0, false, -1, {100, 100, 100, 255}};
+Pixel waterPixel = {WATER, true, 0, false, -1, {15, 94, 156, 255}};
+Pixel woodPixel = {WOOD, true, 0, false, -1, {222, 184, 135, 255}};
+Pixel firePixel = {FIRE, true, 0, false, 8, {128, 9, 9, 255}};
+
 
 
 
@@ -640,9 +645,11 @@ void instantiateSubstance(int x, int y, int dropperSize, int substanceMode) {
                     case 2:
                         if (rand() % 100 < 75) GRID[pixelBlockX][pixelBlockY] = waterPixel;
                         break;
-
                     case 3:
                         GRID[pixelBlockX][pixelBlockY] = woodPixel;
+                        break;
+                    case 4:
+                        if (rand() % 100 < 55) GRID[pixelBlockX][pixelBlockY] = firePixel;
                         break;
                     
                     default:
@@ -687,7 +694,8 @@ int main(int argc, char* args[]) {
                 "Erase", 
                 "Sand", 
                 "Water",
-                "Wood"
+                "Wood",
+                "Fire"
             };
             int sizeOfDropping = 2; 
 
@@ -699,7 +707,7 @@ int main(int argc, char* args[]) {
                         if (event.key.keysym.sym == SDLK_c) memcpy(GRID, EMPTY_GRID, sizeof(GRID));
 
                         // mode for which substance will be dropped
-                        if (event.key.keysym.sym == SDLK_RIGHT && mode+1 <= 3) mode+=1;
+                        if (event.key.keysym.sym == SDLK_RIGHT && mode+1 <= 4) mode+=1;
                         if (event.key.keysym.sym == SDLK_LEFT && mode-1 >= 0) mode-=1;
 
                         // this changes the size of the dropper
@@ -731,7 +739,7 @@ int main(int argc, char* args[]) {
                 // this chooses the mode and presents it
                 if (mode != lastMode)
                 {
-                    const char *whichText = (mode >= 1 && mode <= 3) ? lookUpOfSubstanceNames[mode] : lookUpOfSubstanceNames[0];
+                    const char *whichText = (mode >= 1 && mode <= 4) ? lookUpOfSubstanceNames[mode] : lookUpOfSubstanceNames[0];
                     loadFromRenderedText(&modeTextTexture, whichText, textColor);
                     lastMode = mode; 
                 }
