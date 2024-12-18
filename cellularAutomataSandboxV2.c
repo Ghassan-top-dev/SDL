@@ -65,6 +65,13 @@ const Color colors[] = {
 
 };
 
+// Array for the 8 possible directions + the current position itself (optional depending on needs)
+int offsets[8][2] = {
+    {-1, -1}, {0, -1}, {1, -1}, // Top-left, Top, Top-right
+    {-1,  0},          {1,  0}, // Left,        , Right
+    {-1,  1}, {0,  1}, {1,  1}  // Bottom-left, Bottom, Bottom-right
+};
+
 // Main grid
 Pixel GRID[GRID_WIDTH][GRID_HEIGHT]; 
 // this is for clearing the screen
@@ -81,7 +88,7 @@ Pixel emptyPixel = {EMPTY, false, 0, false, -1, {0, 0, 0, 255}};
 Pixel sandPixel = {SAND, true, 0, false, -1, {100, 100, 100, 255}};
 Pixel waterPixel = {WATER, true, 0, false, -1, {15, 94, 156, 255}};
 Pixel woodPixel = {WOOD, true, 0, false, -1, {222, 184, 135, 255}};
-Pixel firePixel = {FIRE, true, 0, false, 6, {128, 9, 9, 255}};
+Pixel firePixel = {FIRE, true, 0, false, 16, {128, 9, 9, 255}};
 
 
 
@@ -331,6 +338,25 @@ void updatePhysics() {
                 if (GRID[x][y].type == firePixel.type && GRID[x][y].lifetime == 0){
 
                     GRID[x][y] = emptyPixel;
+                    continue;
+
+                }else if(GRID[x][y].type == firePixel.type){
+
+                    for (int i = 0; i < 8; i++) {
+                        int nx = x + offsets[i][0]; // Neighbor's x-coordinate
+                        int ny = y + offsets[i][1]; // Neighbor's y-coordinate
+
+                        // Check bounds
+                        if (nx >= 0 && nx < GRID_WIDTH && ny >= 0 && ny < GRID_HEIGHT) {
+                            if (GRID[nx][ny].type == woodPixel.type) {
+                                // Process wood interaction
+                                GRID[nx][ny] = firePixel; // Example: Convert wood to fire
+                                continue;
+
+                            }
+                        }
+                    }
+                    continue;
 
                 }
 
@@ -484,6 +510,25 @@ void updatePhysics() {
                 if (GRID[x][y].type == firePixel.type && GRID[x][y].lifetime == 0){
 
                     GRID[x][y] = emptyPixel;
+                    continue;
+
+                }else if(GRID[x][y].type == firePixel.type){
+
+                    for (int i = 0; i < 8; i++) {
+                        int nx = x + offsets[i][0]; // Neighbor's x-coordinate
+                        int ny = y + offsets[i][1]; // Neighbor's y-coordinate
+
+                        // Check bounds
+                        if (nx >= 0 && nx < GRID_WIDTH && ny >= 0 && ny < GRID_HEIGHT) {
+                            if (GRID[nx][ny].type == woodPixel.type) {
+                                // Process wood interaction
+                                GRID[nx][ny] = firePixel; // Example: Convert wood to fire
+                                continue;
+
+                            }
+                        }
+                    }
+                    continue;
 
                 }
 
