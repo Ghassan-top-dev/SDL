@@ -350,7 +350,7 @@ void updatePhysics() {
                         if (nx >= 0 && nx < GRID_WIDTH && ny >= 0 && ny < GRID_HEIGHT) {
                             if (GRID[nx][ny].type == woodPixel.type) {
                                 // Process wood interaction
-                                GRID[nx][ny] = firePixel; // Example: Convert wood to fire
+                                if (rand() % 100 < 5) GRID[nx][ny] = firePixel; // Example: Convert wood to fire
                                 continue;
 
                             }
@@ -522,7 +522,7 @@ void updatePhysics() {
                         if (nx >= 0 && nx < GRID_WIDTH && ny >= 0 && ny < GRID_HEIGHT) {
                             if (GRID[nx][ny].type == woodPixel.type) {
                                 // Process wood interaction
-                                GRID[nx][ny] = firePixel; // Example: Convert wood to fire
+                                if (rand() % 100 < 5) GRID[nx][ny] = firePixel; // Example: Convert wood to fire
                                 continue;
 
                             }
