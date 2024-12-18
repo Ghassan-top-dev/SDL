@@ -684,7 +684,7 @@ int main(int argc, char* args[]) {
             // text variables
             int mode = 0; char modePresented[32], lastMode = -1;; //which substance
             const char *lookUpOfSubstanceNames[] = {
-                "Choose a Substance", 
+                "Clear", 
                 "Sand", 
                 "Water",
                 "Wood"
