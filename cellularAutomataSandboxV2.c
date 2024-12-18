@@ -53,6 +53,7 @@ typedef struct {
     float velocity;
     bool updated;
     int lifetime;
+    int howManyFramesNearBurnable;
     Color colour;   // Pixel color for rendering
 } Pixel;
 
@@ -84,11 +85,11 @@ Pixel EMPTY_GRID[GRID_WIDTH][GRID_HEIGHT];
 int s1 = 0, s2 = 0, s3 = 0; // sand colors
 
 // substances
-Pixel emptyPixel = {EMPTY, false, 0, false, -1, {0, 0, 0, 255}};
-Pixel sandPixel = {SAND, true, 0, false, -1, {100, 100, 100, 255}};
-Pixel waterPixel = {WATER, true, 0, false, -1, {15, 94, 156, 255}};
-Pixel woodPixel = {WOOD, true, 0, false, -1, {222, 184, 135, 255}};
-Pixel firePixel = {FIRE, true, 0, false, 16, {128, 9, 9, 255}};
+Pixel emptyPixel = {EMPTY, false, 0, false, -1, -1, {0, 0, 0, 255}};
+Pixel sandPixel = {SAND, true, 0, false, -1, -1, {100, 100, 100, 255}};
+Pixel waterPixel = {WATER, true, 0, false, -1, -1, {15, 94, 156, 255}};
+Pixel woodPixel = {WOOD, true, 0, false, -1, -1, {222, 184, 135, 255}};
+Pixel firePixel = {FIRE, true, 0, false, 16, 20, {128, 9, 9, 255}};
 
 
 
@@ -348,9 +349,15 @@ void updatePhysics() {
 
                         // Check bounds
                         if (nx >= 0 && nx < GRID_WIDTH && ny >= 0 && ny < GRID_HEIGHT) {
-                            if (GRID[nx][ny].type == woodPixel.type) {
-                                // Process wood interaction
+                            if (GRID[x][y].howManyFramesNearBurnable == 0 && GRID[nx][ny].type == woodPixel.type)
+                            {
                                 if (rand() % 100 < 10) GRID[nx][ny] = firePixel; // Example: Convert wood to fire
+                                continue;
+                            }
+                            
+                            else if (GRID[x][y].howManyFramesNearBurnable > 0 && GRID[nx][ny].type == woodPixel.type) {
+                                // Process wood interaction
+                                GRID[x][y].howManyFramesNearBurnable--;
                                 continue;
 
                             }
@@ -520,9 +527,15 @@ void updatePhysics() {
 
                         // Check bounds
                         if (nx >= 0 && nx < GRID_WIDTH && ny >= 0 && ny < GRID_HEIGHT) {
-                            if (GRID[nx][ny].type == woodPixel.type) {
-                                // Process wood interaction
+                            if (GRID[x][y].howManyFramesNearBurnable == 0 && GRID[nx][ny].type == woodPixel.type)
+                            {
                                 if (rand() % 100 < 10) GRID[nx][ny] = firePixel; // Example: Convert wood to fire
+                                continue;
+                            }
+                            
+                            else if (GRID[x][y].howManyFramesNearBurnable > 0 && GRID[nx][ny].type == woodPixel.type) {
+                                // Process wood interaction
+                                GRID[x][y].howManyFramesNearBurnable--;
                                 continue;
 
                             }
