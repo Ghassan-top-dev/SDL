@@ -649,6 +649,12 @@ void instantiateSubstance(int x, int y, int dropperSize, int substanceMode) {
                         break;
                     }
                 }
+                else if(GRID[pixelBlockX][pixelBlockY].exists && substanceMode == 0){
+
+                    GRID[pixelBlockX][pixelBlockY] = emptyPixel;
+
+
+                }
             }
         }
     }
@@ -719,7 +725,7 @@ int main(int argc, char* args[]) {
                 if (pressed) {
                     int mouseX, mouseY;
                     SDL_GetMouseState(&mouseX, &mouseY);
-                    if (mode != 0) instantiateSubstance(mouseX, mouseY, sizeOfDropping, mode);
+                    instantiateSubstance(mouseX, mouseY, sizeOfDropping, mode);
 
                 }
                 // this chooses the mode and presents it
