@@ -1,6 +1,6 @@
 // gcc -I src/include -L src/lib -o main new2.c -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer
 
-// TO DO: add ability to erase
+// TO DO: Add steam, color to fire, maybe make wood less ugly? 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
