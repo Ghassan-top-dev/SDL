@@ -1,6 +1,6 @@
 // gcc -I src/include -L src/lib -o main new2.c -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer
 
-// TO DO: Add steam, maybe make wood less ugly? 
+// TO DO: ? 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -59,6 +59,7 @@ typedef struct {
 } Pixel;
 
 const Color colors[] = {
+    // Sand Colors
     {234, 225, 176, 255}, // Sand color 1
     {229, 216, 144, 255}, // Sand color 2
     {195, 184, 124, 255}, // Sand color 3
@@ -66,12 +67,20 @@ const Color colors[] = {
     {207, 224, 227, 255}, // Sand color 5
 
     // Fire Colors
-    {161, 0, 0, 255},     // New color 1
-    {234, 35, 0, 255},    // New color 2
-    {255, 129, 0, 255},   // New color 3
-    {242, 85, 0, 255},    // New color 4
-    {216, 0, 0, 255}      // New color 5
+    {161, 0, 0, 255},     // Fire color 1
+    {234, 35, 0, 255},    // Fire color 2
+    {255, 129, 0, 255},   // Fire color 3
+    {242, 85, 0, 255},    // Fire color 4
+    {216, 0, 0, 255},     // Fire color 5
+
+    // Wood Color
+    {39, 24, 16, 255},    // wood color 1
+    {79, 32, 15, 255},    // wood color 2
+    {149, 69, 32, 255},   // wood color 3
+    {199, 108, 63, 255},  // wood color 4
+    {189, 148, 118, 255}  // wood color 5
 };
+
 
 
 // Array for the 8 possible directions + the current position itself (optional depending on needs)
@@ -340,6 +349,10 @@ void randColor(int *v1, int *v2, int *v3, int subMode) {
         randSandNum = rand() % 5;  // Random index (0 to 4)
         sandPixel.colour = colors[randSandNum];
         break;
+    case 3:
+        randSandNum = 10 + (rand() % 5); // Random index (10 to 14)
+        woodPixel.colour = colors[randSandNum];
+        break;
     case 4:
         randSandNum = 5 + (rand() % 5); // Random index (5 to 9)
         firePixel.colour = colors[randSandNum];
@@ -371,9 +384,10 @@ void updatePhysics() {
         {
             for (int x = 0; x < GRID_WIDTH; x++) {
 
-                if (GRID[x][y].type == steamPixel.type && GRID[x][y].lifetime == 0 && rand() % 100 < 75){
+                if (GRID[x][y].type == steamPixel.type && GRID[x][y].lifetime == 0){
 
-                    GRID[x][y] = emptyPixel;
+                    if (rand() % 100 < 75) GRID[x][y] = emptyPixel;
+                    else GRID[x][y].lifetime = 100;
                     continue;
 
                 }
@@ -606,9 +620,10 @@ void updatePhysics() {
             for (int x = GRID_WIDTH - 1; x >= 0; --x) {
 
 
-                if (GRID[x][y].type == steamPixel.type && GRID[x][y].lifetime == 0 && rand() % 100 < 75){
+                if (GRID[x][y].type == steamPixel.type && GRID[x][y].lifetime == 0){
 
-                    GRID[x][y] = emptyPixel;
+                    if (rand() % 100 < 75) GRID[x][y] = emptyPixel;
+                    else GRID[x][y].lifetime = 100;
                     continue;
 
                 }
@@ -858,6 +873,7 @@ void instantiateSubstance(int x, int y, int dropperSize, int substanceMode) {
                         if (rand() % 100 < 75) GRID[pixelBlockX][pixelBlockY] = waterPixel;
                         break;
                     case 3:
+                        randColor(&s1, &s2, &s3, 3); 
                         GRID[pixelBlockX][pixelBlockY] = woodPixel;
                         break;
                     case 4:
