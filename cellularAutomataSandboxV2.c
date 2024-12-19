@@ -1,6 +1,6 @@
 // gcc -I src/include -L src/lib -o main new2.c -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer
 
-// TO DO: Add steam, color to fire, maybe make wood less ugly? 
+// TO DO: Add steam, maybe make wood less ugly? 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -62,9 +62,16 @@ const Color colors[] = {
     {229, 216, 144, 255}, // Sand color 2
     {195, 184, 124, 255}, // Sand color 3
     {225, 200, 20, 255},  // Sand color 4
-    {207, 224, 227, 255}  // Sand color 5
+    {207, 224, 227, 255}, // Sand color 5
 
+    // Fire Colors
+    {161, 0, 0, 255},     // New color 1
+    {234, 35, 0, 255},    // New color 2
+    {255, 129, 0, 255},   // New color 3
+    {242, 85, 0, 255},    // New color 4
+    {216, 0, 0, 255}      // New color 5
 };
+
 
 // Array for the 8 possible directions + the current position itself (optional depending on needs)
 int offsets[8][2] = {
@@ -317,6 +324,33 @@ void render() {
 }
 
 
+// this is a function that takes a random integer and that decides which color will be used 
+// from a predefined set of colors. it also takes the 3 variables that will change the color
+// of the substance. lastly it takes the current mode and that will decide which set of colors to choose from
+// This color stuff is complicated
+// 'colors' is the constant array. 'colour' is the variable. 'Color' is the typdef for the struct
+void randColor(int *v1, int *v2, int *v3, int subMode) {
+    int randSandNum;
+    switch (subMode)
+    {
+    case 1:
+        randSandNum = rand() % 5;  // Random index (0 to 4)
+        sandPixel.colour = colors[randSandNum];
+        break;
+    case 4:
+        randSandNum = 5 + (rand() % 5); // Random index (5 to 9)
+        firePixel.colour = colors[randSandNum];
+        break;
+        
+    
+    default:
+        break;
+    }
+    
+    
+}
+
+
 // New function to update sand pixels with physics
 void updatePhysics() {
     // Reset update flags
@@ -351,7 +385,10 @@ void updatePhysics() {
                         if (nx >= 0 && nx < GRID_WIDTH && ny >= 0 && ny < GRID_HEIGHT) {
                             if (GRID[x][y].howManyFramesNearBurnable == 0 && GRID[nx][ny].type == woodPixel.type)
                             {
-                                if (rand() % 100 < 25) GRID[nx][ny] = firePixel; // Example: Convert wood to fire
+                                if (rand() % 100 < 25){
+                                    randColor(&s1, &s2, &s3, 4); 
+                                    GRID[nx][ny] = firePixel; // Example: Convert wood to fire
+                                }
                                 continue;
                             }
                             
@@ -529,7 +566,10 @@ void updatePhysics() {
                         if (nx >= 0 && nx < GRID_WIDTH && ny >= 0 && ny < GRID_HEIGHT) {
                             if (GRID[x][y].howManyFramesNearBurnable == 0 && GRID[nx][ny].type == woodPixel.type)
                             {
-                                if (rand() % 100 < 25) GRID[nx][ny] = firePixel; // Example: Convert wood to fire
+                                if (rand() % 100 < 25){
+                                    randColor(&s1, &s2, &s3, 4); 
+                                    GRID[nx][ny] = firePixel; // Example: Convert wood to fire
+                                }                                
                                 continue;
                             }
                             
@@ -687,22 +727,12 @@ void updatePhysics() {
     }
 }
 
-// this is a function that takes a random integer and that decides which color will be used 
-// from a predefined set of colors. it also takes the 3 variables that will change the color
-// of the substance. lastly it takes the current mode and that will decide which set of colors to choose from
-// This color stuff is complicated
-// 'colors' is the constant array. 'colour' is the variable. 'Color' is the typdef for the struct
-void randColor(int *v1, int *v2, int *v3, int subMode) {
-    int randSandNum = rand() % 5;  // Random index (0 to 4)
-    sandPixel.colour = colors[randSandNum];
-}
 
 // Modified instantiate substance to reset velocity
 void instantiateSubstance(int x, int y, int dropperSize, int substanceMode) { 
     int spawn_range = dropperSize;
     for (int dx = -spawn_range; dx <= spawn_range; dx++) {
         for (int dy = -spawn_range; dy <= spawn_range; dy++) {
-            randColor(&s1, &s2, &s3, 1); 
             int pixelBlockX = (x / PIXEL_SIZE) + dx;
             int pixelBlockY = (y / PIXEL_SIZE) + dy;
             
@@ -712,6 +742,7 @@ void instantiateSubstance(int x, int y, int dropperSize, int substanceMode) {
                     switch (substanceMode)
                     {
                     case 1:
+                        randColor(&s1, &s2, &s3, 1); 
                         if (rand() % 100 < 75) GRID[pixelBlockX][pixelBlockY] = sandPixel;
                         break;
                     case 2:
@@ -721,6 +752,7 @@ void instantiateSubstance(int x, int y, int dropperSize, int substanceMode) {
                         GRID[pixelBlockX][pixelBlockY] = woodPixel;
                         break;
                     case 4:
+                        randColor(&s1, &s2, &s3, 4); 
                         if (rand() % 100 < 55) GRID[pixelBlockX][pixelBlockY] = firePixel;
                         break;
                     
