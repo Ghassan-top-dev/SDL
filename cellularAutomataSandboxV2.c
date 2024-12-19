@@ -98,7 +98,7 @@ Pixel sandPixel = {SAND, true, 0, false, -1, -1, {100, 100, 100, 255}};
 Pixel waterPixel = {WATER, true, 0, false, -1, -1, {15, 94, 156, 255}};
 Pixel woodPixel = {WOOD, true, 0, false, -1, -1, {222, 184, 135, 255}};
 Pixel firePixel = {FIRE, true, 0, false, 16, 20, {128, 9, 9, 255}};
-Pixel steamPixel = {STEAM, true, 0, false, 22, -1, {75, 80, 75, 80}};
+Pixel steamPixel = {STEAM, true, 0, false, 200, -1, {75, 80, 75, 25}};
 
 
 
@@ -373,12 +373,19 @@ void updatePhysics() {
         {
             for (int x = 0; x < GRID_WIDTH; x++) {
 
-                if (GRID[x][y].type == firePixel.type && GRID[x][y].lifetime == 0){
+                if (GRID[x][y].type == steamPixel.type && GRID[x][y].lifetime == 0){
 
                     GRID[x][y] = emptyPixel;
                     continue;
 
-                }else if(GRID[x][y].type == firePixel.type){
+                }
+
+                if (GRID[x][y].type == firePixel.type && GRID[x][y].lifetime == 0){
+
+                    GRID[x][y] = steamPixel;
+
+                }
+                else if(GRID[x][y].type == firePixel.type){
 
                     for (int i = 0; i < 8; i++) {
                         int nx = x + offsets[i][0]; // Neighbor's x-coordinate
@@ -545,6 +552,53 @@ void updatePhysics() {
                     }
                 }
 
+                else if (GRID[x][y].type == steamPixel.type){// THIS IS FOR STEAM (1/2)
+
+                    if (GRID[x][y].exists && !GRID[x][y].updated) {
+
+                        // If we can go up
+                        if (GRID[x][y - 1].type == EMPTY && y - 1 >= 0) {
+                            // Move pixel down
+                            GRID[x][y - 1] = GRID[x][y];
+                            GRID[x][y] = emptyPixel;
+                            GRID[x][y - 1].updated = true;
+                            
+                        }
+                        // If can't fall straight, try diagonal
+                        else {
+                            int fallDirection = (rand() % 2) * 2 - 1; // -1 or 1
+
+                            int newX = x + fallDirection;
+                            
+                            if (newX >= 0 && newX < GRID_WIDTH && !GRID[newX][y].exists) {
+                                GRID[newX][y] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
+                            }
+                            
+                            // Try opposite direction
+                            newX = x - fallDirection;
+                            if (newX >= 0 && newX < GRID_WIDTH && !GRID[newX][y].exists) {
+                                GRID[newX][y] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
+                            }
+                            
+                            // Try diagonal movement if horizontal movement wasn't possible
+                            if (y - 1 >= 0) {
+                                if (x + 1 < GRID_WIDTH && !GRID[x + 1][y - 1].exists) {
+                                    GRID[x + 1][y - 1] = GRID[x][y];
+                                    GRID[x][y] = emptyPixel;
+                                } 
+                                else if (x - 1 >= 0 && !GRID[x - 1][y - 1].exists) {
+                                    GRID[x - 1][y - 1] = GRID[x][y];
+                                    GRID[x][y] = emptyPixel;
+                                }
+                            }
+                        }
+                    }
+
+
+                }
+
             } 
             
 
@@ -554,12 +608,19 @@ void updatePhysics() {
             for (int x = GRID_WIDTH - 1; x >= 0; --x) {
 
 
-                if (GRID[x][y].type == firePixel.type && GRID[x][y].lifetime == 0){
+                if (GRID[x][y].type == steamPixel.type && GRID[x][y].lifetime == 0){
 
                     GRID[x][y] = emptyPixel;
                     continue;
 
-                }else if(GRID[x][y].type == firePixel.type){
+                }
+
+                if (GRID[x][y].type == firePixel.type && GRID[x][y].lifetime == 0){
+
+                    GRID[x][y] = steamPixel;
+
+                }
+                else if(GRID[x][y].type == firePixel.type){
 
                     for (int i = 0; i < 8; i++) {
                         int nx = x + offsets[i][0]; // Neighbor's x-coordinate
@@ -724,6 +785,53 @@ void updatePhysics() {
                             }
                         }
                     }
+                }
+
+                else if (GRID[x][y].type == steamPixel.type){// THIS IS FOR STEAM (2/2)
+
+                    if (GRID[x][y].exists && !GRID[x][y].updated) {
+
+                        // If we can go up
+                        if (GRID[x][y - 1].type == EMPTY) {
+                            // Move pixel down
+                            GRID[x][y - 1] = GRID[x][y];
+                            GRID[x][y] = emptyPixel;
+                            GRID[x][y - 1].updated = true;
+                            
+                        }
+                        // If can't fall straight, try diagonal
+                        else {
+                            int fallDirection = (rand() % 2) * 2 - 1; // -1 or 1
+
+                            int newX = x + fallDirection;
+                            
+                            if (newX >= 0 && newX < GRID_WIDTH && !GRID[newX][y].exists) {
+                                GRID[newX][y] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
+                            }
+                            
+                            // Try opposite direction
+                            newX = x - fallDirection;
+                            if (newX >= 0 && newX < GRID_WIDTH && !GRID[newX][y].exists) {
+                                GRID[newX][y] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
+                            }
+                            
+                            // Try diagonal movement if horizontal movement wasn't possible
+                            if (y - 1 >= 0) {
+                                if (x + 1 < GRID_WIDTH && !GRID[x + 1][y - 1].exists) {
+                                    GRID[x + 1][y - 1] = GRID[x][y];
+                                    GRID[x][y] = emptyPixel;
+                                } 
+                                else if (x - 1 >= 0 && !GRID[x - 1][y - 1].exists) {
+                                    GRID[x - 1][y - 1] = GRID[x][y];
+                                    GRID[x][y] = emptyPixel;
+                                }
+                            }
+                        }
+                    }
+
+
                 }
             }
         }
