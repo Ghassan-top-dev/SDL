@@ -12,12 +12,17 @@
 #include <math.h>
 
 // Screen dimension constants
-#define SCREEN_WIDTH 1392
+// the size of the screen
+#define SCREEN_WIDTH 1392 
 #define SCREEN_HEIGHT 744
+// the size of the "cell" in this case for ex: 4 would mean a 4*4 pixel cell composed of 16 pixels
 #define PIXEL_SIZE 4
+// the rate of change of the velocity each frame
 #define GRAVITY 0.5f
 #define MAX_VELOCITY 10.0f
 
+// this is the grid of the actual cells, if grid width is 100 for example, then you can have 100
+// cells horizontally
 #define GRID_HEIGHT (SCREEN_HEIGHT / PIXEL_SIZE)
 #define GRID_WIDTH (SCREEN_WIDTH / PIXEL_SIZE)
 
@@ -31,6 +36,7 @@ typedef struct {
 SDL_Color textColor = {255, 255, 255}; // text color
 
 //Code for the sandbox
+// enumeration of the different values that a cell could contain
 typedef enum {
     EMPTY = 0,
     SAND = 1,
@@ -50,13 +56,17 @@ typedef struct {
 
 typedef struct {
     PixelType type;          // Pixel type, e.g., EMPTY, SAND
-    bool exists;
-    float velocity;
-    bool updated;
-    int lifetime;
-    int howManyFramesNearBurnable;
+    bool exists;             // all true except for the emptyPixel
+    float velocity;          // velocity member
+    bool updated;            // very important member that skips a cell if it has been updated this frame
+    int lifetime;            // how many frames before this cell decays into another cell
+    int howManyFramesNearBurnable;  // this applies to fire, this is the amount of frames that wood is near fire
     Color colour;   // Pixel color for rendering
 } Pixel;
+
+// COLOR VARIABLES
+
+int s1 = 0, s2 = 0, s3 = 0; // sand colors
 
 const Color colors[] = {
     // Sand Colors
@@ -81,8 +91,6 @@ const Color colors[] = {
     {189, 148, 118, 255}  // wood color 5
 };
 
-
-
 // Array for the 8 possible directions + the current position itself (optional depending on needs)
 int offsets[8][2] = {
     {-1, -1}, {0, -1}, {1, -1}, // Top-left, Top, Top-right
@@ -95,12 +103,6 @@ Pixel GRID[GRID_WIDTH][GRID_HEIGHT];
 // this is for clearing the screen
 Pixel EMPTY_GRID[GRID_WIDTH][GRID_HEIGHT];
 
-
-
-/* COLOR VARIABLES */
-
-int s1 = 0, s2 = 0, s3 = 0; // sand colors
-
 // substances
 Pixel emptyPixel = {EMPTY, false, 0, false, -1, -1, {0, 0, 0, 255}};
 Pixel sandPixel = {SAND, true, 0, false, -1, -1, {100, 100, 100, 255}};
@@ -109,11 +111,7 @@ Pixel woodPixel = {WOOD, true, 0, false, -1, -1, {222, 184, 135, 255}};
 Pixel firePixel = {FIRE, true, 0, false, 16, 20, {128, 9, 9, 255}};
 Pixel steamPixel = {STEAM, true, 0, false, 400, -1, {75, 80, 75, 25}};
 
-
-
-
-
-// Function declarations (same as before)
+// Function declarations
 bool init();
 bool loadMedia();
 void close();
@@ -306,7 +304,7 @@ int getTextureHeight(LTexture* lTexture) {
 
 
 void render() {
-    // Clear screen
+    // Clear screen with grey background color
     SDL_SetRenderDrawColor(gRenderer, 110, 110, 110, 255);
     SDL_RenderClear(gRenderer);
 
@@ -314,12 +312,7 @@ void render() {
     for (int x = 0; x < GRID_WIDTH; x++) {
         for (int y = 0; y < GRID_HEIGHT; y++) {
             if (GRID[x][y].exists) {
-                SDL_Rect particle_rect = {
-                    x * PIXEL_SIZE, 
-                    y * PIXEL_SIZE, 
-                    PIXEL_SIZE, 
-                    PIXEL_SIZE
-                };
+                SDL_Rect particle_rect = {x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE};
 
                 SDL_SetRenderDrawColor(gRenderer, 
                     GRID[x][y].colour.r, 
@@ -367,9 +360,11 @@ void randColor(int *v1, int *v2, int *v3, int subMode) {
 }
 
 
-// New function to update sand pixels with physics
+// New function to update all substances. It works by alternating between scanning from right to left and 
+// scanning from left to right on the horizontal depending on if 'y' is even or odd. once a cell is updated
+// its updated flag is set to true then every frame all flags are reset to false
 void updatePhysics() {
-    // Reset update flags
+    // Reset update flags and decrease lifetime
     for (int x = 0; x < GRID_WIDTH; x++) {
         for (int y = 0; y < GRID_HEIGHT; y++) {
             GRID[x][y].updated = false;
@@ -384,6 +379,8 @@ void updatePhysics() {
         {
             for (int x = 0; x < GRID_WIDTH; x++) {
 
+
+                // very straightforward checks
                 if (GRID[x][y].type == steamPixel.type && GRID[x][y].lifetime == 0){
 
                     if (rand() % 100 < 75) GRID[x][y] = emptyPixel;
@@ -843,8 +840,6 @@ void updatePhysics() {
                             }
                         }
                     }
-
-
                 }
             }
         }
@@ -852,9 +847,12 @@ void updatePhysics() {
 }
 
 
-// Modified instantiate substance to reset velocity
+// this function takes the position of the mouse, and the choice of substance and turns the area of 'dropperSize' into 
+// that substance before it is rendered or updated
 void instantiateSubstance(int x, int y, int dropperSize, int substanceMode) { 
+    // how big you want the spawner to be
     int spawn_range = dropperSize;
+    // for all the squares pixels in that square
     for (int dx = -spawn_range; dx <= spawn_range; dx++) {
         for (int dy = -spawn_range; dy <= spawn_range; dy++) {
             int pixelBlockX = (x / PIXEL_SIZE) + dx;
@@ -862,7 +860,7 @@ void instantiateSubstance(int x, int y, int dropperSize, int substanceMode) {
             
             if (pixelBlockX >= 0 && pixelBlockX < GRID_WIDTH && pixelBlockY >= 0 && pixelBlockY < GRID_HEIGHT) {
                 if (!GRID[pixelBlockX][pixelBlockY].exists) {
-                    
+                    // instantiate the substance along with its designated color
                     switch (substanceMode)
                     {
                     case 1:
@@ -885,6 +883,7 @@ void instantiateSubstance(int x, int y, int dropperSize, int substanceMode) {
                         break;
                     }
                 }
+                // erase cells
                 else if(GRID[pixelBlockX][pixelBlockY].exists && substanceMode == 0){
 
                     GRID[pixelBlockX][pixelBlockY] = emptyPixel;
@@ -896,13 +895,7 @@ void instantiateSubstance(int x, int y, int dropperSize, int substanceMode) {
     }
 }
 
-
-
-
-
-// Rest of the rendering functions remain the same
-
-// Modified main loop to include physics update
+// main function
 int main(int argc, char* args[]) {
     // Seed random number generator
     srand(time(NULL));
@@ -915,6 +908,7 @@ int main(int argc, char* args[]) {
         } else {
             int quit = 0;
             SDL_Event event;
+            // handles mouse presses
             bool pressed = false;
             
             // text variables
@@ -926,10 +920,12 @@ int main(int argc, char* args[]) {
                 "Wood",
                 "Fire"
             };
+            // initial size of the dropper
             int sizeOfDropping = 2; 
 
             while (!quit) {
                 while (SDL_PollEvent(&event) != 0) {
+                    // controls
                     if (event.type == SDL_QUIT) quit = 1;
                     if (event.type == SDL_KEYDOWN) {
                         if (event.key.keysym.sym == SDLK_ESCAPE) quit = 1;
