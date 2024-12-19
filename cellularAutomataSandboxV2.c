@@ -98,7 +98,7 @@ Pixel sandPixel = {SAND, true, 0, false, -1, -1, {100, 100, 100, 255}};
 Pixel waterPixel = {WATER, true, 0, false, -1, -1, {15, 94, 156, 255}};
 Pixel woodPixel = {WOOD, true, 0, false, -1, -1, {222, 184, 135, 255}};
 Pixel firePixel = {FIRE, true, 0, false, 16, 20, {128, 9, 9, 255}};
-Pixel steamPixel = {STEAM, true, 0, false, 200, -1, {75, 80, 75, 25}};
+Pixel steamPixel = {STEAM, true, 0, false, 400, -1, {75, 80, 75, 25}};
 
 
 
