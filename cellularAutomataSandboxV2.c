@@ -364,8 +364,6 @@ void updatePhysics() {
         }
     }
     
-    
-    
     // Update from bottom to top to simulate gravity
     for (int y = GRID_HEIGHT - 1; y >= 0; y--) {
 
@@ -373,7 +371,7 @@ void updatePhysics() {
         {
             for (int x = 0; x < GRID_WIDTH; x++) {
 
-                if (GRID[x][y].type == steamPixel.type && GRID[x][y].lifetime == 0){
+                if (GRID[x][y].type == steamPixel.type && GRID[x][y].lifetime == 0 && rand() % 100 < 75){
 
                     GRID[x][y] = emptyPixel;
                     continue;
@@ -608,7 +606,7 @@ void updatePhysics() {
             for (int x = GRID_WIDTH - 1; x >= 0; --x) {
 
 
-                if (GRID[x][y].type == steamPixel.type && GRID[x][y].lifetime == 0){
+                if (GRID[x][y].type == steamPixel.type && GRID[x][y].lifetime == 0 && rand() % 100 < 75){
 
                     GRID[x][y] = emptyPixel;
                     continue;
