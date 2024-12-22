@@ -31,6 +31,8 @@ typedef struct {
 } LTexture;
 
 SDL_Color textColor = {255, 255, 255}; // text color
+SDL_Color textColorForSubstances = {255, 255, 255};
+
 
 //Code for the sandbox
 // enumeration of the different values that a cell could contain
@@ -87,6 +89,13 @@ const Color colors[] = {
     {199, 108, 63, 255},  // wood color 4
     {189, 148, 118, 255}  // wood color 5
 };
+
+// this is for the text and the color of the text for each substance
+typedef struct {
+    const char *name;
+    SDL_Color color;
+} Substance;
+
 
 // Array for the 8 possible directions + the current position itself (optional depending on needs)
 int offsets[8][2] = {
@@ -177,7 +186,7 @@ bool loadMedia() {
     bool success = true;
 
     // Open the font file at size 28
-    gFont = TTF_OpenFont("bit5x3.ttf", 15); //font size
+    gFont = TTF_OpenFont("bit5x3.ttf", 21); //font size
     if (gFont == NULL) {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
         success = false;
@@ -922,13 +931,13 @@ int main(int argc, char* args[]) {
             bool pressed = false;
             
             // text variables
-            int mode = 0; char modePresented[32], lastMode = -1;; //which substance
-            const char *lookUpOfSubstanceNames[] = {
-                "Erase", 
-                "Sand", 
-                "Water",
-                "Wood",
-                "Fire"
+            int mode = 0; char modePresented[32], lastMode = -1; //which substance
+            const Substance lookUpOfSubstances[] = {
+                {"Erase", {255, 255, 255, 255}}, // White for erase
+                {"Sand", {234, 225, 176, 255}}, // Sand color
+                {"Water", {0, 0, 255, 255}},    // Blue for water
+                {"Wood", {139, 69, 19, 255}},   // Brown for wood
+                {"Fire", {255, 0, 0, 255}}      // Red for fire
             };
             // initial size of the dropper
             int sizeOfDropping = 2; 
@@ -974,10 +983,11 @@ int main(int argc, char* args[]) {
                 // this chooses the mode and presents it
                 if (mode != lastMode)
                 {
-                    const char *whichText = (mode >= 1 && mode <= 4) ? lookUpOfSubstanceNames[mode] : lookUpOfSubstanceNames[0];
-                    loadFromRenderedText(&modeTextTexture, whichText, textColor);
+                    const Substance *currentSubstance = (mode >= 1 && mode <= 4) ? &lookUpOfSubstances[mode] : &lookUpOfSubstances[0];
+                    loadFromRenderedText(&modeTextTexture, currentSubstance->name, currentSubstance->color);
                     lastMode = mode; 
                 }
+
 
                 // Clear screen with grey background color
                 SDL_SetRenderDrawColor(gRenderer, 110, 110, 110, 255);
@@ -995,7 +1005,7 @@ int main(int argc, char* args[]) {
                 
                 //this is for text
                 renderTexture(&modeTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); 
-                renderTexture(&SizeOfDropperTexture, 200,0, NULL, 0, NULL, SDL_FLIP_NONE); 
+                renderTexture(&SizeOfDropperTexture, 0,20, NULL, 0, NULL, SDL_FLIP_NONE); 
                 SDL_RenderPresent(gRenderer); // Update screen
 
                 // Optional: Add a small delay to control simulation speed
