@@ -14,7 +14,7 @@ int main(void)
     //don't know what this does exactly
     SDL_Window      *win = NULL;
     SDL_Renderer    *ren = NULL; 
-    int green = 0; //variable for changing color green
+    int green = 0; //variable for changing color green 
     int red = 255; //variable for changing color red
     int timer = 2; 
 
