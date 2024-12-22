@@ -430,7 +430,7 @@ void updatePhysics() {
                         // Check falling distance
                         // ADD OTHER SUBSTANCES THAT INTERACT WITH SAND HERE FOR GOING STRAIGHT DOWN
                         for (int dy = 1; dy <= maxFallDistance; dy++) {
-                            if (y + dy < GRID_HEIGHT && (GRID[x][y + dy].type == emptyPixel.type || GRID[x][y + dy].type == waterPixel.type) ) fallDistance = dy;
+                            if (y + dy < GRID_HEIGHT && (GRID[x][y + dy].type == emptyPixel.type || GRID[x][y + dy].type == waterPixel.type || GRID[x][y + dy].type == steamPixel.type) ) fallDistance = dy;
                             
                             else break;
 
@@ -440,7 +440,7 @@ void updatePhysics() {
                         // here add the other substances that sand can fall through
                         if (fallDistance > 0) {
 
-                            if (GRID[x][y + fallDistance].type == waterPixel.type) {
+                            if (GRID[x][y + fallDistance].type == waterPixel.type || GRID[x][y + fallDistance].type == steamPixel.type) {
                                 // Swap sand and water
                                 Pixel temp = GRID[x][y + fallDistance];
                                 GRID[x][y + fallDistance] = GRID[x][y];
@@ -498,7 +498,7 @@ void updatePhysics() {
                         
                         // Check falling distance
                         for (int dy = 1; dy <= maxFallDistance; dy++) {
-                            if (y + dy < GRID_HEIGHT && !GRID[x][y + dy].exists) fallDistance = dy;
+                            if (y + dy < GRID_HEIGHT && (GRID[x][y + dy].type == emptyPixel.type || GRID[x][y + dy].type == steamPixel.type) ) fallDistance = dy;
 
                             else break;
 
@@ -506,11 +506,20 @@ void updatePhysics() {
 
                         // If we can fall
                         if (fallDistance > 0) {
-                            // Move pixel down
-                            GRID[x][y + fallDistance] = GRID[x][y];
-                            GRID[x][y] = emptyPixel;
+
+                            if (GRID[x][y + fallDistance].type == steamPixel.type) {
+                                // Swap sand and water
+                                Pixel temp = GRID[x][y + fallDistance];
+                                GRID[x][y + fallDistance] = GRID[x][y];
+                                GRID[x][y] = temp;
+                            } 
+                            else {
+                                // Move sand down
+                                GRID[x][y + fallDistance] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
+                            }
                             GRID[x][y + fallDistance].updated = true;
-                            
+                        
                         }
                         // If can't fall straight, try diagonal
                         else {
@@ -664,16 +673,17 @@ void updatePhysics() {
                         
                         // Check falling distance
                         for (int dy = 1; dy <= maxFallDistance; dy++) {
-                            if (y + dy < GRID_HEIGHT && (GRID[x][y + dy].type == emptyPixel.type || GRID[x][y + dy].type == waterPixel.type) ) fallDistance = dy;
+                            if (y + dy < GRID_HEIGHT && (GRID[x][y + dy].type == emptyPixel.type || GRID[x][y + dy].type == waterPixel.type || GRID[x][y + dy].type == steamPixel.type) ) fallDistance = dy;
                             
                             else break;
 
                         }
 
                         // If we can fall
+                        // here add the other substances that sand can fall through
                         if (fallDistance > 0) {
 
-                            if (GRID[x][y + fallDistance].type == waterPixel.type) {
+                            if (GRID[x][y + fallDistance].type == waterPixel.type || GRID[x][y + fallDistance].type == steamPixel.type) {
                                 // Swap sand and water
                                 Pixel temp = GRID[x][y + fallDistance];
                                 GRID[x][y + fallDistance] = GRID[x][y];
@@ -734,18 +744,28 @@ void updatePhysics() {
                         
                         // Check falling distance
                         for (int dy = 1; dy <= maxFallDistance; dy++) {
-                            if (y + dy < GRID_HEIGHT && !GRID[x][y + dy].exists) fallDistance = dy;
-                            
+                            if (y + dy < GRID_HEIGHT && (GRID[x][y + dy].type == emptyPixel.type || GRID[x][y + dy].type == steamPixel.type) ) fallDistance = dy;
+
                             else break;
+
                         }
 
                         // If we can fall
                         if (fallDistance > 0) {
-                            // Move pixel down
-                            GRID[x][y + fallDistance] = GRID[x][y];
-                            GRID[x][y] = emptyPixel;
+
+                            if (GRID[x][y + fallDistance].type == steamPixel.type) {
+                                // Swap sand and water
+                                Pixel temp = GRID[x][y + fallDistance];
+                                GRID[x][y + fallDistance] = GRID[x][y];
+                                GRID[x][y] = temp;
+                            } 
+                            else {
+                                // Move sand down
+                                GRID[x][y + fallDistance] = GRID[x][y];
+                                GRID[x][y] = emptyPixel;
+                            }
                             GRID[x][y + fallDistance].updated = true;
-                            
+                        
                         }
                         // If can't fall straight, try diagonal
                         else {
