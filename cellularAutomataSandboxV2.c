@@ -301,8 +301,6 @@ int getTextureHeight(LTexture* lTexture) {
 
 
 void render() {
-
-
     // Render particles
     for (int x = 0; x < GRID_WIDTH; x++) {
         for (int y = 0; y < GRID_HEIGHT; y++) {
@@ -318,8 +316,6 @@ void render() {
             }
         }
     }
-
-    // Update screen
 }
 
 
