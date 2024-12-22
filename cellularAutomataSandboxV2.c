@@ -403,10 +403,10 @@ void updatePhysics() {
                         if (nx >= 0 && nx < GRID_WIDTH && ny >= 0 && ny < GRID_HEIGHT) {
                             if (GRID[x][y].howManyFramesNearBurnable == 0 && GRID[nx][ny].type == woodPixel.type)
                             {
-                                if (rand() % 100 < 60){
-                                    randColor(&s1, &s2, &s3, 4); 
-                                    GRID[nx][ny] = firePixel; // Example: Convert wood to fire
-                                }
+                                
+                                randColor(&s1, &s2, &s3, 4); 
+                                GRID[nx][ny] = firePixel; // Example: Convert wood to fire
+                            
                                 continue;
                             }
                             
@@ -648,10 +648,10 @@ void updatePhysics() {
                         if (nx >= 0 && nx < GRID_WIDTH && ny >= 0 && ny < GRID_HEIGHT) {
                             if (GRID[x][y].howManyFramesNearBurnable == 0 && GRID[nx][ny].type == woodPixel.type)
                             {
-                                if (rand() % 100 < 60){
-                                    randColor(&s1, &s2, &s3, 4); 
-                                    GRID[nx][ny] = firePixel; // Example: Convert wood to fire
-                                }                                
+                                
+                                randColor(&s1, &s2, &s3, 4); 
+                                GRID[nx][ny] = firePixel; // Example: Convert wood to fire
+                                                       
                                 continue;
                             }
                             
