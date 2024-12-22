@@ -1,6 +1,3 @@
-// gcc -I src/include -L src/lib -o main new2.c -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer
-
-// TO DO: ? 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -180,7 +177,7 @@ bool loadMedia() {
     bool success = true;
 
     // Open the font file at size 28
-    gFont = TTF_OpenFont("bit5x3.ttf", 15); //font size
+    gFont = TTF_OpenFont("/Users/ghassanmuradagha/Documents/pro/SDL_GENERAL/fonts/open-sans/OpenSans-Bold.ttf", 15); //font size
     if (gFont == NULL) {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
         success = false;
@@ -304,9 +301,7 @@ int getTextureHeight(LTexture* lTexture) {
 
 
 void render() {
-    // Clear screen with grey background color
-    SDL_SetRenderDrawColor(gRenderer, 110, 110, 110, 255);
-    SDL_RenderClear(gRenderer);
+
 
     // Render particles
     for (int x = 0; x < GRID_WIDTH; x++) {
@@ -325,7 +320,6 @@ void render() {
     }
 
     // Update screen
-    SDL_RenderPresent(gRenderer);
 }
 
 
@@ -969,6 +963,11 @@ int main(int argc, char* args[]) {
                     lastMode = mode; 
                 }
 
+                // Clear screen with grey background color
+                SDL_SetRenderDrawColor(gRenderer, 110, 110, 110, 255);
+                SDL_RenderClear(gRenderer);
+
+
                 sprintf(modePresented, "Dropper Size: %d", sizeOfDropping); 
                 loadFromRenderedText(&SizeOfDropperTexture, modePresented, textColor);
 
@@ -984,7 +983,7 @@ int main(int argc, char* args[]) {
                 SDL_RenderPresent(gRenderer); // Update screen
 
                 // Optional: Add a small delay to control simulation speed
-                SDL_Delay(16);
+                //SDL_Delay(16);
 
             }
         }
