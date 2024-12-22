@@ -177,7 +177,7 @@ bool loadMedia() {
     bool success = true;
 
     // Open the font file at size 28
-    gFont = TTF_OpenFont("/Users/ghassanmuradagha/Documents/pro/SDL_GENERAL/fonts/open-sans/OpenSans-Bold.ttf", 15); //font size
+    gFont = TTF_OpenFont("bit5x3.ttf", 15); //font size
     if (gFont == NULL) {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
         success = false;
@@ -983,7 +983,7 @@ int main(int argc, char* args[]) {
                 SDL_RenderPresent(gRenderer); // Update screen
 
                 // Optional: Add a small delay to control simulation speed
-                //SDL_Delay(16);
+                SDL_Delay(16);
 
             }
         }
