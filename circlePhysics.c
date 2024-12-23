@@ -21,14 +21,12 @@
 #define MAX_VELOCITY 10.0f
 #define ENERGY_LOSS 0.7
 
-//PHYSICS
-float velocityY = 10; //This is a constant? not too sure. - no this is a dynamic velocity
-float velocityX = 10; 
-
-float positionY = 500; //This is the position
-float positionX = 700; //both of these are used for user input movement
-
-int shapeSize = 70; //used for the shape of the size. ex. for circle radius
+// Struct for storing circle data
+typedef struct {
+    int posX, posY;        // Position
+    int velocityY, velocityX;      // Velocity
+    int radius;      // Radius
+} Circle;
 
 // Texture wrapper structure to hold texture data and dimensions
 typedef struct {
@@ -248,6 +246,16 @@ int main(int argc, char* args[]) {
             int quit = 0; // Main loop flag
             SDL_Event e; // Event handler
 
+            // Create multiple circles
+            Circle circles[6] = {
+                {100, 100, 2, 3, 30},
+                {200, 200, -3, 2, 40},
+                {300, 300, 1, -1, 50},
+                {900, 92, 2, 3, 30},
+                {71, 80, -3, 2, 40},
+                {675, 635, 3, -8, 55}
+            };
+
             while (!quit) {
                 while (SDL_PollEvent(&e) != 0) { // Handle events
 
@@ -267,32 +275,28 @@ int main(int argc, char* args[]) {
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
                 SDL_RenderClear(gRenderer);     
 
-                positionY += velocityY; //position is dependant on velocity
-                positionX += velocityX;
+                // Update and draw each circle
+                for (int i = 0; i < 6; i++) {
+                    // Update position based on velocity
+                    circles[i].posX += circles[i].velocityX;
+                    circles[i].posY += circles[i].velocityY;
 
-                if (positionX >= SCREEN_WIDTH - shapeSize){ //right boundary
+                    // Handle boundaries
+                    // left and right
+                    if (circles[i].posX >= SCREEN_WIDTH - circles[i].radius || circles[i].posX <= circles[i].radius) {
+                        circles[i].velocityX *= -1;
+                    }
+                    // top and bottom
+                    if (circles[i].posY >= SCREEN_HEIGHT - circles[i].radius || circles[i].posY <= circles[i].radius) {
+                        circles[i].velocityY *= -1;
+                    }
 
-                    velocityX *= -1; 
-                    positionX = SCREEN_WIDTH - shapeSize; 
+                    // Set color for each circle
+                    SDL_SetRenderDrawColor(gRenderer, 65, 107, 223, 255);
+                    // Draw the circle
+                    DrawFilledCircle(gRenderer, circles[i].posX, circles[i].posY, circles[i].radius);
                 }
-                else if (positionX <= shapeSize){ //left boundary
-                    velocityX *= -1; 
-                    positionX = shapeSize; 
-                }
-                else if (positionY <= shapeSize){ //top boundary
-                    velocityY *= -1; 
-                    positionY = shapeSize; 
-                }
-                else if (positionY >= SCREEN_HEIGHT - shapeSize){  //bottom boundary
-                    velocityY *= -1; //velocity goes in the other direction and apply energyLoss
-                    positionY = SCREEN_HEIGHT - shapeSize; //This is a stupid hacky way of doing things - it works
-
-                } 
                 
-                //Maybe place shapes here?
-                //circle
-                SDL_SetRenderDrawColor(gRenderer, 65, 107, 223, 255); // Set color (r, g, b, a)
-                DrawFilledCircle(gRenderer, positionX, positionY, shapeSize); //This will draw filled circle
                 //this is for text
                 renderTexture(&gTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dk, dk, dk,dk); 
                 SDL_RenderPresent(gRenderer); // Update screen
