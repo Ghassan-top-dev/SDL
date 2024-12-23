@@ -324,14 +324,6 @@ void blahblah(Circle* circle1, Circle* circle2) {
         return;
     }
 
-    // Calculate impulse scalar
-    float impulse = (2 * relVelDotN) / (circle1->mass + circle2->mass);
-
-    // Apply impulse to each circle's velocity
-    circle1->velocityX -= impulse * circle2->mass * nx;
-    circle1->velocityY -= impulse * circle2->mass * ny;
-    circle2->velocityX += impulse * circle1->mass * nx;
-    circle2->velocityY += impulse * circle1->mass * ny;
 }
 
 
@@ -406,14 +398,32 @@ int main(int argc, char* args[]) {
                     circles[i].posY += circles[i].velocityY;
 
                     // Handle boundaries
-                    // left and right
-                    if (circles[i].posX >= SCREEN_WIDTH - circles[i].radius || circles[i].posX <= circles[i].radius) {
+                    // right
+                    if (circles[i].posX >= SCREEN_WIDTH - circles[i].radius) {
                         circles[i].velocityX *= -1;
+                        circles[i].posX = SCREEN_WIDTH - circles[i].radius; 
+ 
                     }
-                    // top and bottom
-                    if (circles[i].posY >= SCREEN_HEIGHT - circles[i].radius || circles[i].posY <= circles[i].radius) {
+                    // left
+                    else if (circles[i].posX <= circles[i].radius)
+                    {
+                        circles[i].velocityX *= -1;
+                        circles[i].posX = circles[i].radius; 
+                    }
+                    // bottom
+                    else if (circles[i].posY >= SCREEN_HEIGHT - circles[i].radius) { 
                         circles[i].velocityY *= -1;
+                        circles[i].posY = SCREEN_HEIGHT - circles[i].radius; 
+
                     }
+                    // top
+                    else if (circles[i].posY <= circles[i].radius)
+                    {
+                        circles[i].velocityY *= -1;
+                        circles[i].posY = circles[i].radius; 
+ 
+                    }
+                    
 
                     // Set color for each circle
                     SDL_SetRenderDrawColor(gRenderer, 65, 107, 223, 255);
