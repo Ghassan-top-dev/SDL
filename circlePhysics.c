@@ -1,32 +1,34 @@
-//I am pausing this project on nov 5, it seems I need structs to work with many balls.
-//I'll get back to it soon after some knowledge in CIS-1300 :)
+// gcc -O3 -I src/include -L src/lib -o main circlePhysics.c -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer -mwindows
+
 #include <SDL2/SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> 
+#include <string.h>
 #include <stdbool.h>
+#include <time.h>
+#include <math.h>
 
 // Screen dimension constants
-const int SCREEN_WIDTH = 1400;  
-const int SCREEN_HEIGHT = 750;
+// the size of the screen
+#define SCREEN_WIDTH 1400 
+#define SCREEN_HEIGHT 750
 
-int stepperX = 300; //both of these are used for user input movement
-int stepperY = 300;
-int r = 0, g = 0, b = 0, checker = 0; //used for background 
-int shapeSize = 10; //used for the shape of the size. ex. for circle radius
 
+// the rate of change of the velocity each frame
+#define GRAVITY 0.5f
+#define MAX_VELOCITY 10.0f
+#define ENERGY_LOSS 0.7
 
 //PHYSICS
-float gravity = 1.2; 
-float velocityY = 0; //This is a constant? not too sure. - no this is a dynamic velocity
-float velocityX = 0; 
-float position = 0; //This is the position
-float energyLoss = 0.7; //collision damping 
+float velocityY = 10; //This is a constant? not too sure. - no this is a dynamic velocity
+float velocityX = 10; 
 
-int balls[10]; 
+float positionY = 500; //This is the position
+float positionX = 700; //both of these are used for user input movement
 
+int shapeSize = 70; //used for the shape of the size. ex. for circle radius
 
 // Texture wrapper structure to hold texture data and dimensions
 typedef struct {
@@ -45,75 +47,6 @@ void freeTexture(LTexture* lTexture); // Frees texture memory
 void renderTexture(LTexture* lTexture, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip); // Renders texture to screen
 int getTextureWidth(LTexture* lTexture); // Returns texture width
 int getTextureHeight(LTexture* lTexture); // Returns texture height
-bool moveRight = false, moveLeft = false, moveUp = false, moveDown = false, dash = false; //here add the movements
-
-
-//circle functions:
-
-void DrawCircle(SDL_Renderer* renderer, int32_t centreX, int32_t centreY, int32_t radius)
-{
-    const int32_t diameter = (radius * 2);
-
-    int32_t x = (radius - 1);
-    int32_t y = 0;
-    int32_t tx = 1;
-    int32_t ty = 1;
-    int32_t error = (tx - diameter);
-
-    while (x >= y)
-    {
-        // Each of the following renders an octant of the circle
-        SDL_RenderDrawPoint(renderer, centreX + x, centreY - y);
-        SDL_RenderDrawPoint(renderer, centreX + x, centreY + y);
-        SDL_RenderDrawPoint(renderer, centreX - x, centreY - y);
-        SDL_RenderDrawPoint(renderer, centreX - x, centreY + y);
-        SDL_RenderDrawPoint(renderer, centreX + y, centreY - x);
-        SDL_RenderDrawPoint(renderer, centreX + y, centreY + x);
-        SDL_RenderDrawPoint(renderer, centreX - y, centreY - x);
-        SDL_RenderDrawPoint(renderer, centreX - y, centreY + x);
-
-        if (error <= 0)
-        {
-            ++y;
-            error += ty;
-            ty += 2;
-        }
-
-        if (error > 0)
-        {
-            --x;
-            tx += 2;
-            error += (tx - diameter);
-        }
-    }
-}
-
-void DrawFilledCircle(SDL_Renderer* renderer, int centerX, int centerY, int radius) {
-    // Loop through the y-coordinates of the circle from the top to the bottom
-    for (int y = -radius; y <= radius; y++) {
-        // Calculate the width of each line at this y level (circle equation)
-        int dx = (int)sqrt(radius * radius - y * y); //maybe implement fast inverse square root?
-
-        // Draw a horizontal line for each row from left to right across the diameter
-        SDL_RenderDrawLine(renderer, centerX - dx, centerY + y, centerX + dx, centerY + y);
-    }
-}
-
-
-//collision function
-
-// void collision(balls){
-
-
-
-    
-
-
-
-
-
-
-// }
 
 // Global variables for the SDL window, renderer, font, and text texture
 SDL_Window* gWindow = NULL;
@@ -136,7 +69,7 @@ bool init() {
         }
 
         // Create SDL window
-        gWindow = SDL_CreateWindow("FLUID SIMULATOR", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        gWindow = SDL_CreateWindow("Elastic Physics", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         if (gWindow == NULL) {
             printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
             success = false;
@@ -172,7 +105,7 @@ bool loadMedia() {
     bool success = true;
 
     // Open the font file at size 28
-    gFont = TTF_OpenFont("/Users/ghassanmuradagha/Documents/pro/fonts/open-sans/OpenSans-Bold.ttf", 15); //font size
+    gFont = TTF_OpenFont("bit5x3.ttf", 15); //font size
     if (gFont == NULL) {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
         success = false;
@@ -289,6 +222,20 @@ int getTextureHeight(LTexture* lTexture) {
 }
 
 
+//circle functions:
+
+void DrawFilledCircle(SDL_Renderer* renderer, int centerX, int centerY, int radius) {
+    // Loop through the vertical positions (y-coordinates) of the circle from the top to the bottom
+    for (int y = -radius; y <= radius; y++) {
+        // Calculate the horizontal distance (half-width) at this y-level using the circle equation
+        int dx = (int)sqrt(radius * radius - y * y);  // Could use a faster square root approximation
+
+        // Draw a horizontal line across the diameter of the circle at the current y-level
+        SDL_RenderDrawLine(renderer, centerX - dx, centerY + y, centerX + dx, centerY + y);
+    }
+}
+
+
 //This is where the magic happens...
 // Main function - sets up SDL, loads media, runs main loop, and cleans up
 int main(int argc, char* args[]) {
@@ -314,67 +261,44 @@ int main(int argc, char* args[]) {
                           quit = 1; // Exit on pressing the escape key
                       }
                     
-                    
                     }
-                    
                 }
-                // Clear screen with black background
+                // Clear screen with white background
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
                 SDL_RenderClear(gRenderer);     
 
-                gravity+=0.01; //speed up as your going down - doesn't account for terminak velocity yet...
-                velocityY += gravity; //velocity will always be dependant on gravity, gravity will always fight or help velocity
-                position += velocityY; //position is dependant on velocity
+                positionY += velocityY; //position is dependant on velocity
+                positionX += velocityX;
 
+                if (positionX >= SCREEN_WIDTH - shapeSize){ //right boundary
 
-                //boundaries?? - HELL YEAH
-                // if (stepperX >= SCREEN_WIDTH - shapeSize) stepperX = SCREEN_WIDTH - shapeSize; //right boundary
-                // if (stepperX <= shapeSize) stepperX = shapeSize; //left boundary
-                // if (stepperY <= shapeSize) stepperY = shapeSize; //top boundary
-                // if (position >= SCREEN_HEIGHT - shapeSize){  //bottom boundary
-                //     velocityY *= -1 * energyLoss; //velocity goes in the other direction and apply energyLoss
-                //     position = SCREEN_HEIGHT - shapeSize; //This is a stupid hacky way of doing things - it works
-
-                // } 
-
-
-                if (position >= SCREEN_WIDTH - shapeSize){ //right boundary
-
-                    velocityX *= -1 * energyLoss; 
-                    position = SCREEN_HEIGHT - shapeSize; 
+                    velocityX *= -1; 
+                    positionX = SCREEN_WIDTH - shapeSize; 
                 }
-                
-                if (position <= shapeSize){ //left boundary
-                    velocityX *= -1 * energyLoss; 
-                    velocityX = shapeSize; 
+                else if (positionX <= shapeSize){ //left boundary
+                    velocityX *= -1; 
+                    positionX = shapeSize; 
                 }
-                
-                if (position <= shapeSize){ //top boundary
-                    velocityY *= -1 * energyLoss; 
-                    velocityY = shapeSize; 
+                else if (positionY <= shapeSize){ //top boundary
+                    velocityY *= -1; 
+                    positionY = shapeSize; 
                 }
-
-                if (position >= SCREEN_HEIGHT - shapeSize){  //bottom boundary
-                    velocityY *= -1 * energyLoss; //velocity goes in the other direction and apply energyLoss
-                    position = SCREEN_HEIGHT - shapeSize; //This is a stupid hacky way of doing things - it works
+                else if (positionY >= SCREEN_HEIGHT - shapeSize){  //bottom boundary
+                    velocityY *= -1; //velocity goes in the other direction and apply energyLoss
+                    positionY = SCREEN_HEIGHT - shapeSize; //This is a stupid hacky way of doing things - it works
 
                 } 
                 
-                
-
-
                 //Maybe place shapes here?
                 //circle
                 SDL_SetRenderDrawColor(gRenderer, 65, 107, 223, 255); // Set color (r, g, b, a)
-                DrawFilledCircle(gRenderer, stepperX, position, shapeSize); //This will draw filled circle
-                // DrawCircle(gRenderer, stepperX, stepperY, 60); //This will draw a circle that isn't filled
-
-
-
+                DrawFilledCircle(gRenderer, positionX, positionY, shapeSize); //This will draw filled circle
                 //this is for text
-                renderTexture(&gTextTexture, 650,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dk, dk, dk,dk); 
-
+                renderTexture(&gTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dk, dk, dk,dk); 
                 SDL_RenderPresent(gRenderer); // Update screen
+
+                // Optional: Add a small delay to control simulation speed
+                SDL_Delay(16);
             }
         }
     }
