@@ -26,6 +26,7 @@ typedef struct {
     int posX, posY;        // Position
     int velocityY, velocityX;      // Velocity
     int radius;      // Radius
+    float mass; // mass
 } Circle;
 
 // Texture wrapper structure to hold texture data and dimensions
@@ -233,6 +234,43 @@ void DrawFilledCircle(SDL_Renderer* renderer, int centerX, int centerY, int radi
     }
 }
 
+void HandleCircleCollision(Circle* c1, Circle* c2) {
+    // Calculate the distance between the two circles
+    int dx = c2->posX - c1->posX;
+    int dy = c2->posY - c1->posY;
+    int dist = sqrt(dx * dx + dy * dy);
+
+    // Check if the circles are colliding (i.e., distance is less than sum of radii)
+    if (dist < c1->radius + c2->radius) {
+        // Calculate the normal vector (direction of collision)
+        float nx = dx / (float)dist;
+        float ny = dy / (float)dist;
+
+        // Relative velocity in the normal direction
+        float vn = (c2->velocityX - c1->velocityX) * nx + (c2->velocityY - c1->velocityY) * ny;
+
+        // Only perform collision if the balls are moving towards each other
+        if (vn < 0) {
+            // Calculate impulse scalar using the masses and relative velocity
+            float impulse = (2 * vn) / (c1->mass + c2->mass);
+
+            // Update velocities of the balls after the collision
+            c1->velocityX -= impulse * c2->mass * nx;
+            c1->velocityY -= impulse * c2->mass * ny;
+            c2->velocityX += impulse * c1->mass * nx;
+            c2->velocityY += impulse * c1->mass * ny;
+
+            // Move the balls out of overlap by adjusting their positions
+            int overlap = (c1->radius + c2->radius) - dist;
+            c1->posX -= overlap * (c1->radius / (float)(c1->radius + c2->radius)) * nx;
+            c1->posY -= overlap * (c1->radius / (float)(c1->radius + c2->radius)) * ny;
+            c2->posX += overlap * (c2->radius / (float)(c1->radius + c2->radius)) * nx;
+            c2->posY += overlap * (c2->radius / (float)(c1->radius + c2->radius)) * ny;
+        }
+    }
+}
+
+
 
 //This is where the magic happens...
 // Main function - sets up SDL, loads media, runs main loop, and cleans up
@@ -247,13 +285,10 @@ int main(int argc, char* args[]) {
             SDL_Event e; // Event handler
 
             // Create multiple circles
-            Circle circles[6] = {
-                {100, 100, 2, 3, 30},
-                {200, 200, -3, 2, 40},
-                {300, 300, 1, -1, 50},
-                {900, 92, 2, 3, 30},
-                {71, 80, -3, 2, 40},
-                {675, 635, 3, -8, 55}
+            // posX, posY, velocityX, velocityY, radius, mass
+            Circle circles[2] = {
+                {100, 100, 2, 3, 30, 80},
+                {200, 200, -3, 2, 60, 200}
             };
 
             while (!quit) {
@@ -276,7 +311,7 @@ int main(int argc, char* args[]) {
                 SDL_RenderClear(gRenderer);     
 
                 // Update and draw each circle
-                for (int i = 0; i < 6; i++) {
+                for (int i = 0; i < 2; i++) {
                     // Update position based on velocity
                     circles[i].posX += circles[i].velocityX;
                     circles[i].posY += circles[i].velocityY;
@@ -295,6 +330,12 @@ int main(int argc, char* args[]) {
                     SDL_SetRenderDrawColor(gRenderer, 65, 107, 223, 255);
                     // Draw the circle
                     DrawFilledCircle(gRenderer, circles[i].posX, circles[i].posY, circles[i].radius);
+                }
+
+                for (int i = 0; i < 2; i++) {
+                    for (int j = i + 1; j < 2; j++) {
+                        HandleCircleCollision(&circles[i], &circles[j]);
+                    }
                 }
                 
                 //this is for text
