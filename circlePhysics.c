@@ -12,8 +12,8 @@
 
 // Screen dimension constants
 // the size of the screen
-#define SCREEN_WIDTH 500 
-#define SCREEN_HEIGHT 300
+#define SCREEN_WIDTH 1392 
+#define SCREEN_HEIGHT 744
 
 // Struct for storing circle data
 typedef struct {
@@ -398,9 +398,17 @@ int main(int argc, char* args[]) {
 
             // Create multiple circles
             // posX, posY, velocityX, velocityY, mass, radius
-            Circle circles[2] = {
-                {{100, 100}, {2, 3}, 30, 30},
-                {{200, 200}, {-3, 2}, 100, 45}
+            Circle circles[10] = {
+                {{120, 300}, {2, 4}, 25, 37.5},
+                {{450, 200}, {-3, -1}, 45, 67.5},
+                {{300, 400}, {5, -2}, 30, 45.0},
+                {{600, 250}, {-4, 3}, 20, 30.0},
+                {{400, 500}, {1, -5}, 40, 60.0},
+                {{100, 150}, {-2, 2}, 15, 22.5},
+                {{700, 350}, {3, 3}, 50, 75.0},
+                {{500, 100}, {-5, -4}, 35, 52.5},
+                {{350, 450}, {4, 1}, 10, 15.0},
+                {{250, 250}, {0, 5}, 20, 30.0}
             };
 
             while (!quit) {
@@ -422,14 +430,14 @@ int main(int argc, char* args[]) {
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
                 SDL_RenderClear(gRenderer);    
 
-                for (int i = 0; i < 2; i++) {
-                    for (int j = i + 1; j < 2; j++) {
+                for (int i = 0; i < 10; i++) {
+                    for (int j = i + 1; j < 10; j++) {
                         resolveCollision(&circles[i], &circles[j]);
                     }
                 } 
 
                 // Update and draw each circle
-                for (int i = 0; i < 2; i++) {
+                for (int i = 0; i < 10; i++) {
                     // Update position based on velocity
                     circles[i].position.x += circles[i].velocity.x;
                     circles[i].position.y += circles[i].velocity.y;
