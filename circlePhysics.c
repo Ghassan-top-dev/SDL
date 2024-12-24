@@ -12,8 +12,8 @@
 
 // Screen dimension constants
 // the size of the screen
-#define SCREEN_WIDTH 1392 
-#define SCREEN_HEIGHT 744
+#define SCREEN_WIDTH 744 
+#define SCREEN_HEIGHT 500
 
 // Struct for storing circle data
 typedef struct {
@@ -342,35 +342,77 @@ void DrawFilledCircle(SDL_Renderer* renderer, int centerX, int centerY, float ra
 // }
 
 
+// Add two vectors
+Vector2 addVectors(Vector2 v1, Vector2 v2) {
+    Vector2 result = {
+        .x = v1.x + v2.x,
+        .y = v1.y + v2.y
+    };
+    return result;
+}
+
+
+// Vector subtraction (v1 - v2)
+Vector2 subtractVectors(Vector2 v1, Vector2 v2) {
+    Vector2 result = {
+        .x = v1.x - v2.x,
+        .y = v1.y - v2.y
+    };
+    return result;
+}
+
+// Dot product (returns a scalar/float)
+float dotProduct(Vector2 v1, Vector2 v2) {
+    return v1.x * v2.x + v1.y * v2.y;
+}
+
+// Scale a vector by a number
+Vector2 scaleVector(Vector2 v, float scale) {
+    Vector2 result = {
+        .x = v.x * scale,
+        .y = v.y * scale
+    };
+    return result;
+}
+
+
+
 void resolveCollision(Circle* b1, Circle* b2) {
 
-
+    // this is the distance between the center of the 2 balls
     int dx = b2->position.x - b1->position.x;
     int dy = b2->position.y - b1->position.y;
-    double dist = sqrt(dx * dx + dy * dy);
+    float dist = sqrt(dx * dx + dy * dy);
 
     // Check if the circles are colliding (i.e., distance is less than sum of radii)
-    if (dist < (double)b1->radius + b2->radius) {
-
+    if (dist <= b1->radius + b2->radius) {
         
         // Calculate mass terms
+        
         float totalMass = b1->mass + b2->mass;
-        float massDiff = b1->mass - b2->mass;
         float massScale2 = (2.0f * b2->mass) / totalMass;
         float massScale1 = (2.0f * b1->mass) / totalMass;
+
+        // save the inital velocity components of ball 1
+        float SavedvelocityB1_X = b1->velocity.x;
+        float SavedvelocityB1_Y = b1->velocity.y;
         
-        // Store original velocities
-        float v1x = b1->velocity.x;
-        float v1y = b1->velocity.y;
-        float v2x = b2->velocity.x;
-        float v2y = b2->velocity.y;
-        
-        // Calculate new velocities
-        b1->velocity.x = (v1x * massDiff + 2 * b2->mass * v2x) / totalMass;
-        b1->velocity.y = (v1y * massDiff + 2 * b2->mass * v2y) / totalMass;
-        
-        b2->velocity.x = (v2x * -massDiff + 2 * b1->mass * v1x) / totalMass;
-        b2->velocity.y = (v2y * -massDiff + 2 * b1->mass * v1y) / totalMass;
+        // save the inital velocity components of ball 2
+        float SavedvelocityB2_X = b2->velocity.x;
+        float SavedvelocityB2_Y = b2->velocity.y;
+
+
+        // save the actual velocities
+        Vector2 SavedvelocityB1 = b1->velocity;
+        Vector2 SavedvelocityB2 = b2->velocity;
+
+
+        float numeratorB1 = (2.0f * b2->mass) * (  dotProduct(  subtractVectors(b2->velocity,b1->velocity)  , subtractVectors(b2->position,b1->position) )  );
+        float denomenatorB1 = totalMass * dist * dist; 
+
+
+        b1->velocity = addVectors(SavedvelocityB1 , scaleVector( subtractVectors(b2->position , b1->position) ,  numeratorB1 / denomenatorB1));
+
 
 
 
@@ -398,17 +440,9 @@ int main(int argc, char* args[]) {
 
             // Create multiple circles
             // posX, posY, velocityX, velocityY, mass, radius
-            Circle circles[10] = {
+            Circle circles[2] = {
                 {{120, 300}, {2, 4}, 25, 37.5},
-                {{450, 200}, {-3, -1}, 45, 67.5},
-                {{300, 400}, {5, -2}, 30, 45.0},
-                {{600, 250}, {-4, 3}, 20, 30.0},
-                {{400, 500}, {1, -5}, 40, 60.0},
-                {{100, 150}, {-2, 2}, 15, 22.5},
-                {{700, 350}, {3, 3}, 50, 75.0},
-                {{500, 100}, {-5, -4}, 35, 52.5},
-                {{350, 450}, {4, 1}, 10, 15.0},
-                {{250, 250}, {0, 5}, 20, 30.0}
+                {{450, 200}, {-3, -1}, 45, 67.5}
             };
 
             while (!quit) {
@@ -430,14 +464,14 @@ int main(int argc, char* args[]) {
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
                 SDL_RenderClear(gRenderer);    
 
-                for (int i = 0; i < 10; i++) {
-                    for (int j = i + 1; j < 10; j++) {
+                for (int i = 0; i < 2; i++) {
+                    for (int j = i + 1; j < 2; j++) {
                         resolveCollision(&circles[i], &circles[j]);
                     }
                 } 
 
                 // Update and draw each circle
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 2; i++) {
                     // Update position based on velocity
                     circles[i].position.x += circles[i].velocity.x;
                     circles[i].position.y += circles[i].velocity.y;
