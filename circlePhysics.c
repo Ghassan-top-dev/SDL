@@ -388,19 +388,7 @@ void resolveCollision(Circle* b1, Circle* b2) {
     if (dist <= b1->radius + b2->radius) {
         
         // Calculate mass terms
-        
         float totalMass = b1->mass + b2->mass;
-        float massScale2 = (2.0f * b2->mass) / totalMass;
-        float massScale1 = (2.0f * b1->mass) / totalMass;
-
-        // save the inital velocity components of ball 1
-        float SavedvelocityB1_X = b1->velocity.x;
-        float SavedvelocityB1_Y = b1->velocity.y;
-        
-        // save the inital velocity components of ball 2
-        float SavedvelocityB2_X = b2->velocity.x;
-        float SavedvelocityB2_Y = b2->velocity.y;
-
 
         // save the actual velocities
         Vector2 SavedvelocityB1 = b1->velocity;
@@ -408,10 +396,19 @@ void resolveCollision(Circle* b1, Circle* b2) {
 
 
         float numeratorB1 = (2.0f * b2->mass) * (  dotProduct(  subtractVectors(b2->velocity,b1->velocity)  , subtractVectors(b2->position,b1->position) )  );
-        float denomenatorB1 = totalMass * dist * dist; 
+        
+        float numeratorB2 = (2.0f * b1->mass) * (  dotProduct(  subtractVectors(b1->velocity,b2->velocity)  , subtractVectors(b1->position,b2->position) )  );
 
 
-        b1->velocity = addVectors(SavedvelocityB1 , scaleVector( subtractVectors(b2->position , b1->position) ,  numeratorB1 / denomenatorB1));
+
+
+        float denomenator = totalMass * dist * dist; 
+
+
+        b1->velocity = addVectors(SavedvelocityB1 , scaleVector( subtractVectors(b2->position , b1->position) ,  numeratorB1 / denomenator));
+        
+        b2->velocity = addVectors(SavedvelocityB2 , scaleVector( subtractVectors(b1->position , b2->position) ,  numeratorB2 / denomenator));
+
 
 
 
@@ -441,8 +438,8 @@ int main(int argc, char* args[]) {
             // Create multiple circles
             // posX, posY, velocityX, velocityY, mass, radius
             Circle circles[2] = {
-                {{120, 300}, {2, 4}, 25, 37.5},
-                {{450, 200}, {-3, -1}, 45, 67.5}
+                {{120, 300}, {2, 4}, 165, 37.5},
+                {{450, 200}, {-3, -1}, 200, 67.5}
             };
 
             while (!quit) {
