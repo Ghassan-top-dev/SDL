@@ -15,18 +15,16 @@
 #define SCREEN_WIDTH 500 
 #define SCREEN_HEIGHT 300
 
-
-// the rate of change of the velocity each frame
-#define GRAVITY 0.5f
-#define MAX_VELOCITY 10.0f
-#define ENERGY_LOSS 0.7
-
 // Struct for storing circle data
 typedef struct {
-    int posX, posY;        // Position
-    int velocityY, velocityX;      // Velocity
-    int radius;      // Radius
+    float x, y;
+} Vector2;
+
+typedef struct {
+    Vector2 position;        // Position
+    Vector2 velocity;      // Velocity
     float mass; // mass
+    float radius;      // Radius
 } Circle;
 
 // Texture wrapper structure to hold texture data and dimensions
@@ -223,7 +221,7 @@ int getTextureHeight(LTexture* lTexture) {
 
 //circle functions:
 
-void DrawFilledCircle(SDL_Renderer* renderer, int centerX, int centerY, int radius) {
+void DrawFilledCircle(SDL_Renderer* renderer, int centerX, int centerY, float radius) {
     // Loop through the vertical positions (y-coordinates) of the circle from the top to the bottom
     for (int y = -radius; y <= radius; y++) {
         // Calculate the horizontal distance (half-width) at this y-level using the circle equation
@@ -234,113 +232,152 @@ void DrawFilledCircle(SDL_Renderer* renderer, int centerX, int centerY, int radi
     }
 }
 
-int checkCollision(Circle* c1, Circle* c2){
+// int checkCollision(Circle* c1, Circle* c2){
 
-    int dx = c2->posX - c1->posX;
-    int dy = c2->posY - c1->posY;
-    int dist = sqrt(dx * dx + dy * dy);
+//     int dx = c2->posX - c1->posX;
+//     int dy = c2->posY - c1->posY;
+//     int dist = sqrt(dx * dx + dy * dy);
 
-    if (dist <= c1->radius + c2->radius) {
+//     if (dist <= c1->radius + c2->radius) {
 
-        return 1;
+//         return 1;
         
-    }
+//     }
 
-    return 0;
-}
+//     return 0;
+// }
 
-void blah(Circle* c1, Circle* c2) {
-    // Calculate the distance between the two circles
-    int dx = c2->posX - c1->posX;
-    int dy = c2->posY - c1->posY;
+// void blah(Circle* c1, Circle* c2) {
+//     // Calculate the distance between the two circles
+//     int dx = c2->posX - c1->posX;
+//     int dy = c2->posY - c1->posY;
+//     double dist = sqrt(dx * dx + dy * dy);
+
+//     // Check if the circles are colliding (i.e., distance is less than sum of radii)
+//     if (dist < (double)c1->radius + c2->radius) {
+
+//         // Calculate the normal vector (direction of collision)
+//         // float nx = dx / (float)dist;
+//         // float ny = dy / (float)dist;
+
+//         // Relative velocity in the normal direction
+//         // float vn = (c2->velocityX - c1->velocityX) * nx + (c2->velocityY - c1->velocityY) * ny;
+
+//         // Only perform collision if the balls are moving towards each other
+//         // if (vn < 0) {
+//         //     // Calculate impulse scalar using the masses and relative velocity
+//         //     float impulse = (2 * vn) / (c1->mass + c2->mass);
+
+//         //     // Update velocities of the balls after the collision
+//         //     c1->velocityX -= impulse * c2->mass * nx;
+//         //     c1->velocityY -= impulse * c2->mass * ny;
+//         //     c2->velocityX += impulse * c1->mass * nx;
+//         //     c2->velocityY += impulse * c1->mass * ny;
+
+//         //     // Move the balls out of overlap by adjusting their positions
+//         //     int overlap = (c1->radius + c2->radius) - dist;
+//         //     c1->posX -= overlap * (c1->radius / (float)(c1->radius + c2->radius)) * nx;
+//         //     c1->posY -= overlap * (c1->radius / (float)(c1->radius + c2->radius)) * ny;
+//         //     c2->posX += overlap * (c2->radius / (float)(c1->radius + c2->radius)) * nx;
+//         //     c2->posY += overlap * (c2->radius / (float)(c1->radius + c2->radius)) * ny;
+//         // }
+//     }
+// }
+
+
+// void blahblah(Circle* circle1, Circle* circle2) {
+//     // Compute the normal vector (collision axis)
+//     float dx = circle2->posX - circle1->posX;
+//     float dy = circle2->posY - circle1->posY;
+
+//     // Distance between centers
+//     float distance = sqrt(dx * dx + dy * dy);
+
+//     // Check for collision (balls overlap if distance < sum of radii)
+//     float minDistance = circle1->radius + circle2->radius;
+//     if (distance == 0 || distance >= minDistance) {
+//         return; // No collision or balls perfectly aligned
+//     }
+
+//     // Normalize the collision axis (n)
+//     float nx = dx / distance;
+//     float ny = dy / distance;
+
+//     // Resolve penetration (prevent sticking)
+//     float overlap = minDistance - distance;
+//     circle1->posX -= nx * (overlap / 2); // Push circle1 away
+//     circle1->posY -= ny * (overlap / 2);
+//     circle2->posX += nx * (overlap / 2); // Push circle2 away
+//     circle2->posY += ny * (overlap / 2);
+
+//     // Compute relative velocity
+//     float rvx = circle1->velocityX - circle2->velocityX;
+//     float rvy = circle1->velocityY - circle2->velocityY;
+
+//     // Dot product of relative velocity and normal
+//     float relVelDotN = rvx * nx + rvy * ny;
+
+//     // If the relative velocity is moving apart, exit
+//     if (relVelDotN > 0) {
+//         return;
+//     }
+
+// }
+
+
+
+
+
+// void HandleCircleCollision(Circle* c1, Circle* c2) {
+//     // Calculate the distance between the two circles
+//     int dx = c2->posX - c1->posX;
+//     int dy = c2->posY - c1->posY;
+//     double dist = sqrt(dx * dx + dy * dy);
+
+//     // Check if the circles are colliding (i.e., distance is less than sum of radii)
+//     if (dist < (double)c1->radius + c2->radius) {
+
+        
+//     }
+// }
+
+
+void resolveCollision(Circle* b1, Circle* b2) {
+
+
+    int dx = b2->position.x - b1->position.x;
+    int dy = b2->position.y - b1->position.y;
     double dist = sqrt(dx * dx + dy * dy);
 
     // Check if the circles are colliding (i.e., distance is less than sum of radii)
-    if (dist < (double)c1->radius + c2->radius) {
-
-        // Calculate the normal vector (direction of collision)
-        // float nx = dx / (float)dist;
-        // float ny = dy / (float)dist;
-
-        // Relative velocity in the normal direction
-        // float vn = (c2->velocityX - c1->velocityX) * nx + (c2->velocityY - c1->velocityY) * ny;
-
-        // Only perform collision if the balls are moving towards each other
-        // if (vn < 0) {
-        //     // Calculate impulse scalar using the masses and relative velocity
-        //     float impulse = (2 * vn) / (c1->mass + c2->mass);
-
-        //     // Update velocities of the balls after the collision
-        //     c1->velocityX -= impulse * c2->mass * nx;
-        //     c1->velocityY -= impulse * c2->mass * ny;
-        //     c2->velocityX += impulse * c1->mass * nx;
-        //     c2->velocityY += impulse * c1->mass * ny;
-
-        //     // Move the balls out of overlap by adjusting their positions
-        //     int overlap = (c1->radius + c2->radius) - dist;
-        //     c1->posX -= overlap * (c1->radius / (float)(c1->radius + c2->radius)) * nx;
-        //     c1->posY -= overlap * (c1->radius / (float)(c1->radius + c2->radius)) * ny;
-        //     c2->posX += overlap * (c2->radius / (float)(c1->radius + c2->radius)) * nx;
-        //     c2->posY += overlap * (c2->radius / (float)(c1->radius + c2->radius)) * ny;
-        // }
-    }
-}
-
-
-void blahblah(Circle* circle1, Circle* circle2) {
-    // Compute the normal vector (collision axis)
-    float dx = circle2->posX - circle1->posX;
-    float dy = circle2->posY - circle1->posY;
-
-    // Distance between centers
-    float distance = sqrt(dx * dx + dy * dy);
-
-    // Check for collision (balls overlap if distance < sum of radii)
-    float minDistance = circle1->radius + circle2->radius;
-    if (distance == 0 || distance >= minDistance) {
-        return; // No collision or balls perfectly aligned
-    }
-
-    // Normalize the collision axis (n)
-    float nx = dx / distance;
-    float ny = dy / distance;
-
-    // Resolve penetration (prevent sticking)
-    float overlap = minDistance - distance;
-    circle1->posX -= nx * (overlap / 2); // Push circle1 away
-    circle1->posY -= ny * (overlap / 2);
-    circle2->posX += nx * (overlap / 2); // Push circle2 away
-    circle2->posY += ny * (overlap / 2);
-
-    // Compute relative velocity
-    float rvx = circle1->velocityX - circle2->velocityX;
-    float rvy = circle1->velocityY - circle2->velocityY;
-
-    // Dot product of relative velocity and normal
-    float relVelDotN = rvx * nx + rvy * ny;
-
-    // If the relative velocity is moving apart, exit
-    if (relVelDotN > 0) {
-        return;
-    }
-
-}
-
-
-
-
-
-void HandleCircleCollision(Circle* c1, Circle* c2) {
-    // Calculate the distance between the two circles
-    int dx = c2->posX - c1->posX;
-    int dy = c2->posY - c1->posY;
-    double dist = sqrt(dx * dx + dy * dy);
-
-    // Check if the circles are colliding (i.e., distance is less than sum of radii)
-    if (dist < (double)c1->radius + c2->radius) {
+    if (dist < (double)b1->radius + b2->radius) {
 
         
+        // Calculate mass terms
+        float totalMass = b1->mass + b2->mass;
+        float massDiff = b1->mass - b2->mass;
+        float massScale2 = (2.0f * b2->mass) / totalMass;
+        float massScale1 = (2.0f * b1->mass) / totalMass;
+        
+        // Store original velocities
+        float v1x = b1->velocity.x;
+        float v1y = b1->velocity.y;
+        float v2x = b2->velocity.x;
+        float v2y = b2->velocity.y;
+        
+        // Calculate new velocities
+        b1->velocity.x = (v1x * massDiff + 2 * b2->mass * v2x) / totalMass;
+        b1->velocity.y = (v1y * massDiff + 2 * b2->mass * v2y) / totalMass;
+        
+        b2->velocity.x = (v2x * -massDiff + 2 * b1->mass * v1x) / totalMass;
+        b2->velocity.y = (v2y * -massDiff + 2 * b1->mass * v1y) / totalMass;
+
+
+
+
     }
+
+
 }
 
 
@@ -360,10 +397,10 @@ int main(int argc, char* args[]) {
             bool areTheBallsColiding;
 
             // Create multiple circles
-            // posX, posY, velocityX, velocityY, radius, mass
+            // posX, posY, velocityX, velocityY, mass, radius
             Circle circles[2] = {
-                {100, 100, 2, 3, 30, 80},
-                {200, 200, -3, 2, 60, 200}
+                {{100, 100}, {2, 3}, 30, 30},
+                {{200, 200}, {-3, 2}, 100, 45}
             };
 
             while (!quit) {
@@ -387,40 +424,40 @@ int main(int argc, char* args[]) {
 
                 for (int i = 0; i < 2; i++) {
                     for (int j = i + 1; j < 2; j++) {
-                        blahblah(&circles[i], &circles[j]);
+                        resolveCollision(&circles[i], &circles[j]);
                     }
                 } 
 
                 // Update and draw each circle
                 for (int i = 0; i < 2; i++) {
                     // Update position based on velocity
-                    circles[i].posX += circles[i].velocityX;
-                    circles[i].posY += circles[i].velocityY;
+                    circles[i].position.x += circles[i].velocity.x;
+                    circles[i].position.y += circles[i].velocity.y;
 
                     // Handle boundaries
                     // right
-                    if (circles[i].posX >= SCREEN_WIDTH - circles[i].radius) {
-                        circles[i].velocityX *= -1;
-                        circles[i].posX = SCREEN_WIDTH - circles[i].radius; 
+                    if (circles[i].position.x >= SCREEN_WIDTH - circles[i].radius) {
+                        circles[i].velocity.x *= -1;
+                        circles[i].position.x = SCREEN_WIDTH - circles[i].radius; 
  
                     }
                     // left
-                    else if (circles[i].posX <= circles[i].radius)
+                    else if (circles[i].position.x <= circles[i].radius)
                     {
-                        circles[i].velocityX *= -1;
-                        circles[i].posX = circles[i].radius; 
+                        circles[i].velocity.x *= -1;
+                        circles[i].position.x = circles[i].radius; 
                     }
                     // bottom
-                    else if (circles[i].posY >= SCREEN_HEIGHT - circles[i].radius) { 
-                        circles[i].velocityY *= -1;
-                        circles[i].posY = SCREEN_HEIGHT - circles[i].radius; 
+                    else if (circles[i].position.y >= SCREEN_HEIGHT - circles[i].radius) { 
+                        circles[i].velocity.y *= -1;
+                        circles[i].position.y = SCREEN_HEIGHT - circles[i].radius; 
 
                     }
                     // top
-                    else if (circles[i].posY <= circles[i].radius)
+                    else if (circles[i].position.y <= circles[i].radius)
                     {
-                        circles[i].velocityY *= -1;
-                        circles[i].posY = circles[i].radius; 
+                        circles[i].velocity.y *= -1;
+                        circles[i].position.y = circles[i].radius; 
  
                     }
                     
@@ -428,7 +465,7 @@ int main(int argc, char* args[]) {
                     // Set color for each circle
                     SDL_SetRenderDrawColor(gRenderer, 65, 107, 223, 255);
                     // Draw the circle
-                    DrawFilledCircle(gRenderer, circles[i].posX, circles[i].posY, circles[i].radius);
+                    DrawFilledCircle(gRenderer, circles[i].position.x, circles[i].position.y, circles[i].radius);
                 }
 
                 // SDL_SetRenderDrawColor(gRenderer, 65, 107, 223, 255);
