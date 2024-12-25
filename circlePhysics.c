@@ -273,8 +273,8 @@ float mag(Vector2 vel) {
 void resolveCollision(Circle* b1, Circle* b2) {
 
     // this is the distance between the center of the 2 balls
-    int dx = b2->position.x - b1->position.x;
-    int dy = b2->position.y - b1->position.y;
+    float dx = b2->position.x - b1->position.x;
+    float dy = b2->position.y - b1->position.y;
     float dist = sqrt(dx * dx + dy * dy);
 
     // Check if the circles are colliding (i.e., distance is less than sum of radii)
