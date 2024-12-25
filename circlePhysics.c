@@ -218,9 +218,7 @@ int getTextureHeight(LTexture* lTexture) {
     return lTexture->height;
 }
 
-
-//circle functions:
-
+// circle functions:
 void DrawFilledCircle(SDL_Renderer* renderer, int centerX, int centerY, float radius) {
     // Loop through the vertical positions (y-coordinates) of the circle from the top to the bottom
     for (int y = -radius; y <= radius; y++) {
@@ -231,116 +229,6 @@ void DrawFilledCircle(SDL_Renderer* renderer, int centerX, int centerY, float ra
         SDL_RenderDrawLine(renderer, centerX - dx, centerY + y, centerX + dx, centerY + y);
     }
 }
-
-// int checkCollision(Circle* c1, Circle* c2){
-
-//     int dx = c2->posX - c1->posX;
-//     int dy = c2->posY - c1->posY;
-//     int dist = sqrt(dx * dx + dy * dy);
-
-//     if (dist <= c1->radius + c2->radius) {
-
-//         return 1;
-        
-//     }
-
-//     return 0;
-// }
-
-// void blah(Circle* c1, Circle* c2) {
-//     // Calculate the distance between the two circles
-//     int dx = c2->posX - c1->posX;
-//     int dy = c2->posY - c1->posY;
-//     double dist = sqrt(dx * dx + dy * dy);
-
-//     // Check if the circles are colliding (i.e., distance is less than sum of radii)
-//     if (dist < (double)c1->radius + c2->radius) {
-
-//         // Calculate the normal vector (direction of collision)
-//         // float nx = dx / (float)dist;
-//         // float ny = dy / (float)dist;
-
-//         // Relative velocity in the normal direction
-//         // float vn = (c2->velocityX - c1->velocityX) * nx + (c2->velocityY - c1->velocityY) * ny;
-
-//         // Only perform collision if the balls are moving towards each other
-//         // if (vn < 0) {
-//         //     // Calculate impulse scalar using the masses and relative velocity
-//         //     float impulse = (2 * vn) / (c1->mass + c2->mass);
-
-//         //     // Update velocities of the balls after the collision
-//         //     c1->velocityX -= impulse * c2->mass * nx;
-//         //     c1->velocityY -= impulse * c2->mass * ny;
-//         //     c2->velocityX += impulse * c1->mass * nx;
-//         //     c2->velocityY += impulse * c1->mass * ny;
-
-//         //     // Move the balls out of overlap by adjusting their positions
-//         //     int overlap = (c1->radius + c2->radius) - dist;
-//         //     c1->posX -= overlap * (c1->radius / (float)(c1->radius + c2->radius)) * nx;
-//         //     c1->posY -= overlap * (c1->radius / (float)(c1->radius + c2->radius)) * ny;
-//         //     c2->posX += overlap * (c2->radius / (float)(c1->radius + c2->radius)) * nx;
-//         //     c2->posY += overlap * (c2->radius / (float)(c1->radius + c2->radius)) * ny;
-//         // }
-//     }
-// }
-
-
-// void blahblah(Circle* circle1, Circle* circle2) {
-//     // Compute the normal vector (collision axis)
-//     float dx = circle2->posX - circle1->posX;
-//     float dy = circle2->posY - circle1->posY;
-
-//     // Distance between centers
-//     float distance = sqrt(dx * dx + dy * dy);
-
-//     // Check for collision (balls overlap if distance < sum of radii)
-//     float minDistance = circle1->radius + circle2->radius;
-//     if (distance == 0 || distance >= minDistance) {
-//         return; // No collision or balls perfectly aligned
-//     }
-
-//     // Normalize the collision axis (n)
-//     float nx = dx / distance;
-//     float ny = dy / distance;
-
-//     // Resolve penetration (prevent sticking)
-//     float overlap = minDistance - distance;
-//     circle1->posX -= nx * (overlap / 2); // Push circle1 away
-//     circle1->posY -= ny * (overlap / 2);
-//     circle2->posX += nx * (overlap / 2); // Push circle2 away
-//     circle2->posY += ny * (overlap / 2);
-
-//     // Compute relative velocity
-//     float rvx = circle1->velocityX - circle2->velocityX;
-//     float rvy = circle1->velocityY - circle2->velocityY;
-
-//     // Dot product of relative velocity and normal
-//     float relVelDotN = rvx * nx + rvy * ny;
-
-//     // If the relative velocity is moving apart, exit
-//     if (relVelDotN > 0) {
-//         return;
-//     }
-
-// }
-
-
-
-
-
-// void HandleCircleCollision(Circle* c1, Circle* c2) {
-//     // Calculate the distance between the two circles
-//     int dx = c2->posX - c1->posX;
-//     int dy = c2->posY - c1->posY;
-//     double dist = sqrt(dx * dx + dy * dy);
-
-//     // Check if the circles are colliding (i.e., distance is less than sum of radii)
-//     if (dist < (double)c1->radius + c2->radius) {
-
-        
-//     }
-// }
-
 
 // Add two vectors
 Vector2 addVectors(Vector2 v1, Vector2 v2) {
@@ -375,6 +263,11 @@ Vector2 scaleVector(Vector2 v, float scale) {
     return result;
 }
 
+float mag(Vector2 vel) {
+
+    return sqrt((vel.x * vel.x) + (vel.y * vel.y));
+}
+
 
 
 void resolveCollision(Circle* b1, Circle* b2) {
@@ -394,34 +287,24 @@ void resolveCollision(Circle* b1, Circle* b2) {
         Vector2 SavedvelocityB1 = b1->velocity;
         Vector2 SavedvelocityB2 = b2->velocity;
 
-
+        // numerator ball1
         float numeratorB1 = (2.0f * b2->mass) * (  dotProduct(  subtractVectors(b2->velocity,b1->velocity)  , subtractVectors(b2->position,b1->position) )  );
-        
+        // numerator ball2
         float numeratorB2 = (2.0f * b1->mass) * (  dotProduct(  subtractVectors(b1->velocity,b2->velocity)  , subtractVectors(b1->position,b2->position) )  );
 
 
 
-
+        // denomenator
         float denomenator = totalMass * dist * dist; 
 
-
+        // ball1
         b1->velocity = addVectors(SavedvelocityB1 , scaleVector( subtractVectors(b2->position , b1->position) ,  numeratorB1 / denomenator));
-        
+        // ball2
         b2->velocity = addVectors(SavedvelocityB2 , scaleVector( subtractVectors(b1->position , b2->position) ,  numeratorB2 / denomenator));
 
-
-
-
-
-
     }
-
-
 }
 
-
-
-//This is where the magic happens...
 // Main function - sets up SDL, loads media, runs main loop, and cleans up
 int main(int argc, char* args[]) {
     if (!init()) { // Initialize SDL and create window
@@ -438,8 +321,8 @@ int main(int argc, char* args[]) {
             // Create multiple circles
             // posX, posY, velocityX, velocityY, mass, radius
             Circle circles[2] = {
-                {{200, 245}, {8, -13}, 200, 50},
-                {{400, 300}, {-3, 4}, 400, 90}
+                {{200, 300}, {8, 0}, 200, 50},
+                {{400, 300}, {-8, 0}, 800, 90}
             };
 
             while (!quit) {
@@ -461,8 +344,25 @@ int main(int argc, char* args[]) {
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
                 SDL_RenderClear(gRenderer);    
 
+
+
                 for (int i = 0; i < 2; i++) {
                     for (int j = i + 1; j < 2; j++) {
+
+                        
+                        // check if the kinetic energy is conserved
+
+                        float speedB1 = mag(circles[i].velocity); 
+
+                        float speedB2 = mag(circles[j].velocity);
+
+                        float kinB1 = 0.5 * circles[i].mass * speedB1 * speedB1;
+                        float kinB2 = 0.5 * circles[j].mass * speedB2 * speedB2;
+
+                        printf("%f\n", kinB1 + kinB2);
+
+
+
                         resolveCollision(&circles[i], &circles[j]);
                     }
                 } 
@@ -506,15 +406,6 @@ int main(int argc, char* args[]) {
                     // Draw the circle
                     DrawFilledCircle(gRenderer, circles[i].position.x, circles[i].position.y, circles[i].radius);
                 }
-
-                // SDL_SetRenderDrawColor(gRenderer, 65, 107, 223, 255);
-                // DrawFilledCircle(gRenderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 50);
-
-                // // Draw horizontal and vertical lines to verify radius
-                // SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255); // Red for debugging
-                // SDL_RenderDrawLine(gRenderer, SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2 + 50, SCREEN_HEIGHT / 2); // Horizontal diameter
-                // SDL_RenderDrawLine(gRenderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 50); // Vertical diameter
-
                 
                 //this is for text
                 renderTexture(&gTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dk, dk, dk,dk); 
