@@ -438,8 +438,8 @@ int main(int argc, char* args[]) {
             // Create multiple circles
             // posX, posY, velocityX, velocityY, mass, radius
             Circle circles[2] = {
-                {{120, 300}, {2, 4}, 165, 37.5},
-                {{450, 200}, {-3, -1}, 200, 67.5}
+                {{200, 245}, {8, -13}, 200, 50},
+                {{400, 300}, {-3, 4}, 400, 90}
             };
 
             while (!quit) {
