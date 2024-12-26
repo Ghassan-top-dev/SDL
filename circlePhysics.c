@@ -13,7 +13,10 @@
 // Screen dimension constants
 // the size of the screen
 #define SCREEN_WIDTH 744 
-#define SCREEN_HEIGHT 500
+#define SCREEN_HEIGHT 744
+
+#define MAX_BALLS 10
+
 
 // Struct for storing circle data
 typedef struct {
@@ -26,6 +29,9 @@ typedef struct {
     float mass; // mass
     float radius;      // Radius
 } Circle;
+
+Circle circles[MAX_BALLS]; // Declare the array
+
 
 // Texture wrapper structure to hold texture data and dimensions
 typedef struct {
@@ -263,9 +269,27 @@ Vector2 scaleVector(Vector2 v, float scale) {
     return result;
 }
 
+// calculates the magnitude of a vector
 float mag(Vector2 vel) {
 
     return sqrt((vel.x * vel.x) + (vel.y * vel.y));
+}
+
+// Set the magnitude of a vector
+Vector2 setMagnitude(Vector2 v, float newMag) {
+    // Calculate the current magnitude of the vector
+    float currentMag = mag(v);
+
+    // If the current magnitude is zero, return the original vector to avoid division by zero
+    if (currentMag == 0) {
+        return v;
+    }
+
+    // Calculate the scaling factor
+    float scale = newMag / currentMag;
+
+    // Scale the vector to the desired magnitude
+    return scaleVector(v, scale);
 }
 
 
@@ -276,9 +300,29 @@ void resolveCollision(Circle* b1, Circle* b2) {
     float dx = b2->position.x - b1->position.x;
     float dy = b2->position.y - b1->position.y;
     float dist = sqrt(dx * dx + dy * dy);
+    
+
+
 
     // Check if the circles are colliding (i.e., distance is less than sum of radii)
     if (dist <= b1->radius + b2->radius) {
+
+        Vector2 impactVector = subtractVectors(b2->position, b1->position); 
+
+        float overlap = dist - (b1->radius + b2->radius);
+
+        Vector2 moveDifference = setMagnitude(impactVector, overlap * 0.5); 
+        
+        addVectors(b1->position, moveDifference); 
+        subtractVectors(b2->position, moveDifference); 
+
+        
+
+
+
+    
+
+
         
         // Calculate mass terms
         float totalMass = b1->mass + b2->mass;
@@ -305,6 +349,26 @@ void resolveCollision(Circle* b1, Circle* b2) {
     }
 }
 
+void InitializeCircles() {
+    srand(time(NULL)); // Seed random number generator
+
+    for (int i = 0; i < MAX_BALLS; i++) {
+        // Random position within screen bounds (adjust based on your screen size)
+        circles[i].position.x = rand() % (SCREEN_WIDTH - 100) + 50; // Keep circles away from edges
+        circles[i].position.y = rand() % (SCREEN_HEIGHT - 100) + 50;
+
+        // Random velocity components (from -5 to 5, but non-zero)
+        circles[i].velocity.x = (rand() % 11) - 5; // -5 to 5
+        circles[i].velocity.y = (rand() % 11) - 5;
+
+        // Random radius (10 to 50)
+        circles[i].radius = rand() % 41 + 10; // 10 to 50
+
+        // Mass proportional to radius (scaling factor: 1.5 for example)
+        circles[i].mass = circles[i].radius * 1.5;
+    }
+}
+
 // Main function - sets up SDL, loads media, runs main loop, and cleans up
 int main(int argc, char* args[]) {
     if (!init()) { // Initialize SDL and create window
@@ -315,15 +379,25 @@ int main(int argc, char* args[]) {
         } else {
             int quit = 0; // Main loop flag
             SDL_Event e; // Event handler
+            InitializeCircles();
+            // Circle circles[MAX_BALLS]; // Declare the array
 
-            bool areTheBallsColiding;
+            // for (int i = 0; i < MAX_BALLS; i++) {
+            //     circles[i] = (Circle) {
+            //         {rand() % SCREEN_WIDTH + 1, rand() % SCREEN_HEIGHT + 1},  // Random position: [-200, 200]
+            //         {rand() % 11 - 5, rand() % 11 - 5},        // Random velocity: [-5, 5]
+            //         rand() % 50 + 10,                          // Random radius: [10, 59]
+            //         rand() % 100 + 10                          // Random mass: [10, 109]
+            //     };
+            // }
+
 
             // Create multiple circles
             // posX, posY, velocityX, velocityY, mass, radius
-            Circle circles[2] = {
-                {{200, 300}, {8, 0}, 200, 50},
-                {{400, 300}, {-8, 0}, 800, 90}
-            };
+            // Circle circles[2] = {
+            //     {{200, 300}, {8, 0}, 200, 50},
+            //     {{400, 300}, {-8, 0}, 800, 90}
+            // };
 
             while (!quit) {
                 while (SDL_PollEvent(&e) != 0) { // Handle events
@@ -346,29 +420,16 @@ int main(int argc, char* args[]) {
 
 
 
-                for (int i = 0; i < 2; i++) {
-                    for (int j = i + 1; j < 2; j++) {
-
-                        
-                        // check if the kinetic energy is conserved
-
-                        float speedB1 = mag(circles[i].velocity); 
-
-                        float speedB2 = mag(circles[j].velocity);
-
-                        float kinB1 = 0.5 * circles[i].mass * speedB1 * speedB1;
-                        float kinB2 = 0.5 * circles[j].mass * speedB2 * speedB2;
-
-                        printf("%f\n", kinB1 + kinB2);
-
-
+                for (int i = 0; i < MAX_BALLS; i++) {
+                    for (int j = i + 1; j < MAX_BALLS; j++) {
 
                         resolveCollision(&circles[i], &circles[j]);
+
                     }
                 } 
 
                 // Update and draw each circle
-                for (int i = 0; i < 2; i++) {
+                for (int i = 0; i < MAX_BALLS; i++) {
                     // Update position based on velocity
                     circles[i].position.x += circles[i].velocity.x;
                     circles[i].position.y += circles[i].velocity.y;
