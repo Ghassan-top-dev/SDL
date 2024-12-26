@@ -339,6 +339,9 @@ bool checkOverlap(Circle* b1, Circle* b2){
 void InitializeCircles() {
     srand(time(NULL)); // Seed random number generator
 
+    int allowedTimes = 5; 
+    bool breakOuterLoop = false;
+
     for (int i = 0; i < MAX_BALLS; i++) {
         // Random position within screen bounds (adjust based on your screen size)
         circles[i].position.x = rand() % (SCREEN_WIDTH - 100) + 50; // Keep circles away from edges
@@ -356,13 +359,24 @@ void InitializeCircles() {
 
         for (int j = 0; j < i; j++)
         {
-            if (checkOverlap(&circles[i], &circles[j]))
+            if (checkOverlap(&circles[i], &circles[j]) && allowedTimes != 0)
             {
                 i--; 
+                allowedTimes--; 
                 break; 
+            }
+            else if(checkOverlap(&circles[i], &circles[j]) && allowedTimes != 0){
+                breakOuterLoop = true; 
+
             }
             
         }
+
+        if (breakOuterLoop)
+        {
+            break;
+        }
+        
         
     }
 }
