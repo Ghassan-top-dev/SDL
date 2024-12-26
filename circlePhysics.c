@@ -12,10 +12,10 @@
 
 // Screen dimension constants
 // the size of the screen
-#define SCREEN_WIDTH 744 
-#define SCREEN_HEIGHT 744
+#define SCREEN_WIDTH 300
+#define SCREEN_HEIGHT 300
 
-#define MAX_BALLS 100
+#define MAX_BALLS 10
 
 
 // Struct for storing circle data
@@ -339,9 +339,6 @@ bool checkOverlap(Circle* b1, Circle* b2){
 void InitializeCircles() {
     srand(time(NULL)); // Seed random number generator
 
-    int allowedTimes = 5; 
-    bool breakOuterLoop = false;
-
     for (int i = 0; i < MAX_BALLS; i++) {
         // Random position within screen bounds (adjust based on your screen size)
         circles[i].position.x = rand() % (SCREEN_WIDTH - 100) + 50; // Keep circles away from edges
@@ -359,25 +356,40 @@ void InitializeCircles() {
 
         for (int j = 0; j < i; j++)
         {
-            if (checkOverlap(&circles[i], &circles[j]) && allowedTimes != 0)
+            if (checkOverlap(&circles[i], &circles[j]))
             {
                 i--; 
-                allowedTimes--; 
                 break; 
             }
-            else if(checkOverlap(&circles[i], &circles[j]) && allowedTimes != 0){
-                breakOuterLoop = true; 
 
-            }
             
         }
+        
+        
+    }
+}
 
-        if (breakOuterLoop)
-        {
-            break;
+
+void correctPositions() {
+    for (int i = 0; i < MAX_BALLS; i++) {
+        for (int j = i + 1; j < MAX_BALLS; j++) {
+            if (checkOverlap(&circles[i], &circles[j])) {
+                float dx = circles[j].position.x - circles[i].position.x;
+                float dy = circles[j].position.y - circles[i].position.y;
+                float dist = sqrt(dx * dx + dy * dy);
+                float overlap = (circles[i].radius + circles[j].radius) - dist;
+
+                if (dist > 0) { // Avoid divide by zero
+                    float moveX = (dx / dist) * (overlap / 2);
+                    float moveY = (dy / dist) * (overlap / 2);
+
+                    circles[i].position.x -= moveX;
+                    circles[i].position.y -= moveY;
+                    circles[j].position.x += moveX;
+                    circles[j].position.y += moveY;
+                }
+            }
         }
-        
-        
     }
 }
 
@@ -392,24 +404,7 @@ int main(int argc, char* args[]) {
             int quit = 0; // Main loop flag
             SDL_Event e; // Event handler
             InitializeCircles();
-            // Circle circles[MAX_BALLS]; // Declare the array
 
-            // for (int i = 0; i < MAX_BALLS; i++) {
-            //     circles[i] = (Circle) {
-            //         {rand() % SCREEN_WIDTH + 1, rand() % SCREEN_HEIGHT + 1},  // Random position: [-200, 200]
-            //         {rand() % 11 - 5, rand() % 11 - 5},        // Random velocity: [-5, 5]
-            //         rand() % 50 + 10,                          // Random radius: [10, 59]
-            //         rand() % 100 + 10                          // Random mass: [10, 109]
-            //     };
-            // }
-
-
-            // Create multiple circles
-            // posX, posY, velocityX, velocityY, mass, radius
-            // Circle circles[2] = {
-            //     {{200, 300}, {8, 0}, 200, 50},
-            //     {{400, 300}, {-8, 0}, 800, 90}
-            // };
 
             while (!quit) {
                 while (SDL_PollEvent(&e) != 0) { // Handle events
@@ -439,6 +434,9 @@ int main(int argc, char* args[]) {
 
                     }
                 } 
+
+                correctPositions();
+
 
                 // Update and draw each circle
                 for (int i = 0; i < MAX_BALLS; i++) {
