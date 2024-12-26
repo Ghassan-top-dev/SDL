@@ -15,7 +15,7 @@
 #define SCREEN_WIDTH 744 
 #define SCREEN_HEIGHT 744
 
-#define MAX_BALLS 10
+#define MAX_BALLS 100
 
 
 // Struct for storing circle data
@@ -300,30 +300,10 @@ void resolveCollision(Circle* b1, Circle* b2) {
     float dx = b2->position.x - b1->position.x;
     float dy = b2->position.y - b1->position.y;
     float dist = sqrt(dx * dx + dy * dy);
-    
-
-
 
     // Check if the circles are colliding (i.e., distance is less than sum of radii)
     if (dist <= b1->radius + b2->radius) {
 
-        Vector2 impactVector = subtractVectors(b2->position, b1->position); 
-
-        float overlap = dist - (b1->radius + b2->radius);
-
-        Vector2 moveDifference = setMagnitude(impactVector, overlap * 0.5); 
-        
-        addVectors(b1->position, moveDifference); 
-        subtractVectors(b2->position, moveDifference); 
-
-        
-
-
-
-    
-
-
-        
         // Calculate mass terms
         float totalMass = b1->mass + b2->mass;
 
@@ -349,6 +329,13 @@ void resolveCollision(Circle* b1, Circle* b2) {
     }
 }
 
+bool checkOverlap(Circle* b1, Circle* b2){
+    float dx = b2->position.x - b1->position.x;
+    float dy = b2->position.y - b1->position.y;
+    float dist = sqrt(dx * dx + dy * dy);
+    return dist <= (b1->radius + b2->radius);
+}
+
 void InitializeCircles() {
     srand(time(NULL)); // Seed random number generator
 
@@ -366,6 +353,17 @@ void InitializeCircles() {
 
         // Mass proportional to radius (scaling factor: 1.5 for example)
         circles[i].mass = circles[i].radius * 1.5;
+
+        for (int j = 0; j < i; j++)
+        {
+            if (checkOverlap(&circles[i], &circles[j]))
+            {
+                i--; 
+                break; 
+            }
+            
+        }
+        
     }
 }
 
