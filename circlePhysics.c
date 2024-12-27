@@ -46,25 +46,28 @@ Circle circles[MAX_BALLS]; // Declare the array
 int s1 = 0, s2 = 0, s3 = 0; 
 
 const Color colors[] = {
-    // Cool Colors
-    {85, 170, 255, 255},  // Cool blue 1
-    {65, 105, 225, 255},  // Cool blue 2
-    {72, 209, 204, 255},  // Cool teal 1
-    {32, 178, 170, 255},  // Cool teal 2
-    {0, 128, 128, 255},   // Cool teal 3
+    // Earthy Browns and Greens
+    {139, 69, 19, 255},    // Saddle brown
+    {160, 82, 45, 255},    // Sienna
+    {85, 107, 47, 255},    // Dark olive green
+    {107, 142, 35, 255},   // Olive drab
+    {34, 139, 34, 255},    // Forest green
 
-    {123, 104, 238, 255}, // Cool purple 1
-    {106, 90, 205, 255},  // Cool purple 2
-    {75, 0, 130, 255},    // Cool purple 3
-    {138, 43, 226, 255},  // Cool purple 4
-    {147, 112, 219, 255}, // Cool purple 5
+    // Water and Sky Blues
+    {70, 130, 180, 255},   // Steel blue
+    {30, 144, 255, 255},   // Dodger blue
+    {0, 191, 255, 255},    // Deep sky blue
+    {176, 224, 230, 255},  // Powder blue
+    {100, 149, 237, 255},  // Cornflower blue
 
-    {70, 130, 180, 255},  // Cool slate 1
-    {95, 158, 160, 255},  // Cool slate 2
-    {176, 224, 230, 255}, // Cool light blue
-    {0, 191, 255, 255},   // Cool sky blue
-    {135, 206, 250, 255}  // Cool pale blue
+    // Natural Rock and Soil Shades
+    {112, 128, 144, 255},  // Slate gray
+    {119, 136, 153, 255},  // Light slate gray
+    {210, 180, 140, 255},  // Tan
+    {244, 164, 96, 255},   // Sand brown
+    {205, 133, 63, 255}    // Peru
 };
+
 
 
 
