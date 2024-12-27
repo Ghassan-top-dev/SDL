@@ -12,10 +12,10 @@
 
 // Screen dimension constants
 // the size of the screen
-#define SCREEN_WIDTH 300
-#define SCREEN_HEIGHT 300
+#define SCREEN_WIDTH 1392 
+#define SCREEN_HEIGHT 744
 
-#define MAX_BALLS 10
+#define MAX_BALLS 25
 
 
 // Struct for storing circle data
@@ -24,13 +24,48 @@ typedef struct {
 } Vector2;
 
 typedef struct {
+    int r; // Red component
+    int g; // Green component
+    int b; // Blue component
+    int a; // Alpha component
+} Color;
+
+typedef struct {
     Vector2 position;        // Position
     Vector2 velocity;      // Velocity
     float mass; // mass
     float radius;      // Radius
+    Color colour;
+
 } Circle;
 
 Circle circles[MAX_BALLS]; // Declare the array
+
+
+// COLOR VARIABLES
+int s1 = 0, s2 = 0, s3 = 0; 
+
+const Color colors[] = {
+    // Cool Colors
+    {85, 170, 255, 255},  // Cool blue 1
+    {65, 105, 225, 255},  // Cool blue 2
+    {72, 209, 204, 255},  // Cool teal 1
+    {32, 178, 170, 255},  // Cool teal 2
+    {0, 128, 128, 255},   // Cool teal 3
+
+    {123, 104, 238, 255}, // Cool purple 1
+    {106, 90, 205, 255},  // Cool purple 2
+    {75, 0, 130, 255},    // Cool purple 3
+    {138, 43, 226, 255},  // Cool purple 4
+    {147, 112, 219, 255}, // Cool purple 5
+
+    {70, 130, 180, 255},  // Cool slate 1
+    {95, 158, 160, 255},  // Cool slate 2
+    {176, 224, 230, 255}, // Cool light blue
+    {0, 191, 255, 255},   // Cool sky blue
+    {135, 206, 250, 255}  // Cool pale blue
+};
+
 
 
 // Texture wrapper structure to hold texture data and dimensions
@@ -340,19 +375,23 @@ void InitializeCircles() {
     srand(time(NULL)); // Seed random number generator
 
     for (int i = 0; i < MAX_BALLS; i++) {
+        int randColor = rand() % 15;
         // Random position within screen bounds (adjust based on your screen size)
         circles[i].position.x = rand() % (SCREEN_WIDTH - 100) + 50; // Keep circles away from edges
         circles[i].position.y = rand() % (SCREEN_HEIGHT - 100) + 50;
 
         // Random velocity components (from -5 to 5, but non-zero)
-        circles[i].velocity.x = (rand() % 11) - 5; // -5 to 5
-        circles[i].velocity.y = (rand() % 11) - 5;
+        circles[i].velocity.x = (rand() % 5) - 2; // -5 to 5
+        circles[i].velocity.y = (rand() % 5) - 2;
 
         // Random radius (10 to 50)
-        circles[i].radius = rand() % 41 + 10; // 10 to 50
+        circles[i].radius = rand() % 81 + 10; // 10 to 50
 
         // Mass proportional to radius (scaling factor: 1.5 for example)
         circles[i].mass = circles[i].radius * 1.5;
+
+        // Mass proportional to radius (scaling factor: 1.5 for example)
+        circles[i].colour = colors[randColor]; 
 
         for (int j = 0; j < i; j++)
         {
@@ -431,7 +470,6 @@ int main(int argc, char* args[]) {
                     for (int j = i + 1; j < MAX_BALLS; j++) {
 
                         resolveCollision(&circles[i], &circles[j]);
-
                     }
                 } 
 
@@ -471,9 +509,8 @@ int main(int argc, char* args[]) {
  
                     }
                     
-
-                    // Set color for each circle
-                    SDL_SetRenderDrawColor(gRenderer, 65, 107, 223, 255);
+                    int randColor = rand() % 15;  // Random index (0 to 14)
+                    SDL_SetRenderDrawColor(gRenderer, circles[i].colour.r, circles[i].colour.g, circles[i].colour.b, circles[i].colour.a);
                     // Draw the circle
                     DrawFilledCircle(gRenderer, circles[i].position.x, circles[i].position.y, circles[i].radius);
                 }
