@@ -36,6 +36,7 @@ typedef struct {
     float mass; // mass
     float radius;      // Radius
     Color colour;
+    bool exists; 
 
 } Circle;
 
@@ -395,6 +396,52 @@ void InitializeCircles() {
 
         // Mass proportional to radius (scaling factor: 1.5 for example)
         circles[i].colour = colors[randColor]; 
+        
+        circles[i].exists = true; 
+
+
+        for (int j = 0; j < i; j++)
+        {
+            if (checkOverlap(&circles[i], &circles[j]))
+            {
+                i--; 
+                break; 
+            }
+
+            
+        }
+        
+        
+    }
+}
+
+void instantiateCircle(int DYNAMIC_CIRCLES, int xPos, int yPos) {
+    srand(time(NULL)); // Seed random number generator
+
+    for (int i = 0; i < MAX_BALLS + DYNAMIC_CIRCLES; i++) {
+        if (circles[i].exists)
+        {
+            continue;
+        }
+        
+        int randColor = rand() % 15;
+        // Random position within screen bounds (adjust based on your screen size)
+        circles[i].position.x = xPos; // Keep circles away from edges
+        circles[i].position.y = yPos;
+
+        // Random velocity components (from -5 to 5, but non-zero)
+        circles[i].velocity.x = (rand() % 5) - 2; // -5 to 5
+        circles[i].velocity.y = (rand() % 5) - 2;
+
+        // Random radius (10 to 50)
+        circles[i].radius = rand() % 81 + 10; // 10 to 50
+
+        // Mass proportional to radius (scaling factor: 1.5 for example)
+        circles[i].mass = circles[i].radius * 1.5;
+
+        // Mass proportional to radius (scaling factor: 1.5 for example)
+        circles[i].colour = colors[randColor]; 
+        circles[i].exists = true; 
 
         for (int j = 0; j < i; j++)
         {
@@ -412,9 +459,9 @@ void InitializeCircles() {
 }
 
 
-void correctPositions() {
-    for (int i = 0; i < MAX_BALLS; i++) {
-        for (int j = i + 1; j < MAX_BALLS; j++) {
+void correctPositions(int DYNAMIC_CIRCLES) {
+    for (int i = 0; i < MAX_BALLS + DYNAMIC_CIRCLES; i++) {
+        for (int j = i + 1; j < MAX_BALLS + DYNAMIC_CIRCLES; j++) {
             if (checkOverlap(&circles[i], &circles[j])) {
                 float dx = circles[j].position.x - circles[i].position.x;
                 float dy = circles[j].position.y - circles[i].position.y;
@@ -447,6 +494,8 @@ int main(int argc, char* args[]) {
             SDL_Event e; // Event handler
             InitializeCircles();
 
+            int DYNAMIC_CIRCLES = 0; 
+
 
             while (!quit) {
                 while (SDL_PollEvent(&e) != 0) { // Handle events
@@ -457,9 +506,24 @@ int main(int argc, char* args[]) {
                     }
 
                     if (e.type == SDL_KEYDOWN) {
-                      if (e.key.keysym.sym == SDLK_ESCAPE) {
-                          quit = 1; // Exit on pressing the escape key
-                      }
+                        if (e.key.keysym.sym == SDLK_ESCAPE) {
+                            quit = 1; // Exit on pressing the escape key
+                        }
+
+
+                        if (e.type == SDL_MOUSEBUTTONDOWN) {
+                            if (e.button.button == SDL_BUTTON_LEFT) {
+
+                                DYNAMIC_CIRCLES++; 
+                                int mouseX, mouseY;
+
+                                mouseX = e.motion.x;
+                                mouseY = e.motion.y;
+                                instantiateCircle(DYNAMIC_CIRCLES, mouseX, mouseY); 
+                               
+                               
+                            }
+                        }
                     
                     }
                 }
@@ -469,18 +533,18 @@ int main(int argc, char* args[]) {
 
 
 
-                for (int i = 0; i < MAX_BALLS; i++) {
-                    for (int j = i + 1; j < MAX_BALLS; j++) {
+                for (int i = 0; i < MAX_BALLS + DYNAMIC_CIRCLES; i++) {
+                    for (int j = i + 1; j < MAX_BALLS + DYNAMIC_CIRCLES; j++) {
 
                         resolveCollision(&circles[i], &circles[j]);
                     }
                 } 
 
-                correctPositions();
+                correctPositions(DYNAMIC_CIRCLES);
 
 
                 // Update and draw each circle
-                for (int i = 0; i < MAX_BALLS; i++) {
+                for (int i = 0; i < MAX_BALLS + DYNAMIC_CIRCLES; i++) {
                     // Update position based on velocity
                     circles[i].position.x += circles[i].velocity.x;
                     circles[i].position.y += circles[i].velocity.y;
