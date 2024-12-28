@@ -15,7 +15,7 @@
 #define SCREEN_WIDTH 1392 
 #define SCREEN_HEIGHT 744
 
-#define MAX_BALLS 25
+#define MAX_BALLS 600
 
 
 // Struct for storing circle data
@@ -36,8 +36,6 @@ typedef struct {
     float mass; // mass
     float radius;      // Radius
     Color colour;
-    bool exists; 
-
 } Circle;
 
 Circle circles[MAX_BALLS]; // Declare the array
@@ -73,6 +71,7 @@ const Color colors[] = {
 
 
 
+SDL_Color textColor = {0, 0, 0}; // text color
 
 // Texture wrapper structure to hold texture data and dimensions
 typedef struct {
@@ -154,7 +153,6 @@ bool loadMedia() {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
         success = false;
     } else {
-        SDL_Color textColor = {0, 0, 0}; // text color
 
         // Render the text to create a texture
         if (!loadFromRenderedText(&gTextTexture, " ", textColor)) {
@@ -398,9 +396,6 @@ void InitializeCircles() {
 
         // Mass proportional to radius (scaling factor: 1.5 for example)
         circles[i].colour = colors[randColor]; 
-        
-        circles[i].exists = true; 
-
 
         for (int j = 0; j < i; j++)
         {
@@ -452,6 +447,7 @@ int main(int argc, char* args[]) {
             int quit = 0; // Main loop flag
             SDL_Event e; // Event handler
             InitializeCircles();
+            char ballNum[32];
 
             while (!quit) {
                 while (SDL_PollEvent(&e) != 0) { // Handle events
@@ -546,7 +542,9 @@ int main(int argc, char* args[]) {
                     // Draw the circle
                     DrawFilledCircle(gRenderer, circles[i].position.x, circles[i].position.y, circles[i].radius);
                 }
-                
+
+                sprintf(ballNum, "Number of balls: %d", DYNAMIC_CIRCLES);
+                loadFromRenderedText(&gTextTexture,ballNum, textColor);
                 //this is for text
                 renderTexture(&gTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); //this is for text (dk, posx, posy, dk, dk, dk,dk); 
                 SDL_RenderPresent(gRenderer); // Update screen
