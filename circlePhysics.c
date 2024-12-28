@@ -41,6 +41,8 @@ typedef struct {
 } Circle;
 
 Circle circles[MAX_BALLS]; // Declare the array
+int DYNAMIC_CIRCLES = MAX_BALLS;
+
 
 
 // COLOR VARIABLES
@@ -155,7 +157,7 @@ bool loadMedia() {
         SDL_Color textColor = {0, 0, 0}; // text color
 
         // Render the text to create a texture
-        if (!loadFromRenderedText(&gTextTexture, "CIRCLE", textColor)) {
+        if (!loadFromRenderedText(&gTextTexture, " ", textColor)) {
             printf("Failed to render text texture!\n");
             success = false;
         }
@@ -378,7 +380,7 @@ bool checkOverlap(Circle* b1, Circle* b2){
 void InitializeCircles() {
     srand(time(NULL)); // Seed random number generator
 
-    for (int i = 0; i < MAX_BALLS; i++) {
+    for (int i = 0; i < DYNAMIC_CIRCLES; i++) {
         int randColor = rand() % 15;
         // Random position within screen bounds (adjust based on your screen size)
         circles[i].position.x = rand() % (SCREEN_WIDTH - 100) + 50; // Keep circles away from edges
@@ -415,53 +417,10 @@ void InitializeCircles() {
     }
 }
 
-void instantiateCircle(int DYNAMIC_CIRCLES, int xPos, int yPos) {
-    srand(time(NULL)); // Seed random number generator
 
-    for (int i = 0; i < MAX_BALLS + DYNAMIC_CIRCLES; i++) {
-        if (circles[i].exists)
-        {
-            continue;
-        }
-        
-        int randColor = rand() % 15;
-        // Random position within screen bounds (adjust based on your screen size)
-        circles[i].position.x = xPos; // Keep circles away from edges
-        circles[i].position.y = yPos;
-
-        // Random velocity components (from -5 to 5, but non-zero)
-        circles[i].velocity.x = (rand() % 5) - 2; // -5 to 5
-        circles[i].velocity.y = (rand() % 5) - 2;
-
-        // Random radius (10 to 50)
-        circles[i].radius = rand() % 81 + 10; // 10 to 50
-
-        // Mass proportional to radius (scaling factor: 1.5 for example)
-        circles[i].mass = circles[i].radius * 1.5;
-
-        // Mass proportional to radius (scaling factor: 1.5 for example)
-        circles[i].colour = colors[randColor]; 
-        circles[i].exists = true; 
-
-        for (int j = 0; j < i; j++)
-        {
-            if (checkOverlap(&circles[i], &circles[j]))
-            {
-                i--; 
-                break; 
-            }
-
-            
-        }
-        
-        
-    }
-}
-
-
-void correctPositions(int DYNAMIC_CIRCLES) {
-    for (int i = 0; i < MAX_BALLS + DYNAMIC_CIRCLES; i++) {
-        for (int j = i + 1; j < MAX_BALLS + DYNAMIC_CIRCLES; j++) {
+void correctPositions() {
+    for (int i = 0; i < DYNAMIC_CIRCLES; i++) {
+        for (int j = i + 1; j < DYNAMIC_CIRCLES; j++) {
             if (checkOverlap(&circles[i], &circles[j])) {
                 float dx = circles[j].position.x - circles[i].position.x;
                 float dy = circles[j].position.y - circles[i].position.y;
@@ -494,9 +453,6 @@ int main(int argc, char* args[]) {
             SDL_Event e; // Event handler
             InitializeCircles();
 
-            int DYNAMIC_CIRCLES = 0; 
-
-
             while (!quit) {
                 while (SDL_PollEvent(&e) != 0) { // Handle events
 
@@ -509,22 +465,31 @@ int main(int argc, char* args[]) {
                         if (e.key.keysym.sym == SDLK_ESCAPE) {
                             quit = 1; // Exit on pressing the escape key
                         }
+                    }
 
 
-                        if (e.type == SDL_MOUSEBUTTONDOWN) {
-                            if (e.button.button == SDL_BUTTON_LEFT) {
+                    if (e.type == SDL_MOUSEBUTTONDOWN) {
+                        if (e.button.button == SDL_BUTTON_LEFT) {
+                            int mouseX, mouseY;
 
-                                DYNAMIC_CIRCLES++; 
-                                int mouseX, mouseY;
+                            // Get mouse position
+                            SDL_GetMouseState(&mouseX, &mouseY);
 
-                                mouseX = e.motion.x;
-                                mouseY = e.motion.y;
-                                instantiateCircle(DYNAMIC_CIRCLES, mouseX, mouseY); 
-                               
-                               
-                            }
+                            int randColor = rand() % 15;
+
+                            // Create a new circle
+                            Circle newCircle;
+                            newCircle.position.x = mouseX;
+                            newCircle.position.y = mouseY;
+                            newCircle.velocity.x = (rand() % 5) - 2; // Random velocity
+                            newCircle.velocity.y = (rand() % 5) - 2;
+                            newCircle.radius = rand() % 81 + 10;     // Random radius
+                            newCircle.mass = newCircle.radius * 1.5; // Mass proportional to radius
+                            newCircle.colour = colors[randColor];
+
+                            // Add the circle to the array
+                            circles[DYNAMIC_CIRCLES++] = newCircle;                        
                         }
-                    
                     }
                 }
                 // Clear screen with white background
@@ -533,18 +498,18 @@ int main(int argc, char* args[]) {
 
 
 
-                for (int i = 0; i < MAX_BALLS + DYNAMIC_CIRCLES; i++) {
-                    for (int j = i + 1; j < MAX_BALLS + DYNAMIC_CIRCLES; j++) {
+                for (int i = 0; i < DYNAMIC_CIRCLES; i++) {
+                    for (int j = i + 1; j < DYNAMIC_CIRCLES; j++) {
 
                         resolveCollision(&circles[i], &circles[j]);
                     }
                 } 
 
-                correctPositions(DYNAMIC_CIRCLES);
+                correctPositions();
 
 
                 // Update and draw each circle
-                for (int i = 0; i < MAX_BALLS + DYNAMIC_CIRCLES; i++) {
+                for (int i = 0; i < DYNAMIC_CIRCLES; i++) {
                     // Update position based on velocity
                     circles[i].position.x += circles[i].velocity.x;
                     circles[i].position.y += circles[i].velocity.y;
