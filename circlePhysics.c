@@ -15,7 +15,7 @@
 #define SCREEN_WIDTH 1392 
 #define SCREEN_HEIGHT 744
 
-#define MAX_BALLS 500
+#define MAX_BALLS 25
 
 // Struct for storing circle data
 typedef struct {
@@ -62,6 +62,12 @@ const Color colors[] = {
     {244, 164, 96, 255},   // Sand brown
     {205, 133, 63, 255}    // Peru
 };
+
+float mouseVX, mouseVY;
+float deltaTime = 1.0f / 60.0f; // Assume a frame rate of 60 FPS (adjust if variable)
+
+// Global or persistent variables to store mouse positions
+int previousMouseX = 0, previousMouseY = 0;
 
 
 
@@ -430,6 +436,40 @@ void correctPositions() {
     }
 }
 
+
+void updateMouseVelocity(float* mouseVX, float* mouseVY, float deltaTime) {
+    int currentMouseX, currentMouseY;
+
+    // Get the current mouse position
+    SDL_GetMouseState(&currentMouseX, &currentMouseY);
+
+    // Calculate the velocity
+    *mouseVX = (currentMouseX - previousMouseX) / deltaTime;
+    *mouseVY = (currentMouseY - previousMouseY) / deltaTime;
+
+    // Update the previous position for the next frame
+    previousMouseX = currentMouseX;
+    previousMouseY = currentMouseY;
+}
+
+
+void handleMouseCollision(int mouseX, int mouseY, float mouseVX, float mouseVY) {
+    Circle mouseCircle;
+    mouseCircle.position.x = mouseX;
+    mouseCircle.position.y = mouseY;
+    mouseCircle.velocity.x = 5;
+    mouseCircle.velocity.y = 5;
+    mouseCircle.radius = 50.0f; // Arbitrary large size
+    mouseCircle.mass = 50.0f; // Very large mass
+
+    for (int i = 0; i < DYNAMIC_CIRCLES; i++) {
+        if (checkOverlap(&mouseCircle, &circles[i])) {
+            resolveCollision(&mouseCircle, &circles[i]);
+        }
+    }
+}
+
+
 // Main function - sets up SDL, loads media, runs main loop, and cleans up
 int main(int argc, char* args[]) {
     if (!init()) { // Initialize SDL and create window
@@ -442,6 +482,11 @@ int main(int argc, char* args[]) {
             SDL_Event e; // Event handler
             InitializeCircles();
             char ballNum[32];
+
+            bool pressed = false; 
+
+            int mouseX, mouseY;
+
 
             while (!quit) {
                 while (SDL_PollEvent(&e) != 0) { // Handle events
@@ -460,17 +505,19 @@ int main(int argc, char* args[]) {
 
                     if (e.type == SDL_MOUSEBUTTONDOWN) {
                         if (e.button.button == SDL_BUTTON_LEFT) {
-                            int mouseX, mouseY;
+                            pressed = true;
+
+                            int mouseXPos, mouseYPos;
 
                             // Get mouse position
-                            SDL_GetMouseState(&mouseX, &mouseY);
+                            SDL_GetMouseState(&mouseXPos, &mouseYPos);
 
                             int randColor = rand() % 15;
 
                             // Create a new circle
                             Circle newCircle;
-                            newCircle.position.x = mouseX;
-                            newCircle.position.y = mouseY;
+                            newCircle.position.x = mouseXPos;
+                            newCircle.position.y = mouseYPos;
                             newCircle.velocity.x = (rand() % 5) - 2; // Random velocity
                             newCircle.velocity.y = (rand() % 5) - 2;
                             newCircle.radius = rand() % 11 + 10;     // Random radius
@@ -481,6 +528,23 @@ int main(int argc, char* args[]) {
                             circles[DYNAMIC_CIRCLES++] = newCircle;                        
                         }
                     }
+
+                    if (e.type == SDL_MOUSEBUTTONUP){
+                        if (e.button.button == SDL_BUTTON_LEFT)
+                        {
+                            pressed = false; 
+                        }
+                    }
+
+                    
+                    if (e.type == SDL_MOUSEMOTION && pressed == true){
+
+
+                        // Handle collisions with the mouse as a circle
+                        handleMouseCollision(mouseX, mouseY, mouseVX, mouseVY);
+                    }
+
+                    
                 }
                 // Clear screen with white background
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
@@ -496,6 +560,14 @@ int main(int argc, char* args[]) {
                 } 
 
                 correctPositions();
+
+                updateMouseVelocity(&mouseVX, &mouseVY, deltaTime);
+
+
+                // Get mouse position
+                SDL_GetMouseState(&mouseX, &mouseY);
+
+
 
 
                 // Update and draw each circle
@@ -552,4 +624,3 @@ int main(int argc, char* args[]) {
 
     return 0;
 }
- 
