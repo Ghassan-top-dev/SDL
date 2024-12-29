@@ -12,10 +12,10 @@
 
 // Screen dimension constants
 // the size of the screen
-#define SCREEN_WIDTH 500 
-#define SCREEN_HEIGHT 500
+#define SCREEN_WIDTH 1392
+#define SCREEN_HEIGHT 744
 
-#define MAX_BALLS 10
+#define MAX_BALLS 1500
 
 // Struct for storing circle data
 typedef struct {
@@ -38,7 +38,7 @@ typedef struct {
 } Circle;
 
 Circle circles[MAX_BALLS]; // Declare the array
-int DYNAMIC_CIRCLES = MAX_BALLS;
+int DYNAMIC_CIRCLES = 1000;
 
 const Color colors[] = {
     // Earthy Browns and Greens
@@ -498,6 +498,10 @@ int main(int argc, char* args[]) {
 
 
             while (!quit) {
+
+                // Get mouse position
+                SDL_GetMouseState(&mouseX, &mouseY);
+
                 while (SDL_PollEvent(&e) != 0) { // Handle events
 
                 //place controls below...
@@ -515,7 +519,7 @@ int main(int argc, char* args[]) {
                     if (e.type == SDL_MOUSEBUTTONDOWN) {
                         if (e.button.button == SDL_BUTTON_RIGHT) {
 
-                            int mousePosX, mousePosY;
+                            //int mousePosX, mousePosY;
                             // Get mouse position
                             //SDL_GetMouseState(&mousePosX, &mousePosY);
 
@@ -523,8 +527,8 @@ int main(int argc, char* args[]) {
 
                             // Create a new circle
                             Circle newCircle;
-                            newCircle.position.x = e.motion.x;
-                            newCircle.position.y = e.motion.y;
+                            newCircle.position.x = mouseX;
+                            newCircle.position.y = mouseY;
                             newCircle.velocity.x = (rand() % 5) - 2; // Random velocity
                             newCircle.velocity.y = (rand() % 5) - 2;
                             newCircle.radius = rand() % 11 + 10;     // Random radius
@@ -573,8 +577,7 @@ int main(int argc, char* args[]) {
 
                 correctPositions();
 
-                // Get mouse position
-                SDL_GetMouseState(&mouseX, &mouseY);
+
 
                 updateMouseVelocity(&mouseVX, &mouseVY, deltaTime, mouseX, mouseY);
 
