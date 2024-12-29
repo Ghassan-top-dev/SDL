@@ -15,7 +15,7 @@
 #define SCREEN_WIDTH 1392
 #define SCREEN_HEIGHT 744
 
-#define MAX_BALLS 4000
+#define MAX_BALLS 1000
 
 // Struct for storing circle data
 typedef struct {
@@ -38,7 +38,7 @@ typedef struct {
 } Circle;
 
 Circle circles[MAX_BALLS]; // Declare the array
-int DYNAMIC_CIRCLES = 3000;
+int DYNAMIC_CIRCLES = 1;
 
 const Color colors[] = {
     // Earthy Browns and Greens
@@ -389,7 +389,7 @@ void InitializeCircles() {
         circles[i].velocity.y = (rand() % 5) - 2;
 
         // Random radius (10 to 50)
-        circles[i].radius = rand() % 5 + 5; // 10 to 50
+        circles[i].radius = rand() % 11 + 10; // 10 to 50
 
         // Mass proportional to radius (scaling factor: 1.5 for example)
         circles[i].mass = circles[i].radius * 1.5;
@@ -451,16 +451,37 @@ void updateMouseVelocity(float* mouseVX, float* mouseVY, float deltaTime , int c
 
 void handleMouseCollision(int mouseX, int mouseY, float mouseVX, float mouseVY) {
     Circle mouseCircle;
+    // Center the mouse circle properly
     mouseCircle.position.x = mouseX;
     mouseCircle.position.y = mouseY;
-    mouseCircle.velocity.x = mouseVX * 0.01;
-    mouseCircle.velocity.y = mouseVY * 0.01;
-    mouseCircle.radius = 10.0f; // Arbitrary large size
-    mouseCircle.mass = 50.0f; // Very large mass
+    
+    // Adjust velocity scaling based on testing
+    const float velocityScale = 0.05f;  // Adjusted from 0.01
+    mouseCircle.velocity.x = mouseVX * velocityScale;
+    mouseCircle.velocity.y = mouseVY * velocityScale;
+    
+    // Make radius and mass more reasonable
+    mouseCircle.radius = 5.0f;  // Smaller radius for more precise collisions
+    mouseCircle.mass = 20.0f;   // Adjusted mass for better collision response
+    
+    // Add some minimum velocity threshold to prevent tiny movements
+    const float minVelocity = 0.1f;
+    if (fabsf(mouseCircle.velocity.x) < minVelocity && fabsf(mouseCircle.velocity.y) < minVelocity) {
+        return;
+    }
 
     for (int i = 0; i < DYNAMIC_CIRCLES; i++) {
         if (checkOverlap(&mouseCircle, &circles[i])) {
             resolveCollision(&mouseCircle, &circles[i]);
+            
+            // Add minimum velocity after collision to prevent sticking
+            const float minPostCollisionVel = 0.5f;
+            if (fabsf(circles[i].velocity.x) < minPostCollisionVel) {
+                circles[i].velocity.x *= minPostCollisionVel / fabsf(circles[i].velocity.x);
+            }
+            if (fabsf(circles[i].velocity.y) < minPostCollisionVel) {
+                circles[i].velocity.y *= minPostCollisionVel / fabsf(circles[i].velocity.y);
+            }
         }
     }
 }
