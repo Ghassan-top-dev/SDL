@@ -15,8 +15,7 @@
 #define SCREEN_WIDTH 1392 
 #define SCREEN_HEIGHT 744
 
-#define MAX_BALLS 600
-
+#define MAX_BALLS 500
 
 // Struct for storing circle data
 typedef struct {
@@ -40,11 +39,6 @@ typedef struct {
 
 Circle circles[MAX_BALLS]; // Declare the array
 int DYNAMIC_CIRCLES = MAX_BALLS;
-
-
-
-// COLOR VARIABLES
-int s1 = 0, s2 = 0, s3 = 0; 
 
 const Color colors[] = {
     // Earthy Browns and Greens
@@ -389,7 +383,7 @@ void InitializeCircles() {
         circles[i].velocity.y = (rand() % 5) - 2;
 
         // Random radius (10 to 50)
-        circles[i].radius = rand() % 81 + 10; // 10 to 50
+        circles[i].radius = rand() % 11 + 10; // 10 to 50
 
         // Mass proportional to radius (scaling factor: 1.5 for example)
         circles[i].mass = circles[i].radius * 1.5;
@@ -479,7 +473,7 @@ int main(int argc, char* args[]) {
                             newCircle.position.y = mouseY;
                             newCircle.velocity.x = (rand() % 5) - 2; // Random velocity
                             newCircle.velocity.y = (rand() % 5) - 2;
-                            newCircle.radius = rand() % 81 + 10;     // Random radius
+                            newCircle.radius = rand() % 11 + 10;     // Random radius
                             newCircle.mass = newCircle.radius * 1.5; // Mass proportional to radius
                             newCircle.colour = colors[randColor];
 
