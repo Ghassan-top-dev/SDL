@@ -457,8 +457,8 @@ void handleMouseCollision(int mouseX, int mouseY, float mouseVX, float mouseVY) 
     Circle mouseCircle;
     mouseCircle.position.x = mouseX;
     mouseCircle.position.y = mouseY;
-    mouseCircle.velocity.x = 5;
-    mouseCircle.velocity.y = 5;
+    mouseCircle.velocity.x = mouseVX * 0.1;
+    mouseCircle.velocity.y = mouseVY * 0.1;
     mouseCircle.radius = 50.0f; // Arbitrary large size
     mouseCircle.mass = 50.0f; // Very large mass
 
@@ -504,8 +504,7 @@ int main(int argc, char* args[]) {
 
 
                     if (e.type == SDL_MOUSEBUTTONDOWN) {
-                        if (e.button.button == SDL_BUTTON_LEFT) {
-                            pressed = true;
+                        if (e.button.button == SDL_BUTTON_RIGHT) {
 
                             int mouseXPos, mouseYPos;
 
@@ -527,6 +526,9 @@ int main(int argc, char* args[]) {
                             // Add the circle to the array
                             circles[DYNAMIC_CIRCLES++] = newCircle;                        
                         }
+
+                        if (e.button.button == SDL_BUTTON_LEFT) pressed = true;
+                        
                     }
 
                     if (e.type == SDL_MOUSEBUTTONUP){
