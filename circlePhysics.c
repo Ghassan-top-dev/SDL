@@ -12,10 +12,10 @@
 
 // Screen dimension constants
 // the size of the screen
-#define SCREEN_WIDTH 1392 
-#define SCREEN_HEIGHT 744
+#define SCREEN_WIDTH 500 
+#define SCREEN_HEIGHT 500
 
-#define MAX_BALLS 25
+#define MAX_BALLS 10
 
 // Struct for storing circle data
 typedef struct {
@@ -437,11 +437,7 @@ void correctPositions() {
 }
 
 
-void updateMouseVelocity(float* mouseVX, float* mouseVY, float deltaTime) {
-    int currentMouseX, currentMouseY;
-
-    // Get the current mouse position
-    SDL_GetMouseState(&currentMouseX, &currentMouseY);
+void updateMouseVelocity(float* mouseVX, float* mouseVY, float deltaTime , int currentMouseX, int currentMouseY) {
 
     // Calculate the velocity
     *mouseVX = (currentMouseX - previousMouseX) / deltaTime;
@@ -457,9 +453,9 @@ void handleMouseCollision(int mouseX, int mouseY, float mouseVX, float mouseVY) 
     Circle mouseCircle;
     mouseCircle.position.x = mouseX;
     mouseCircle.position.y = mouseY;
-    mouseCircle.velocity.x = mouseVX * 0.1;
-    mouseCircle.velocity.y = mouseVY * 0.1;
-    mouseCircle.radius = 50.0f; // Arbitrary large size
+    mouseCircle.velocity.x = mouseVX * 0.01;
+    mouseCircle.velocity.y = mouseVY * 0.01;
+    mouseCircle.radius = 10.0f; // Arbitrary large size
     mouseCircle.mass = 50.0f; // Very large mass
 
     for (int i = 0; i < DYNAMIC_CIRCLES; i++) {
@@ -467,6 +463,19 @@ void handleMouseCollision(int mouseX, int mouseY, float mouseVX, float mouseVY) 
             resolveCollision(&mouseCircle, &circles[i]);
         }
     }
+}
+
+void applyDampening(float *xVel, float *yVel){
+
+    if (rand() % 100 < 30)
+    {
+        *xVel *= 0.99;
+        *yVel *= 0.99;
+
+    }
+    
+
+
 }
 
 
@@ -506,17 +515,16 @@ int main(int argc, char* args[]) {
                     if (e.type == SDL_MOUSEBUTTONDOWN) {
                         if (e.button.button == SDL_BUTTON_RIGHT) {
 
-                            int mouseXPos, mouseYPos;
-
+                            int mousePosX, mousePosY;
                             // Get mouse position
-                            SDL_GetMouseState(&mouseXPos, &mouseYPos);
+                            //SDL_GetMouseState(&mousePosX, &mousePosY);
 
                             int randColor = rand() % 15;
 
                             // Create a new circle
                             Circle newCircle;
-                            newCircle.position.x = mouseXPos;
-                            newCircle.position.y = mouseYPos;
+                            newCircle.position.x = e.motion.x;
+                            newCircle.position.y = e.motion.y;
                             newCircle.velocity.x = (rand() % 5) - 2; // Random velocity
                             newCircle.velocity.y = (rand() % 5) - 2;
                             newCircle.radius = rand() % 11 + 10;     // Random radius
@@ -542,6 +550,8 @@ int main(int argc, char* args[]) {
                     if (e.type == SDL_MOUSEMOTION && pressed == true){
 
 
+                       
+
                         // Handle collisions with the mouse as a circle
                         handleMouseCollision(mouseX, mouseY, mouseVX, mouseVY);
                     }
@@ -563,13 +573,10 @@ int main(int argc, char* args[]) {
 
                 correctPositions();
 
-                updateMouseVelocity(&mouseVX, &mouseVY, deltaTime);
-
-
                 // Get mouse position
                 SDL_GetMouseState(&mouseX, &mouseY);
 
-
+                updateMouseVelocity(&mouseVX, &mouseVY, deltaTime, mouseX, mouseY);
 
 
                 // Update and draw each circle
@@ -604,6 +611,8 @@ int main(int argc, char* args[]) {
                         circles[i].position.y = circles[i].radius; 
  
                     }
+
+                    applyDampening(&circles[i].velocity.x, &circles[i].velocity.y);
                     
                     int randColor = rand() % 15;  // Random index (0 to 14)
                     SDL_SetRenderDrawColor(gRenderer, circles[i].colour.r, circles[i].colour.g, circles[i].colour.b, circles[i].colour.a);
