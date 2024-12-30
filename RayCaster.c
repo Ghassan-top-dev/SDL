@@ -14,12 +14,27 @@
 #define SCREEN_HEIGHT 744 // the size of the screen
 #define NUM_POINTS 72 // Number of points on the circle
 
+#define MAX_BALLS 10
+
 
 typedef struct {
     float x, y;
 } Point;
 
+typedef struct {
+    float x, y;
+} Vector2;
 
+
+typedef struct {
+    Vector2 position;        // Position
+    Vector2 velocity;      // Velocity
+    float mass; // mass
+    float radius;      // Radius
+} Circle;
+
+Circle circles[MAX_BALLS]; // Declare the array
+int DYNAMIC_CIRCLES = 1;
 
 // Texture wrapper structure to hold texture data and dimensions
 typedef struct {
@@ -214,6 +229,60 @@ int getTextureHeight(LTexture* lTexture) {
     return lTexture->height;
 }
 
+bool checkOverlap(Circle* b1, Circle* b2){
+    float dx = b2->position.x - b1->position.x;
+    float dy = b2->position.y - b1->position.y;
+    float dist = sqrt(dx * dx + dy * dy);
+    return dist <= (b1->radius + b2->radius);
+}
+
+// circle functions:
+void DrawFilledCircle(SDL_Renderer* renderer, int centerX, int centerY, float radius) {
+    // Loop through the vertical positions (y-coordinates) of the circle from the top to the bottom
+    for (int y = -radius; y <= radius; y++) {
+        // Calculate the horizontal distance (half-width) at this y-level using the circle equation
+        int dx = (int)sqrt(radius * radius - y * y);  // Could use a faster square root approximation
+
+        // Draw a horizontal line across the diameter of the circle at the current y-level
+        SDL_RenderDrawLine(renderer, centerX - dx, centerY + y, centerX + dx, centerY + y);
+    }
+}
+
+void InitializeCircles() {
+    srand(time(NULL)); // Seed random number generator
+
+    for (int i = 0; i < DYNAMIC_CIRCLES; i++) {
+        int randColor = rand() % 15;
+        // Random position within screen bounds (adjust based on your screen size)
+        circles[i].position.x = rand() % (SCREEN_WIDTH - 100) + 50; // Keep circles away from edges
+        circles[i].position.y = rand() % (SCREEN_HEIGHT - 100) + 50;
+
+        // Random velocity components (from -5 to 5, but non-zero)
+        circles[i].velocity.x = (rand() % 5) - 2; // -5 to 5
+        circles[i].velocity.y = (rand() % 5) - 2;
+
+        // Random radius (10 to 50)
+        circles[i].radius = rand() % 11 + 10; // 10 to 50
+
+        // Mass proportional to radius (scaling factor: 1.5 for example)
+        circles[i].mass = circles[i].radius * 1.5;
+
+        // Mass proportional to radius (scaling factor: 1.5 for example)
+
+        for (int j = 0; j < i; j++)
+        {
+            if (checkOverlap(&circles[i], &circles[j]))
+            {
+                i--; 
+                break; 
+            }
+        }
+        
+    }
+}
+
+
+
 // main function
 int main(int argc, char* args[]) {
     
@@ -227,9 +296,7 @@ int main(int argc, char* args[]) {
         } else {
             int quit = 0;
             SDL_Event event;
-
-            Point circle = {400, 300};
-            float radius = 100;
+            InitializeCircles();
 
             while (!quit) {
                 while (SDL_PollEvent(&event) != 0) {
@@ -267,22 +334,67 @@ int main(int argc, char* args[]) {
                 SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
                 SDL_RenderClear(gRenderer);
 
+                
+                // Update and draw each circle
+                for (int i = 0; i < DYNAMIC_CIRCLES; i++) {
+                    // Update position based on velocity
+                    circles[i].position.x += circles[i].velocity.x;
+                    circles[i].position.y += circles[i].velocity.y;
+
+                    // Handle boundaries
+                    // right
+                    if (circles[i].position.x >= SCREEN_WIDTH - circles[i].radius) {
+                        circles[i].velocity.x *= -1;
+                        circles[i].position.x = SCREEN_WIDTH - circles[i].radius; 
+ 
+                    }
+                    // left
+                    else if (circles[i].position.x <= circles[i].radius)
+                    {
+                        circles[i].velocity.x *= -1;
+                        circles[i].position.x = circles[i].radius; 
+                    }
+                    // bottom
+                    else if (circles[i].position.y >= SCREEN_HEIGHT - circles[i].radius) { 
+                        circles[i].velocity.y *= -1;
+                        circles[i].position.y = SCREEN_HEIGHT - circles[i].radius; 
+
+                    }
+                    // top
+                    else if (circles[i].position.y <= circles[i].radius)
+                    {
+                        circles[i].velocity.y *= -1;
+                        circles[i].position.y = circles[i].radius; 
+ 
+                    }
+
+                    
+                    SDL_SetRenderDrawColor(gRenderer, 246, 196, 31, 255);
+                    // Draw the circle
+                    DrawFilledCircle(gRenderer, circles[i].position.x, circles[i].position.y, circles[i].radius);
+                }
+
+
+
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
                 for (int i = 0; i < NUM_POINTS; i++) {
                     // Calculate the angle for this outline point
                     float angle = i * (2 * M_PI / NUM_POINTS);
 
                     // Calculate the starting point of the ray on the circle outline
-                    float startX = circle.x + radius * cos(angle);
-                    float startY = circle.y + radius * sin(angle);
+                    float startX = circles[0].position.x + circles[0].radius * cos(angle);
+                    float startY = circles[0].position.y + circles[0].radius * sin(angle);
 
                     // Calculate the end point of the ray (extending outward)
-                    float endX = startX + 200 * cos(angle);
-                    float endY = startY + 200 * sin(angle);
+                    float endX = startX + 1000 * cos(angle);
+                    float endY = startY + 1000 * sin(angle);
 
                     // Draw the ray
                     SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endX, (int)endY);
                 }
+
+                SDL_RenderDrawLine(gRenderer, 100, 300, 400, 500);
+
 
                 //this is for text
                 renderTexture(&modeTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); 
