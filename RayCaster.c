@@ -10,14 +10,16 @@
 #include <time.h>
 #include <math.h>
 
-#define FOV 360           // Field of View for the raycaster
 #define SCREEN_WIDTH 1392 // Screen dimension constants
 #define SCREEN_HEIGHT 744 // the size of the screen
-#define GRID_SIZE 8       // Grid dimensions
-#define CELL_SIZE 100     // Size of each grid cell
-#define PLAYER_RADIUS 25  // Radius of the player representation
-#define PLAYER_SPEED 2    // Movement speed of the player
-#define ROTATION_SPEED 0.01 // Rotation speed of the player
+#define NUM_POINTS 72 // Number of points on the circle
+
+
+typedef struct {
+    float x, y;
+} Point;
+
+
 
 // Texture wrapper structure to hold texture data and dimensions
 typedef struct {
@@ -212,92 +214,10 @@ int getTextureHeight(LTexture* lTexture) {
     return lTexture->height;
 }
 
-// Function to render walls based on the grid
-void makeWall(int array[GRID_SIZE][GRID_SIZE], SDL_Renderer *renderer) {
-    for (int i = 0; i < GRID_SIZE; i++) {
-        for (int j = 0; j < GRID_SIZE; j++) {
-            if (array[i][j] == 1) {
-                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black for walls
-                SDL_Rect rect = {j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE};
-                SDL_RenderFillRect(renderer, &rect);
-            }
-        }
-    }
-}
-
-// Function to render the player and handle movement/rotation
-void player(SDL_Renderer *renderer, bool forward, bool backward, int *cx, int *cy, double *angle, bool rotateRight, bool rotateLeft) {
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // White for the player
-
-    // Normalize the angle to keep it within 0 to 2*PI
-    *angle = fmod(*angle, 2 * M_PI);
-    if (*angle < 0) *angle += 2 * M_PI;
-
-    // Movement handling
-    if (forward) {
-        *cx += PLAYER_SPEED * cos(*angle);
-        *cy += PLAYER_SPEED * sin(*angle);
-    }
-    if (backward) {
-        *cx -= PLAYER_SPEED * cos(*angle);
-        *cy -= PLAYER_SPEED * sin(*angle);
-    }
-
-    // Rotation handling
-    if (rotateRight) *angle += ROTATION_SPEED;
-    if (rotateLeft) *angle -= ROTATION_SPEED;
-
-    // Render player as a small rectangle
-    SDL_Rect playerRect = {*cx - PLAYER_RADIUS, *cy - PLAYER_RADIUS, PLAYER_RADIUS * 2, PLAYER_RADIUS * 2};
-    SDL_RenderFillRect(renderer, &playerRect);
-}
-
-// Function to cast rays and detect walls
-void castRay(SDL_Renderer *renderer, int cx, int cy, double angle, int array[GRID_SIZE][GRID_SIZE]) {
-    double rayAngle;
-    double rayStep = (FOV * (M_PI / 180)) / 100; // Divide FOV into 400 sections
-
-    for (int i = 0; i <= 400; i++) {
-        rayAngle = angle - (FOV * M_PI / 360) + (i * rayStep);
-
-        for (int length = 0; length < SCREEN_WIDTH; length++) {
-            // Calculate ray position
-            int xRay = cx + length * cos(rayAngle);
-            int yRay = cy + length * sin(rayAngle);
-            int gridX = xRay / CELL_SIZE;
-            int gridY = yRay / CELL_SIZE;
-
-            // Check for wall collision
-            if (gridX >= 0 && gridX < GRID_SIZE && gridY >= 0 && gridY < GRID_SIZE && array[gridY][gridX] == 1) {
-                SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255); // Yellow for rays
-                SDL_RenderDrawLine(renderer, cx, cy, xRay, yRay);
-                break;
-            }
-        }
-    }
-}
-
-
 // main function
 int main(int argc, char* args[]) {
     
-    
-    // Grid map: 1 represents walls, 0 represents empty spaces
-    int array[GRID_SIZE][GRID_SIZE] = {
-        {1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 0, 1, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 1},
-        {1, 1, 0, 0, 0, 0, 0, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1}
-    };
 
-    // Player state
-    int cx = SCREEN_WIDTH / 2, cy = SCREEN_HEIGHT / 4;
-    double angle = M_PI / 2; // Initial angle facing downwards
-    bool forward = false, backward = false, rotateRight = false, rotateLeft = false;
 
     if (!init()) {
         printf("Failed to initialize!\n");
@@ -307,6 +227,9 @@ int main(int argc, char* args[]) {
         } else {
             int quit = 0;
             SDL_Event event;
+
+            Point circle = {400, 300};
+            float radius = 100;
 
             while (!quit) {
                 while (SDL_PollEvent(&event) != 0) {
@@ -341,12 +264,26 @@ int main(int argc, char* args[]) {
                 }
 
                 // Clear screen with grey background color
-                SDL_SetRenderDrawColor(gRenderer, 110, 110, 110, 255);
+                SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
                 SDL_RenderClear(gRenderer);
 
-                player(gRenderer, forward, backward, &cx, &cy, &angle, rotateRight, rotateLeft);
-                castRay(gRenderer, cx, cy, angle, array);
-                
+                SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+                for (int i = 0; i < NUM_POINTS; i++) {
+                    // Calculate the angle for this outline point
+                    float angle = i * (2 * M_PI / NUM_POINTS);
+
+                    // Calculate the starting point of the ray on the circle outline
+                    float startX = circle.x + radius * cos(angle);
+                    float startY = circle.y + radius * sin(angle);
+
+                    // Calculate the end point of the ray (extending outward)
+                    float endX = startX + 200 * cos(angle);
+                    float endY = startY + 200 * sin(angle);
+
+                    // Draw the ray
+                    SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endX, (int)endY);
+                }
+
                 //this is for text
                 renderTexture(&modeTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); 
                 SDL_RenderPresent(gRenderer); // Update screen
