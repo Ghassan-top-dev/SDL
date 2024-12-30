@@ -34,7 +34,7 @@ typedef struct {
 } Circle;
 
 Circle circles[MAX_BALLS]; // Declare the array
-int DYNAMIC_CIRCLES = 1;
+int DYNAMIC_CIRCLES = 2;
 
 // Texture wrapper structure to hold texture data and dimensions
 typedef struct {
@@ -262,7 +262,7 @@ void InitializeCircles() {
         circles[i].velocity.y = (rand() % 5) - 2;
 
         // Random radius (10 to 50)
-        circles[i].radius = rand() % 11 + 10; // 10 to 50
+        circles[i].radius = rand() % 81 + 10; // 10 to 50
 
         // Mass proportional to radius (scaling factor: 1.5 for example)
         circles[i].mass = circles[i].radius * 1.5;
@@ -390,8 +390,6 @@ int RayIntersectsCircle(float rayStartX, float rayStartY, float rayEndX, float r
 // main function
 int main(int argc, char* args[]) {
     
-
-
     if (!init()) {
         printf("Failed to initialize!\n");
     } else {
@@ -400,8 +398,12 @@ int main(int argc, char* args[]) {
         } else {
             int quit = 0;
             SDL_Event event;
-            Circle singleCircle;
-            singleCircle.position.x = 300; singleCircle.position.y = 400; singleCircle.radius = 100; 
+            Circle lightCircle;
+            lightCircle.position.x = 350; lightCircle.position.y = 400; lightCircle.radius = 80; 
+
+            Circle testCircle;
+            testCircle.position.x = 600; testCircle.position.y = 200; testCircle.radius = 145; 
+
 
             InitializeCircles();
 
@@ -479,41 +481,62 @@ int main(int argc, char* args[]) {
                     SDL_SetRenderDrawColor(gRenderer, 246, 196, 31, 255);
                     // Draw the circle
                     DrawFilledCircle(gRenderer, circles[i].position.x, circles[i].position.y, circles[i].radius);
+                    
+                    DrawFilledCircle(gRenderer, lightCircle.position.x, lightCircle.position.y, lightCircle.radius);
+
+
+
+
                 }
 
-                DrawFilledCircle(gRenderer, singleCircle.position.x, singleCircle.position.y, singleCircle.radius);
+                for (int j = 0; j < NUM_POINTS; j++) {
+                    // Calculate the angle for this ray
+                    float angle = j * (2 * M_PI / NUM_POINTS);
 
+                    // Calculate the starting point of the ray
+                    float startX = lightCircle.position.x + lightCircle.radius * cos(angle);
+                    float startY = lightCircle.position.y + lightCircle.radius * sin(angle);
 
-                SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
-                for (int i = 0; i < NUM_POINTS; i++) {
-                    // Calculate the angle for this outline point
-                    float angle = i * (2 * M_PI / NUM_POINTS);
+                    // Initialize the end point of the ray to be far away
+                    float endX = startX + 5000 * cos(angle);
+                    float endY = startY + 5000 * sin(angle);
 
-                    // Calculate the starting point of the ray on the circle outline
-                    float startX = circles[0].position.x + circles[0].radius * cos(angle);
-                    float startY = circles[0].position.y + circles[0].radius * sin(angle);
+                    float nearestX = endX, nearestY = endY; // Store nearest intersection point
+                    int foundIntersection = 0; // Flag to indicate intersection occurred
 
-                    // Calculate the end point of the ray (extending outward)
-                    float endX = startX + 20000 * cos(angle);
-                    float endY = startY + 20000 * sin(angle);
+                    for (int i = 0; i < DYNAMIC_CIRCLES; i++) {
+                        float intersectionX, intersectionY;
 
-                    float intersectionX, intersectionY;
+                        if (RayIntersectsCircle(startX, startY, endX, endY,
+                                                circles[i].position.x, circles[i].position.y, circles[i].radius,
+                                                &intersectionX, &intersectionY)) {
+                            
+                            foundIntersection = 1;
 
-                    if(RayIntersectsCircle( startX,  startY,  endX,  endY,
-                         singleCircle.position.x,  singleCircle.position.y,  singleCircle.radius, 
-                         &intersectionX,  &intersectionY)){
+                            // Calculate distance to this intersection
+                            float distToIntersection = sqrt(pow(intersectionX - startX, 2) + pow(intersectionY - startY, 2));
+                            float distToNearest = sqrt(pow(nearestX - startX, 2) + pow(nearestY - startY, 2));
 
-                        SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)intersectionX, (int)intersectionY);
-
-
+                            // Update nearest intersection point if closer
+                            if (distToIntersection < distToNearest) {
+                                nearestX = intersectionX;
+                                nearestY = intersectionY;
+                            }
+                            
+                        }
                     }
-                    else{
+
+                    // Draw the ray to the nearest intersection point or its full length
+                    if (foundIntersection) {
+                        SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)nearestX, (int)nearestY);
+                    } else {
                         SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endX, (int)endY);
                     }
-
                 }
 
-
+                
+                
+                
 
                 //this is for text
                 renderTexture(&modeTextTexture, 0,0, NULL, 0, NULL, SDL_FLIP_NONE); 
