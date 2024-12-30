@@ -348,9 +348,40 @@ int checkPreBuilt(float rayStartX, float rayStartY, float *rayEndX, float *rayEn
 int RayIntersectsCircle(float rayStartX, float rayStartY, float rayEndX, float rayEndY,
                         float circleX, float circleY, float radius, 
                         float *intersectionX, float *intersectionY) {
+    float dx = rayEndX - rayStartX;
+    float dy = rayEndY - rayStartY;
 
-    
+    // Quadratic coefficients
+    float A = dx * dx + dy * dy;
+    float B = 2 * (dx * (rayStartX - circleX) + dy * (rayStartY - circleY));
+    float C = (rayStartX - circleX) * (rayStartX - circleX) + 
+              (rayStartY - circleY) * (rayStartY - circleY) - radius * radius;
+
+    // Discriminant
+    float discriminant = B * B - 4 * A * C;
+
+    if (discriminant < 0) {
+        return 0; // No intersection
+    }
+
+    // Compute the two possible values of t
+    float sqrtDiscriminant = sqrt(discriminant);
+    float t1 = (-B - sqrtDiscriminant) / (2 * A);
+    float t2 = (-B + sqrtDiscriminant) / (2 * A);
+
+    // Check for the smallest positive t (valid intersection)
+    float t = (t1 >= 0) ? t1 : ((t2 >= 0) ? t2 : -1);
+    if (t < 0) {
+        return 0; // No valid intersection
+    }
+
+    // Calculate the intersection point
+    *intersectionX = rayStartX + t * dx;
+    *intersectionY = rayStartY + t * dy;
+
+    return 1; // Intersection found
 }
+
 
 
 
@@ -468,8 +499,17 @@ int main(int argc, char* args[]) {
 
                     float intersectionX, intersectionY;
 
-                    SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endX, (int)endY);
+                    if(RayIntersectsCircle( startX,  startY,  endX,  endY,
+                         singleCircle.position.x,  singleCircle.position.y,  singleCircle.radius, 
+                         &intersectionX,  &intersectionY)){
 
+                        SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)intersectionX, (int)intersectionY);
+
+
+                    }
+                    else{
+                        SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endX, (int)endY);
+                    }
 
                 }
 
