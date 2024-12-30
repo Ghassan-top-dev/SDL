@@ -18,8 +18,8 @@
 
 
 typedef struct {
-    float x, y;
-} Point;
+    float startX, startY, endX, endY;
+} lines;
 
 typedef struct {
     float x, y;
@@ -309,6 +309,42 @@ int rayIntersectsLine(float rayStartX, float rayStartY, float rayEndX, float ray
     return 0; // No valid intersection
 }
 
+int checkBoundaries(float rayStartX, float rayStartY, float *rayEndX, float *rayEndY){
+    float dx = *rayEndX - rayStartX;
+    float dy = *rayEndY - rayStartY;
+
+    // boundaries
+    lines line[4];
+    line[0].startX = 0; line[0].startY = 0; line[0].endX = SCREEN_WIDTH; line[0].endY = 0; // top
+    line[1].startX = 0; line[1].startY = SCREEN_HEIGHT; line[1].endX = SCREEN_WIDTH; line[1].endY = SCREEN_HEIGHT; // bottom
+    line[2].startX = 0; line[2].startY = 0; line[2].endX = 0; line[2].endY = SCREEN_HEIGHT; // left
+    line[3].startX = SCREEN_WIDTH; line[3].startY = 0; line[3].endX = SCREEN_WIDTH; line[3].endY = SCREEN_HEIGHT; // right
+
+    for (int i = 0; i < 4; i++)
+    {
+        float sx = line[i].endX - line[i].startX;
+        float sy = line[i].endY - line[i].startY;
+        float denominator = dx * sy - dy * sx;
+
+        // Check if lines are parallel
+        if (fabs(denominator) < 1e-6) {
+            continue;
+        }
+
+        float t = ((line[i].startX - rayStartX) * sy - (line[i].startY - rayStartY) * sx) / denominator;
+        float u = ((line[i].startX - rayStartX) * dy - (line[i].startY - rayStartY) * dx) / denominator;
+
+        // Check if the intersection is valid
+        if (t >= 0 && u >= 0 && u <= 1) {
+            *rayEndX = rayStartX + t * dx;
+            *rayEndY = rayStartY + t * dy;
+            return 1; // Intersection found
+        } 
+    }
+    return 0; 
+
+}
+
 
 
 
@@ -403,9 +439,6 @@ int main(int argc, char* args[]) {
                     DrawFilledCircle(gRenderer, circles[i].position.x, circles[i].position.y, circles[i].radius);
                 }
 
-
-                SDL_RenderDrawLine(gRenderer, 100, 300, 400, 500);
-
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
                 for (int i = 0; i < NUM_POINTS; i++) {
                     // Calculate the angle for this outline point
@@ -416,21 +449,27 @@ int main(int argc, char* args[]) {
                     float startY = circles[0].position.y + circles[0].radius * sin(angle);
 
                     // Calculate the end point of the ray (extending outward)
-                    float endX = startX + 1000 * cos(angle);
-                    float endY = startY + 1000 * sin(angle);
+                    float endX = startX + 10000 * cos(angle);
+                    float endY = startY + 10000 * sin(angle);
 
                     float intersectionX, intersectionY;
 
-
-
-                    if(rayIntersectsLine(startX, startY, endX, endY, 100 , 300, 400, 500, &intersectionX, &intersectionY)){
-                         
-
-                    }
-
-
-                    // Draw the ray
+                    checkBoundaries(startX, startY, &endX, &endY); 
                     SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endX, (int)endY);
+
+
+
+                    // if(checkBoundaries(startX, startY, endX, endY)){
+                    //     // Draw the ray
+                    //     SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)intersectionX, (int)intersectionY);
+
+                    // }else{
+
+                    //     // Draw the ray
+                    //     SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endX, (int)endY);
+                    // }
+
+
                 }
 
 
