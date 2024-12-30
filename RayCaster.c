@@ -345,6 +345,14 @@ int checkPreBuilt(float rayStartX, float rayStartY, float *rayEndX, float *rayEn
 
 }
 
+int RayIntersectsCircle(float rayStartX, float rayStartY, float rayEndX, float rayEndY,
+                        float circleX, float circleY, float radius, 
+                        float *intersectionX, float *intersectionY) {
+
+    
+}
+
+
 
 
 
@@ -361,6 +369,9 @@ int main(int argc, char* args[]) {
         } else {
             int quit = 0;
             SDL_Event event;
+            Circle singleCircle;
+            singleCircle.position.x = 300; singleCircle.position.y = 400; singleCircle.radius = 100; 
+
             InitializeCircles();
 
             while (!quit) {
@@ -438,6 +449,9 @@ int main(int argc, char* args[]) {
                     // Draw the circle
                     DrawFilledCircle(gRenderer, circles[i].position.x, circles[i].position.y, circles[i].radius);
                 }
+
+                DrawFilledCircle(gRenderer, singleCircle.position.x, singleCircle.position.y, singleCircle.radius);
+
 
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
                 for (int i = 0; i < NUM_POINTS; i++) {
