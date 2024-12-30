@@ -309,7 +309,7 @@ int rayIntersectsLine(float rayStartX, float rayStartY, float rayEndX, float ray
     return 0; // No valid intersection
 }
 
-int checkBoundaries(float rayStartX, float rayStartY, float *rayEndX, float *rayEndY){
+int checkPreBuilt(float rayStartX, float rayStartY, float *rayEndX, float *rayEndY){ // I will need to refactor this
     float dx = *rayEndX - rayStartX;
     float dy = *rayEndY - rayStartY;
 
@@ -449,25 +449,12 @@ int main(int argc, char* args[]) {
                     float startY = circles[0].position.y + circles[0].radius * sin(angle);
 
                     // Calculate the end point of the ray (extending outward)
-                    float endX = startX + 10000 * cos(angle);
-                    float endY = startY + 10000 * sin(angle);
+                    float endX = startX + 20000 * cos(angle);
+                    float endY = startY + 20000 * sin(angle);
 
                     float intersectionX, intersectionY;
 
-                    checkBoundaries(startX, startY, &endX, &endY); 
                     SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endX, (int)endY);
-
-
-
-                    // if(checkBoundaries(startX, startY, endX, endY)){
-                    //     // Draw the ray
-                    //     SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)intersectionX, (int)intersectionY);
-
-                    // }else{
-
-                    //     // Draw the ray
-                    //     SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endX, (int)endY);
-                    // }
 
 
                 }
