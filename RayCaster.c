@@ -12,7 +12,7 @@
 
 #define SCREEN_WIDTH 1392 // Screen dimension constants
 #define SCREEN_HEIGHT 744 // the size of the screen
-#define NUM_POINTS 72 // Number of points on the circle
+#define NUM_POINTS 144 // Number of points on the circle
 
 #define MAX_BALLS 10
 
