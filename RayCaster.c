@@ -281,6 +281,35 @@ void InitializeCircles() {
     }
 }
 
+int rayIntersectsLine(float rayStartX, float rayStartY, float rayEndX, float rayEndY,
+                      float lineStartX, float lineStartY, float lineEndX, float lineEndY,
+                      float *intersectionX, float *intersectionY) {
+    float dx = rayEndX - rayStartX;
+    float dy = rayEndY - rayStartY;
+    float sx = lineEndX - lineStartX;
+    float sy = lineEndY - lineStartY;
+
+    float denominator = dx * sy - dy * sx;
+
+    // Check if lines are parallel
+    if (fabs(denominator) < 1e-6) {
+        return 0; // No intersection
+    }
+
+    float t = ((lineStartX - rayStartX) * sy - (lineStartY - rayStartY) * sx) / denominator;
+    float u = ((lineStartX - rayStartX) * dy - (lineStartY - rayStartY) * dx) / denominator;
+
+    // Check if the intersection is valid
+    if (t >= 0 && u >= 0 && u <= 1) {
+        *intersectionX = rayStartX + t * dx;
+        *intersectionY = rayStartY + t * dy;
+        return 1; // Intersection found
+    }
+
+    return 0; // No valid intersection
+}
+
+
 
 
 // main function
@@ -375,6 +404,7 @@ int main(int argc, char* args[]) {
                 }
 
 
+                SDL_RenderDrawLine(gRenderer, 100, 300, 400, 500);
 
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
                 for (int i = 0; i < NUM_POINTS; i++) {
@@ -389,11 +419,20 @@ int main(int argc, char* args[]) {
                     float endX = startX + 1000 * cos(angle);
                     float endY = startY + 1000 * sin(angle);
 
+                    float intersectionX, intersectionY;
+
+
+
+                    if(rayIntersectsLine(startX, startY, endX, endY, 100 , 300, 400, 500, &intersectionX, &intersectionY)){
+                         
+
+                    }
+
+
                     // Draw the ray
                     SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endX, (int)endY);
                 }
 
-                SDL_RenderDrawLine(gRenderer, 100, 300, 400, 500);
 
 
                 //this is for text
