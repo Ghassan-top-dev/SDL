@@ -14,7 +14,7 @@
 #define SCREEN_HEIGHT 744 // the size of the screen
 #define NUM_POINTS 144 // Number of points on the circle
 
-#define MAX_BALLS 10
+#define MAX_BALLS 1000
 
 
 typedef struct {
@@ -34,7 +34,7 @@ typedef struct {
 } Circle;
 
 Circle circles[MAX_BALLS]; // Declare the array
-int DYNAMIC_CIRCLES = 2;
+int DYNAMIC_CIRCLES = 100;
 
 // Texture wrapper structure to hold texture data and dimensions
 typedef struct {
@@ -522,7 +522,7 @@ int main(int argc, char* args[]) {
                                 nearestX = intersectionX;
                                 nearestY = intersectionY;
                             }
-                            
+
                         }
                     }
 
