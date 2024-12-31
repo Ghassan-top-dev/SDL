@@ -34,7 +34,7 @@ typedef struct {
 } Circle;
 
 Circle circles[MAX_BALLS]; // Declare the array
-int DYNAMIC_CIRCLES = 100;
+int DYNAMIC_CIRCLES = 1;
 
 // Texture wrapper structure to hold texture data and dimensions
 typedef struct {
@@ -488,7 +488,8 @@ int main(int argc, char* args[]) {
 
 
                 }
-
+                
+                SDL_Point lightPolygon[NUM_POINTS];
                 for (int j = 0; j < NUM_POINTS; j++) {
                     // Calculate the angle for this ray
                     float angle = j * (2 * M_PI / NUM_POINTS);
