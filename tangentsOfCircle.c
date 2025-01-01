@@ -435,7 +435,7 @@ int main(int argc, char* args[]) {
             lightCircle.position.x = 350; lightCircle.position.y = 400; lightCircle.radius = 80; 
 
             Circle testCircle;
-            testCircle.position.x = 900; testCircle.position.y = 400; testCircle.radius = 100; 
+            testCircle.position.x = 500; testCircle.position.y = 600; testCircle.radius = 65; 
             
             SDL_Point rayStartPoints[NUM_RAYS]; 
             SDL_Point rayEndPoints[NUM_RAYS]; 
