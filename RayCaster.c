@@ -398,12 +398,9 @@ int main(int argc, char* args[]) {
         } else {
             int quit = 0;
             SDL_Event event;
+            
             Circle lightCircle;
             lightCircle.position.x = 350; lightCircle.position.y = 400; lightCircle.radius = 80; 
-
-            Circle testCircle;
-            testCircle.position.x = 600; testCircle.position.y = 200; testCircle.radius = 145; 
-
 
             InitializeCircles();
 
@@ -485,11 +482,9 @@ int main(int argc, char* args[]) {
                     DrawFilledCircle(gRenderer, lightCircle.position.x, lightCircle.position.y, lightCircle.radius);
 
 
-
-
                 }
+
                 
-                SDL_Point lightPolygon[NUM_POINTS];
                 for (int j = 0; j < NUM_POINTS; j++) {
                     // Calculate the angle for this ray
                     float angle = j * (2 * M_PI / NUM_POINTS);
