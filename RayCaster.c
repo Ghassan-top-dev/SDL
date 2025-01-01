@@ -12,7 +12,7 @@
 
 #define SCREEN_WIDTH 1392 // Screen dimension constants
 #define SCREEN_HEIGHT 744 // the size of the screen
-#define NUM_POINTS 144 // Number of points on the circle
+#define NUM_RAYS 360 // Number of points on the circle
 
 #define MAX_BALLS 1000
 
@@ -34,7 +34,7 @@ typedef struct {
 } Circle;
 
 Circle circles[MAX_BALLS]; // Declare the array
-int DYNAMIC_CIRCLES = 1;
+int DYNAMIC_CIRCLES = 4;
 
 // Texture wrapper structure to hold texture data and dimensions
 typedef struct {
@@ -383,7 +383,33 @@ int RayIntersectsCircle(float rayStartX, float rayStartY, float rayEndX, float r
 }
 
 
+void DrawLightFromOutline(SDL_Renderer* renderer, SDL_Point rayEndpoints[], SDL_Point rayStarts[]) {
+    SDL_Vertex vertices[NUM_RAYS * 2]; // Two vertices for each ray: start and end
 
+    // Create vertices for the light effect
+    for (int i = 0; i < NUM_RAYS; i++) {
+        // Ray start point (on the circle outline)
+        vertices[i * 2].position.x = rayStarts[i].x;
+        vertices[i * 2].position.y = rayStarts[i].y;
+        vertices[i * 2].color = (SDL_Color){255, 255, 100, 200}; // Light yellow
+
+        // Ray end point
+        vertices[i * 2 + 1].position.x = rayEndpoints[i].x;
+        vertices[i * 2 + 1].position.y = rayEndpoints[i].y;
+        vertices[i * 2 + 1].color = (SDL_Color){255, 255, 100, 0}; // Fading light
+    }
+
+    // Define indices for triangles
+    int indices[(NUM_RAYS - 1) * 3]; // Each triangle needs 3 indices
+    for (int i = 0; i < NUM_RAYS - 1; i++) {
+        indices[i * 3] = i * 2;         // Start of ray i
+        indices[i * 3 + 1] = i * 2 + 1; // End of ray i
+        indices[i * 3 + 2] = i * 2 + 3; // End of ray i+1
+    }
+
+    // Draw geometry
+    SDL_RenderGeometry(renderer, NULL, vertices, NUM_RAYS * 2, indices, (NUM_RAYS - 1) * 3);
+}
 
 
 
@@ -401,6 +427,10 @@ int main(int argc, char* args[]) {
             
             Circle lightCircle;
             lightCircle.position.x = 350; lightCircle.position.y = 400; lightCircle.radius = 80; 
+            
+            SDL_Point rayStartPoints[NUM_RAYS]; 
+            SDL_Point rayEndPoints[NUM_RAYS]; 
+
 
             InitializeCircles();
 
@@ -484,10 +514,9 @@ int main(int argc, char* args[]) {
 
                 }
 
-                
-                for (int j = 0; j < NUM_POINTS; j++) {
+                for (int j = 0; j < NUM_RAYS; j++) {
                     // Calculate the angle for this ray
-                    float angle = j * (2 * M_PI / NUM_POINTS);
+                    float angle = j * (2 * M_PI / NUM_RAYS);
 
                     // Calculate the starting point of the ray
                     float startX = lightCircle.position.x + lightCircle.radius * cos(angle);
@@ -523,12 +552,16 @@ int main(int argc, char* args[]) {
                     }
 
                     // Draw the ray to the nearest intersection point or its full length
-                    if (foundIntersection) {
-                        SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)nearestX, (int)nearestY);
-                    } else {
-                        SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endX, (int)endY);
-                    }
+                    // SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)nearestX, (int)nearestY);
+
+                    rayStartPoints[j].x = (int)startX; rayStartPoints[j].y = (int)startY;
+                    rayEndPoints[j].x = (int)nearestX; rayEndPoints[j].y = (int)nearestY;
+
+
+                        
                 }
+
+                DrawLightFromOutline(gRenderer, rayEndPoints, rayStartPoints);
 
                 
                 
