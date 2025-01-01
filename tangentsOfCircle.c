@@ -531,7 +531,7 @@ int main(int argc, char* args[]) {
 
                  
                 // step 3
-                float theta = asin(testCircle.radius / distLightToObstacle); 
+                float theta = asin(fmax(-1.0f, fmin(1.0f, testCircle.radius / distLightToObstacle)));
 
                 // step 4
 
@@ -550,10 +550,10 @@ int main(int argc, char* args[]) {
                 // step 7
 
                 float endXRay1 = startX + 5000 * cos(directionOfRay1);
-                float endYRay1 = startY + 5000 * sin(directionOfRay1);
+                float endYRay1 = startY + 5000 * sin(directionOfRay1) - 155;
 
                 float endXRay2 = startX + 5000 * cos(directionOfRay2);
-                float endYRay2 = startY + 5000 * sin(directionOfRay2);
+                float endYRay2 = startY + 5000 * sin(directionOfRay2) + 155;
 
 
                 SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
