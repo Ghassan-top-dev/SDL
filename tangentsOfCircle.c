@@ -435,7 +435,7 @@ int main(int argc, char* args[]) {
             lightCircle.position.x = 350; lightCircle.position.y = 400; lightCircle.radius = 80; 
 
             Circle testCircle;
-            testCircle.position.x = 500; testCircle.position.y = 600; testCircle.radius = 65; 
+            testCircle.position.x = 800; testCircle.position.y = 400; testCircle.radius = 65; 
             
             SDL_Point rayStartPoints[NUM_RAYS]; 
             SDL_Point rayEndPoints[NUM_RAYS]; 
@@ -476,7 +476,7 @@ int main(int argc, char* args[]) {
                 }
 
                 // Clear screen with grey background color
-                SDL_SetRenderDrawColor(gRenderer, 255, 255, 100, 255);
+                SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
                 SDL_RenderClear(gRenderer);
 
                 
@@ -554,11 +554,33 @@ int main(int argc, char* args[]) {
                 float endYRay2 = startY + 5000 * sin(directionOfRay2);
 
 
-                SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+                SDL_SetRenderDrawColor(gRenderer, 255, 255, 100, 255);
                 // Draw the ray to the nearest intersection point or its full length
                 SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endXRay1, (int)endYRay1); // ray1
 
                 SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endXRay2, (int)endYRay2); // ray2
+
+                SDL_Vertex vertices[3]; // Two vertices for each ray: start and end
+
+                // Ray start point (on the circle outline)
+                vertices[0].position.x = startX;
+                vertices[0].position.y = startY;
+                vertices[0].color = (SDL_Color){255, 255, 100, 200}; // Light yellow
+
+                vertices[1].position.x = endXRay1;
+                vertices[1].position.y = endYRay1;
+                vertices[1].color = (SDL_Color){255, 255, 100, 200}; // Light yellow
+
+                vertices[2].position.x = endXRay2;
+                vertices[2].position.y = endYRay2;
+                vertices[2].color = (SDL_Color){255, 255, 100, 200}; // Light yellow
+
+                int indices[3] = {0, 1, 2}; // Use the three vertices in order
+
+                SDL_RenderGeometry(gRenderer, NULL, vertices, 3, indices, 3);
+
+
+
 
 
 
