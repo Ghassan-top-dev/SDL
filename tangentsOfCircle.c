@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h> 
+#include <stdbool.h>
 #include <time.h>
 #include <math.h>
 
@@ -419,6 +419,7 @@ void DrawLightFromOutline(SDL_Renderer* renderer, SDL_Point rayEndpoints[], SDL_
 
 
 
+
 // main function
 int main(int argc, char* args[]) {
     
@@ -435,10 +436,11 @@ int main(int argc, char* args[]) {
             lightCircle.position.x = 350; lightCircle.position.y = 400; lightCircle.radius = 80; 
 
             Circle testCircle;
-            testCircle.position.x = 800; testCircle.position.y = 400; testCircle.radius = 65; 
+            testCircle.position.x = 800; testCircle.position.y = 400; testCircle.radius = 80; 
             
             SDL_Point rayStartPoints[NUM_RAYS]; 
             SDL_Point rayEndPoints[NUM_RAYS]; 
+
 
 
             InitializeCircles();
@@ -517,7 +519,11 @@ int main(int argc, char* args[]) {
                     // DrawFilledCircle(gRenderer, circles[i].position.x, circles[i].position.y, circles[i].radius);
                 }
 
+
+
                 SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
+                SDL_RenderDrawLine(gRenderer, testCircle.position.x - 80, 100, testCircle.position.x - 80, 600); 
+
                 
                 DrawFilledCircle(gRenderer, testCircle.position.x, testCircle.position.y, testCircle.radius);
                 DrawFilledCircle(gRenderer, lightCircle.position.x, lightCircle.position.y, lightCircle.radius);
@@ -531,7 +537,6 @@ int main(int argc, char* args[]) {
                  
                 // step 3
                 float theta = asin(testCircle.radius / distLightToObstacle); 
-
 
                 float phi = atan2(lightToObstacleVector.y, lightToObstacleVector.x); // Correct usage
 
@@ -552,7 +557,7 @@ int main(int argc, char* args[]) {
 
                 float endXRay2 = startX + 5000 * cos(directionOfRay2);
                 float endYRay2 = startY + 5000 * sin(directionOfRay2);
-
+                
 
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 100, 255);
                 // Draw the ray to the nearest intersection point or its full length
@@ -560,24 +565,10 @@ int main(int argc, char* args[]) {
 
                 SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endXRay2, (int)endYRay2); // ray2
 
-                SDL_Vertex vertices[3]; // Two vertices for each ray: start and end
 
-                // Ray start point (on the circle outline)
-                vertices[0].position.x = startX;
-                vertices[0].position.y = startY;
-                vertices[0].color = (SDL_Color){255, 255, 100, 200}; // Light yellow
 
-                vertices[1].position.x = endXRay1;
-                vertices[1].position.y = endYRay1;
-                vertices[1].color = (SDL_Color){255, 255, 100, 200}; // Light yellow
 
-                vertices[2].position.x = endXRay2;
-                vertices[2].position.y = endYRay2;
-                vertices[2].color = (SDL_Color){255, 255, 100, 200}; // Light yellow
-
-                int indices[3] = {0, 1, 2}; // Use the three vertices in order
-
-                SDL_RenderGeometry(gRenderer, NULL, vertices, 3, indices, 3);
+                
 
 
 
