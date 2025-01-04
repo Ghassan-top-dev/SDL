@@ -433,7 +433,7 @@ int main(int argc, char* args[]) {
             SDL_Event event;
             
             Circle lightCircle;
-            lightCircle.position.x = 350; lightCircle.position.y = 400; lightCircle.radius = 80; 
+            lightCircle.position.x = 200; lightCircle.position.y = 100; lightCircle.radius = 80; 
 
             Circle testCircle;
             testCircle.position.x = 800; testCircle.position.y = 400; testCircle.radius = 80; 
@@ -559,7 +559,6 @@ int main(int argc, char* args[]) {
                 // this calculates the dots of the tangents of the test circle
 
                 // Calculate first tangent point
-                
                 // Normalized light-to-obstacle vector
                 Vector2 normalizedVector;
                 normalizedVector.x = lightToObstacleVector.x / mag(lightToObstacleVector);
@@ -582,8 +581,8 @@ int main(int argc, char* args[]) {
 
                 // Render the tangent points
                 SDL_SetRenderDrawColor(gRenderer, 100, 100, 100, 255);
-                DrawFilledCircle(gRenderer, tangentPoint1.x, tangentPoint1.y, 2);
-                DrawFilledCircle(gRenderer, tangentPoint2.x, tangentPoint2.y, 2);
+                DrawFilledCircle(gRenderer, tangentPoint1.x - 12, tangentPoint1.y, 2);
+                DrawFilledCircle(gRenderer, tangentPoint2.x - 12, tangentPoint2.y, 2);
 
 
 
@@ -615,7 +614,7 @@ int main(int argc, char* args[]) {
                 SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
                 SDL_RenderDrawLine(gRenderer, testCircle.position.x - 80, 100, testCircle.position.x - 80, 600); 
                 SDL_SetRenderDrawColor(gRenderer, 0, 255, 0, 255);
-                SDL_RenderDrawLine(gRenderer, lightCircle.position.x, lightCircle.position.y, testCircle.position.x - testCircle.radius, testCircle.position.y); 
+                SDL_RenderDrawLine(gRenderer, lightCircle.position.x, lightCircle.position.y, testCircle.position.x, testCircle.position.y); 
 
 
 
