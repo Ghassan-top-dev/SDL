@@ -537,6 +537,8 @@ int main(int argc, char* args[]) {
                 Vector2 lightToObstacleVector;
                 lightToObstacleVector.x = testCircle.position.x - lightCircle.position.x;
                 lightToObstacleVector.y = testCircle.position.y - lightCircle.position.y;
+                
+                
                 float distLightToObstacle = mag(lightToObstacleVector) - lightCircle.radius;    
                  
                 // step 3
