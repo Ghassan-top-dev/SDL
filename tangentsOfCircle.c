@@ -437,6 +437,9 @@ int main(int argc, char* args[]) {
 
             Circle testCircle;
             testCircle.position.x = 800; testCircle.position.y = 400; testCircle.radius = 80; 
+
+            Vector2 tangentPoint1, tangentPoint2;
+
             
             SDL_Point rayStartPoints[NUM_RAYS]; 
             SDL_Point rayEndPoints[NUM_RAYS]; 
@@ -546,8 +549,30 @@ int main(int argc, char* args[]) {
                 float directionOfRay1 = phi - theta;
                 float directionOfRay2 = phi + theta;
 
+                float distToTangent = testCircle.radius / tan(theta);
+
+
                 // step 6
 
+                // this calculates the dots of the tangents of the test circle
+
+                // Calculate first tangent point
+                tangentPoint1.x = testCircle.position.x - distToTangent * cos(theta);
+                tangentPoint1.y = testCircle.position.y - distToTangent * sin(theta);
+                
+                // Calculate second tangent point
+                tangentPoint2.x = testCircle.position.x - distToTangent * cos(-theta);
+                tangentPoint2.y = testCircle.position.y - distToTangent * sin(-theta);
+
+                SDL_SetRenderDrawColor(gRenderer, 100, 100, 100, 255);
+                DrawFilledCircle(gRenderer, tangentPoint1.x, tangentPoint1.y, 2);
+                DrawFilledCircle(gRenderer, tangentPoint2.x, tangentPoint2.y, 2);
+
+
+
+
+
+                // this calculates the rays
                 float startX = lightCircle.position.x + lightCircle.radius * cos(phi);
                 float startY = lightCircle.position.y + lightCircle.radius * sin(phi);
                 
@@ -573,12 +598,6 @@ int main(int argc, char* args[]) {
                 SDL_RenderDrawLine(gRenderer, testCircle.position.x - 80, 100, testCircle.position.x - 80, 600); 
                 SDL_SetRenderDrawColor(gRenderer, 0, 255, 0, 255);
                 SDL_RenderDrawLine(gRenderer, lightCircle.position.x, lightCircle.position.y, testCircle.position.x - testCircle.radius, testCircle.position.y); 
-
-
-
-
-
-                
 
 
 
