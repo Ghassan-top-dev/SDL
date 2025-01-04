@@ -465,6 +465,9 @@ int main(int argc, char* args[]) {
 
                     if (event.type == SDL_MOUSEBUTTONDOWN) {
                         if (event.button.button == SDL_BUTTON_LEFT) {
+                            int mouseX, mouseY;
+                            SDL_GetMouseState(&mouseX, &mouseY); 
+                            printf("Mouse Pressed: (%d, %d)\n", mouseX, mouseY); 
                             
                         }
                     }
@@ -520,9 +523,7 @@ int main(int argc, char* args[]) {
                 }
 
 
-
                 SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
-                SDL_RenderDrawLine(gRenderer, testCircle.position.x - 80, 100, testCircle.position.x - 80, 600); 
 
                 
                 DrawFilledCircle(gRenderer, testCircle.position.x, testCircle.position.y, testCircle.radius);
@@ -564,6 +565,15 @@ int main(int argc, char* args[]) {
                 SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endXRay1, (int)endYRay1); // ray1
 
                 SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endXRay2, (int)endYRay2); // ray2
+
+
+
+                // measuring lines 
+                SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
+                SDL_RenderDrawLine(gRenderer, testCircle.position.x - 80, 100, testCircle.position.x - 80, 600); 
+                SDL_SetRenderDrawColor(gRenderer, 0, 255, 0, 255);
+                SDL_RenderDrawLine(gRenderer, lightCircle.position.x, lightCircle.position.y, testCircle.position.x - testCircle.radius, testCircle.position.y); 
+
 
 
 
