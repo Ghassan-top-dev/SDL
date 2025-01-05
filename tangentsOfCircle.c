@@ -551,38 +551,9 @@ int main(int argc, char* args[]) {
                 float directionOfRay1 = phi - theta;
                 float directionOfRay2 = phi + theta;
 
-                float distToTangent = testCircle.radius / tan(theta);
-
 
                 // step 6
 
-                // this calculates the dots of the tangents of the test circle
-
-                // Calculate first tangent point
-                // Normalized light-to-obstacle vector
-                Vector2 normalizedVector;
-                normalizedVector.x = lightToObstacleVector.x / mag(lightToObstacleVector);
-                normalizedVector.y = lightToObstacleVector.y / mag(lightToObstacleVector);
-
-                // Perpendicular vector for tangent directions
-                Vector2 perpVector1, perpVector2;
-                perpVector1.x = -normalizedVector.y;
-                perpVector1.y = normalizedVector.x;
-                perpVector2.x = normalizedVector.y;
-                perpVector2.y = -normalizedVector.x;
-
-                // First tangent point
-                tangentPoint1.x = testCircle.position.x + testCircle.radius * perpVector1.x;
-                tangentPoint1.y = testCircle.position.y + testCircle.radius * perpVector1.y;
-
-                // Second tangent point
-                tangentPoint2.x = testCircle.position.x + testCircle.radius * perpVector2.x;
-                tangentPoint2.y = testCircle.position.y + testCircle.radius * perpVector2.y;
-
-                // Render the tangent points
-                SDL_SetRenderDrawColor(gRenderer, 100, 100, 100, 255);
-                DrawFilledCircle(gRenderer, tangentPoint1.x - 12, tangentPoint1.y, 2);
-                DrawFilledCircle(gRenderer, tangentPoint2.x - 12, tangentPoint2.y, 2);
 
 
 
@@ -607,6 +578,39 @@ int main(int argc, char* args[]) {
                 SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endXRay1, (int)endYRay1); // ray1
 
                 SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endXRay2, (int)endYRay2); // ray2
+
+
+
+                // this calculates the dots of the tangents of the test circle
+                // using this tutorial
+                // https://stackoverflow.com/questions/49968720/find-tangent-points-in-a-circle-from-a-point
+
+                float vectorFromLightToObstacle = sqrt(pow(startX - testCircle.position.x, 2) + pow(startY - testCircle.position.y, 2)); // this is 'b'
+
+                float thetaV2 = acos(testCircle.radius/ vectorFromLightToObstacle);  // angle theta
+
+                float directionAngle = atan2(startY - testCircle.position.y, startX - testCircle.position.x); // this is 'd'
+
+                float d1 = directionAngle + thetaV2;
+                float d2 = directionAngle - thetaV2;
+                
+                // first tangent point
+                tangentPoint1.x = testCircle.position.x + testCircle.radius * cos(d1);
+                tangentPoint1.y = testCircle.position.y + testCircle.radius * sin(d1);
+                // Second tangent point
+                tangentPoint2.x = testCircle.position.x + testCircle.radius * cos(d2);
+                tangentPoint2.y = testCircle.position.y + testCircle.radius * sin(d2);
+
+                // Render the tangent points
+                SDL_SetRenderDrawColor(gRenderer, 100, 100, 100, 255);
+                DrawFilledCircle(gRenderer, tangentPoint1.x, tangentPoint1.y, 2);
+                DrawFilledCircle(gRenderer, tangentPoint2.x, tangentPoint2.y, 2);
+
+
+
+
+
+
 
 
 
