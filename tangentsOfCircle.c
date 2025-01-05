@@ -451,53 +451,51 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, in
     int prev_x = 0;
     int prev_y = 0;
 
-    SDL_Vertex vertices[segments * 2 + 4]; // Two vertices for each ray: start and end
+    // Arc vertices
+    SDL_Vertex vertices[(segments + 3) * 2];
 
-    
-    // Draw the arc segment by segment
+    // Add center vertex
+    vertices[0].position.x = end_x;
+    vertices[0].position.y = end_y;
+    vertices[0].color = (SDL_Color){255, 255, 100, 200}; // Center color
+
     for (int i = 0; i <= segments; i++) {
         double angle = deg_to_rad(start_angle + (i * angle_step));
         int x = center_x + (int)(radius * cos(angle));
         int y = center_y + (int)(radius * sin(angle));
 
-
-
-        
         if (i > 0) {
-            // Draw line from previous point to current point
-            SDL_RenderDrawLine(renderer, prev_x, prev_y, x, y);
+            // Add arc vertices
+            vertices[i * 2 - 1].position.x = prev_x;
+            vertices[i * 2 - 1].position.y = prev_y;
+            vertices[i * 2 - 1].color = (SDL_Color){255, 255, 100, 200}; // Light yellow
 
-
-            // collect the start and end point of each line as verticies
-            // Ray start point (on the circle outline)
-            vertices[i * 2].position.x = prev_x;
-            vertices[i * 2].position.y = prev_y;
+            vertices[i * 2].position.x = x;
+            vertices[i * 2].position.y = y;
             vertices[i * 2].color = (SDL_Color){255, 255, 100, 200}; // Light yellow
-
-            // Ray end point
-            vertices[i * 2 + 1].position.x = x;
-            vertices[i * 2 + 1].position.y = y;
-            vertices[i * 2 + 1].color = (SDL_Color){255, 255, 100, 200}; // Fading light
         }
-        else{
 
-            // collect the start and end point of each line as verticies
-            // Ray start point (on the circle outline)
-            vertices[i * 2].position.x = end_x;
-            vertices[i * 2].position.y = end_y;
-            vertices[i * 2].color = (SDL_Color){255, 255, 100, 200}; // Light yellow
-
-            // Ray end point
-            vertices[i * 2 + 1].position.x = x;
-            vertices[i * 2 + 1].position.y = y;
-            vertices[i * 2 + 1].color = (SDL_Color){255, 255, 100, 200}; // Fading light
-
+        if (i == segments)
+        {
+            /* code */
         }
         
-        // Store current point as previous for next iteration
+
+        // Store current point as previous
         prev_x = x;
         prev_y = y;
     }
+
+    // Create indices
+    int indices[segments * 3];
+    for (int i = 0; i < segments; i++) {
+        indices[i * 3] = 0;                 // Center vertex
+        indices[i * 3 + 1] = i * 2 + 1;     // First segment vertex
+        indices[i * 3 + 2] = i * 2 + 2;     // Second segment vertex
+    }
+
+    // Render the arc as a triangle fan
+    SDL_RenderGeometry(renderer, NULL, vertices, (segments + 1) * 2, indices, segments * 3);
 }
 
 
