@@ -428,12 +428,10 @@ double get_angle(int x1, int y1, int x2, int y2) {
 }
 
 // Draw an arc from start point to end point with given radius
-void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, 
-              int start_x, int start_y, int end_x, int end_y, 
-              int radius, SDL_Color color) {
+void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, int end_y, int start_x, int start_y, int radius) {
     
     // Set the draw color
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255);
     
     // Calculate start and end angles
     double start_angle = get_angle(center_x, center_y, start_x, start_y);
@@ -441,26 +439,59 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,
     
     // Ensure end angle is greater than start angle
     if (end_angle < start_angle) {
-        end_angle += 360.0;
+        end_angle += 360; 
+
     }
     
     // Number of segments to draw (more segments = smoother arc)
-    const int segments = 120;
+    #define segments 20
     double angle_step = (end_angle - start_angle) / segments;
     
     // Variables to store the previous point
     int prev_x = 0;
     int prev_y = 0;
+
+    SDL_Vertex vertices[segments * 2 + 4]; // Two vertices for each ray: start and end
+
     
     // Draw the arc segment by segment
     for (int i = 0; i <= segments; i++) {
         double angle = deg_to_rad(start_angle + (i * angle_step));
         int x = center_x + (int)(radius * cos(angle));
         int y = center_y + (int)(radius * sin(angle));
+
+
+
         
         if (i > 0) {
             // Draw line from previous point to current point
             SDL_RenderDrawLine(renderer, prev_x, prev_y, x, y);
+
+
+            // collect the start and end point of each line as verticies
+            // Ray start point (on the circle outline)
+            vertices[i * 2].position.x = prev_x;
+            vertices[i * 2].position.y = prev_y;
+            vertices[i * 2].color = (SDL_Color){255, 255, 100, 200}; // Light yellow
+
+            // Ray end point
+            vertices[i * 2 + 1].position.x = x;
+            vertices[i * 2 + 1].position.y = y;
+            vertices[i * 2 + 1].color = (SDL_Color){255, 255, 100, 200}; // Fading light
+        }
+        else{
+
+            // collect the start and end point of each line as verticies
+            // Ray start point (on the circle outline)
+            vertices[i * 2].position.x = end_x;
+            vertices[i * 2].position.y = end_y;
+            vertices[i * 2].color = (SDL_Color){255, 255, 100, 200}; // Light yellow
+
+            // Ray end point
+            vertices[i * 2 + 1].position.x = x;
+            vertices[i * 2 + 1].position.y = y;
+            vertices[i * 2 + 1].color = (SDL_Color){255, 255, 100, 200}; // Fading light
+
         }
         
         // Store current point as previous for next iteration
@@ -579,9 +610,8 @@ int main(int argc, char* args[]) {
 
 
                 SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
-                DrawFilledCircle(gRenderer, testCircle.position.x, testCircle.position.y, testCircle.radius);
                 DrawFilledCircle(gRenderer, lightCircle.position.x, lightCircle.position.y, lightCircle.radius);
-
+                // DrawFilledCircle(gRenderer, testCircle.position.x, testCircle.position.y, testCircle.radius);
  
                 // step 1
                 Vector2 lightToObstacleVector;
@@ -650,8 +680,8 @@ int main(int argc, char* args[]) {
                 DrawFilledCircle(gRenderer, tangentPoint1.x, tangentPoint1.y, 2);
                 DrawFilledCircle(gRenderer, tangentPoint2.x, tangentPoint2.y, 2);
 
-            
 
+                
 
 
                 // measuring lines 
@@ -662,7 +692,7 @@ int main(int argc, char* args[]) {
 
 
 
-
+                draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint1.x, tangentPoint1.y, 720, 400, 80); 
 
 
 
