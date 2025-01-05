@@ -417,6 +417,58 @@ void DrawLightFromOutline(SDL_Renderer* renderer, SDL_Point rayEndpoints[], SDL_
     SDL_RenderGeometry(renderer, NULL, vertices, NUM_RAYS * 2, indices, (NUM_RAYS - 1) * 3);
 }
 
+// Helper function to convert degrees to radians
+double deg_to_rad(double degrees) {
+    return degrees * M_PI / 180.0;
+}
+
+// Helper function to calculate angle between two points
+double get_angle(int x1, int y1, int x2, int y2) {
+    return atan2(y2 - y1, x2 - x1) * 180.0 / M_PI;
+}
+
+// Draw an arc from start point to end point with given radius
+void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, 
+              int start_x, int start_y, int end_x, int end_y, 
+              int radius, SDL_Color color) {
+    
+    // Set the draw color
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    
+    // Calculate start and end angles
+    double start_angle = get_angle(center_x, center_y, start_x, start_y);
+    double end_angle = get_angle(center_x, center_y, end_x, end_y);
+    
+    // Ensure end angle is greater than start angle
+    if (end_angle < start_angle) {
+        end_angle += 360.0;
+    }
+    
+    // Number of segments to draw (more segments = smoother arc)
+    const int segments = 120;
+    double angle_step = (end_angle - start_angle) / segments;
+    
+    // Variables to store the previous point
+    int prev_x = 0;
+    int prev_y = 0;
+    
+    // Draw the arc segment by segment
+    for (int i = 0; i <= segments; i++) {
+        double angle = deg_to_rad(start_angle + (i * angle_step));
+        int x = center_x + (int)(radius * cos(angle));
+        int y = center_y + (int)(radius * sin(angle));
+        
+        if (i > 0) {
+            // Draw line from previous point to current point
+            SDL_RenderDrawLine(renderer, prev_x, prev_y, x, y);
+        }
+        
+        // Store current point as previous for next iteration
+        prev_x = x;
+        prev_y = y;
+    }
+}
+
 
 
 
@@ -433,7 +485,7 @@ int main(int argc, char* args[]) {
             SDL_Event event;
             
             Circle lightCircle;
-            lightCircle.position.x = 200; lightCircle.position.y = 100; lightCircle.radius = 80; 
+            lightCircle.position.x = 200; lightCircle.position.y = 400; lightCircle.radius = 80; 
 
             Circle testCircle;
             testCircle.position.x = 800; testCircle.position.y = 400; testCircle.radius = 80; 
@@ -527,8 +579,6 @@ int main(int argc, char* args[]) {
 
 
                 SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
-
-                
                 DrawFilledCircle(gRenderer, testCircle.position.x, testCircle.position.y, testCircle.radius);
                 DrawFilledCircle(gRenderer, lightCircle.position.x, lightCircle.position.y, lightCircle.radius);
 
@@ -553,12 +603,6 @@ int main(int argc, char* args[]) {
 
 
                 // step 6
-
-
-
-
-
-
 
                 // this calculates the rays
                 float startX = lightCircle.position.x + lightCircle.radius * cos(phi);
@@ -606,11 +650,7 @@ int main(int argc, char* args[]) {
                 DrawFilledCircle(gRenderer, tangentPoint1.x, tangentPoint1.y, 2);
                 DrawFilledCircle(gRenderer, tangentPoint2.x, tangentPoint2.y, 2);
 
-
-
-
-
-
+            
 
 
 
