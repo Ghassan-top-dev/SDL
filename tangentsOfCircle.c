@@ -1,4 +1,5 @@
 // gcc -O3 -I src/include -L src/lib -o main tangents.c -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer
+// 2:44
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -443,6 +444,7 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, in
     
     // Number of segments to draw (more segments = smoother arc)
     #define segments 20
+
     double angle_step = (end_angle - start_angle) / segments;
     
     // Variables to store the previous point
@@ -450,7 +452,7 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, in
     int prev_y = 0;
 
     // Arc vertices
-    SDL_Vertex vertices[(segments + 1) * 2];
+    SDL_Vertex vertices[(segments + 2) * 2];
 
     // Add center vertex
     vertices[0].position.x = end_x;
@@ -479,6 +481,16 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, in
         prev_y = y;
     }
 
+    // going to the left after the final point from the arc is placed
+    vertices[42].position.x = 720;
+    vertices[42].position.y = 334;
+    vertices[42].color = (SDL_Color){255, 255, 100, 200}; // Center color
+
+    // going to the left after the final point from the arc is placed
+    vertices[43].position.x = end_x;
+    vertices[43].position.y = end_y;
+    vertices[43].color = (SDL_Color){255, 255, 100, 200}; // Center color
+
     // Create indices
     int indices[segments * 3];
     for (int i = 0; i < segments; i++) {
@@ -488,7 +500,7 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, in
     }
 
     // Render the arc as a triangle fan
-    SDL_RenderGeometry(renderer, NULL, vertices, (segments + 1) * 2, indices, segments * 3);
+    SDL_RenderGeometry(renderer, NULL, vertices, (segments + 2) * 2, indices, segments * 3);
 }
 
 
@@ -688,7 +700,25 @@ int main(int argc, char* args[]) {
                 draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint1.x, tangentPoint1.y, 720, 400, 80); 
 
 
+                // Define three vertices for the triangle
+                SDL_Vertex vertices[3];
+                vertices[0].position.x = 300; // First vertex
+                vertices[0].position.y = 200;
+                vertices[0].color = (SDL_Color){255, 0, 0, 255}; // Red
 
+                vertices[1].position.x = 500; // Second vertex
+                vertices[1].position.y = 400;
+                vertices[1].color = (SDL_Color){0, 255, 0, 255}; // Green
+
+                vertices[2].position.x = 100; // Third vertex
+                vertices[2].position.y = 400;
+                vertices[2].color = (SDL_Color){0, 0, 255, 255}; // Blue
+
+                // Define indices for the triangle
+                int indices[3] = {0, 1, 2}; // Use the three vertices in order
+
+                // Render the geometry
+                SDL_RenderGeometry(gRenderer, NULL, vertices, 3, indices, 3);
 
 
 
