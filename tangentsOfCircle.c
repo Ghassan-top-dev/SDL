@@ -1,5 +1,4 @@
 // gcc -O3 -I src/include -L src/lib -o main tangents.c -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer
-// 2:44
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -113,7 +112,7 @@ bool loadMedia() {
     bool success = true;
 
     // Open the font file at size 28
-    gFont = TTF_OpenFont("bit5x3.ttf", 21); //font size
+    gFont = TTF_OpenFont("OpenSans-Bold.ttf", 21); //font size
     if (gFont == NULL) {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
         success = false;
@@ -598,7 +597,7 @@ int main(int argc, char* args[]) {
  
                     }
                     
-                    // // Draw the circle
+                    // Draw the circle
                     // DrawFilledCircle(gRenderer, circles[i].position.x, circles[i].position.y, circles[i].radius);
                 }
 
