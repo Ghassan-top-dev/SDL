@@ -1,5 +1,5 @@
 // gcc -O3 -I src/include -L src/lib -o main tangents.c -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer
-
+// 2:44
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -427,7 +427,6 @@ double get_angle(int x1, int y1, int x2, int y2) {
     return atan2(y2 - y1, x2 - x1) * 180.0 / M_PI;
 }
 
-// Draw an arc from start point to end point with given radius
 void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, int end_y, int start_x, int start_y, int radius) {
     
     // Set the draw color
@@ -452,22 +451,13 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, in
     int prev_y = 0;
 
     // Arc vertices
-    // Total vertices and indices calculation
-    int arc_vertices_count = segments * 2;  // Arc uses 2 vertices per segment
-    int extra_vertices_count = 6;          // 3 lines * 2 vertices each
-    int total_vertices = arc_vertices_count + extra_vertices_count + 1;  // +1 for center vertex
-    int total_triangles = segments + 3;    // Arc triangles + 3 extra triangles
-
-    // Vertex and index arrays
-    SDL_Vertex vertices[47];
-    int indices[23 * 3];
+    SDL_Vertex vertices[(segments + 1) * 2];
 
     // Add center vertex
     vertices[0].position.x = end_x;
     vertices[0].position.y = end_y;
     vertices[0].color = (SDL_Color){255, 255, 100, 200}; // Center color
 
-    // Create arc vertices
     for (int i = 0; i <= segments; i++) {
         double angle = deg_to_rad(start_angle + (i * angle_step));
         int x = center_x + (int)(radius * cos(angle));
@@ -483,74 +473,26 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, in
             vertices[i * 2].position.y = y;
             vertices[i * 2].color = (SDL_Color){255, 255, 100, 200}; // Light yellow
         }
+        
 
         // Store current point as previous
         prev_x = x;
         prev_y = y;
-
-        // Add extra vertices when reaching the last point
-        if (i == segments) {
-            int offset = arc_vertices_count + 1; // Start after the arc vertices
-            for (int j = 0; j < 3; j++) {
-                switch (j) {
-                case 0:
-                    vertices[offset].position.x = prev_x;
-                    vertices[offset].position.y = prev_y;
-                    vertices[offset].color = (SDL_Color){255, 255, 100, 200};
-
-                    vertices[offset + 1].position.x = 720;
-                    vertices[offset + 1].position.y = 400;
-                    vertices[offset + 1].color = (SDL_Color){255, 255, 100, 200};
-                    break;
-
-                case 1:
-                    vertices[offset + 2].position.x = 720;
-                    vertices[offset + 2].position.y = 400;
-                    vertices[offset + 2].color = (SDL_Color){255, 255, 100, 200};
-
-                    vertices[offset + 3].position.x = 720;
-                    vertices[offset + 3].position.y = 332;
-                    vertices[offset + 3].color = (SDL_Color){255, 255, 100, 200};
-                    break;
-
-                case 2:
-                    vertices[offset + 4].position.x = 720;
-                    vertices[offset + 4].position.y = 332;
-                    vertices[offset + 4].color = (SDL_Color){255, 255, 100, 200};
-
-                    vertices[offset + 5].position.x = end_x;
-                    vertices[offset + 5].position.y = end_y;
-                    vertices[offset + 5].color = (SDL_Color){255, 255, 100, 200};
-                    break;
-                }
-            }
-        }
     }
 
-    // Create indices for triangles
+    // Create indices
+    int indices[segments * 3];
     for (int i = 0; i < segments; i++) {
-        indices[i * 3] = 0;             // Center vertex
-        indices[i * 3 + 1] = i * 2 + 1; // First segment vertex
-        indices[i * 3 + 2] = i * 2 + 2; // Second segment vertex
+        indices[i * 3] = 0;                 // Center vertex
+        indices[i * 3 + 1] = i * 2 + 1;     // First segment vertex
+        indices[i * 3 + 2] = i * 2 + 2;     // Second segment vertex
     }
 
-    // Add indices for extra lines
-    int offset = arc_vertices_count + 1;
-    indices[segments * 3] = 0;             // Connect to center
-    indices[segments * 3 + 1] = offset;
-    indices[segments * 3 + 2] = offset + 1;
-
-    indices[segments * 3 + 3] = 0;
-    indices[segments * 3 + 4] = offset + 2;
-    indices[segments * 3 + 5] = offset + 3;
-
-    indices[segments * 3 + 6] = 0;
-    indices[segments * 3 + 7] = offset + 4;
-    indices[segments * 3 + 8] = offset + 5;
-
-    // Render the geometry
-    SDL_RenderGeometry(renderer, NULL, vertices, total_vertices, indices, total_triangles * 3);
+    // Render the arc as a triangle fan
+    SDL_RenderGeometry(renderer, NULL, vertices, (segments + 1) * 2, indices, segments * 3);
 }
+
+
 
 
 
@@ -663,7 +605,7 @@ int main(int argc, char* args[]) {
 
                 SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
                 DrawFilledCircle(gRenderer, lightCircle.position.x, lightCircle.position.y, lightCircle.radius);
-                DrawFilledCircle(gRenderer, testCircle.position.x, testCircle.position.y, testCircle.radius);
+                // DrawFilledCircle(gRenderer, testCircle.position.x, testCircle.position.y, testCircle.radius);
  
                 // step 1
                 Vector2 lightToObstacleVector;
