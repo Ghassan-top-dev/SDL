@@ -466,11 +466,16 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, in
         prev_x = x;
         prev_y = y;
     }
-    SDL_RenderDrawLine(renderer, prev_x, prev_y, x, y); 
-    SDL_RenderDrawLine(renderer, prev_x, prev_y, x, y); 
+    SDL_RenderDrawLine(renderer, 720, 400, 720, 332); 
+    SDL_RenderDrawLine(renderer, 720, 332, end_x, end_y); 
 
 
 }
+
+
+bool checkIsWithInShape();
+
+
 
 
 
