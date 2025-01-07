@@ -471,16 +471,16 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, in
         prev_x = x;
         prev_y = y;
     }
-    SDL_RenderDrawLine(renderer, 720, 400, 720, 332); 
-    SDL_RenderDrawLine(renderer, 720, 332, end_x, end_y); 
+    // SDL_RenderDrawLine(renderer, 720, 400, 720, 332); 
+    // SDL_RenderDrawLine(renderer, 720, 332, end_x, end_y); 
 
-    for (int i = 0; i < segments; i++)
-    {
-        SDL_RenderDrawLine(renderer, 720, 332, arcPoints[i].x, arcPoints[i].y); 
-        SDL_RenderDrawLine(renderer, 720, 337, arcPoints[i].x, arcPoints[i].y); 
-        SDL_RenderDrawLine(renderer, 720, 342, arcPoints[i].x, arcPoints[i].y); 
+    // for (int i = 0; i < segments; i++)
+    // {
+    //     SDL_RenderDrawLine(renderer, 720, 332, arcPoints[i].x, arcPoints[i].y); 
+    //     SDL_RenderDrawLine(renderer, 720, 337, arcPoints[i].x, arcPoints[i].y); 
+    //     SDL_RenderDrawLine(renderer, 720, 342, arcPoints[i].x, arcPoints[i].y); 
         
-    }
+    // }
     
     
 
@@ -714,11 +714,11 @@ int main(int argc, char* args[]) {
                 rayIntersectsLine(startX, startY, tangentPoint2.x, tangentPoint2.y, perp_x1, perp_y1, perp_x2, perp_y2, &intersectionOfLineRay2X, &intersectionOfLineRay2Y);
 
 
-                printf("(%d,%d)\n",(int)intersectionOfLineRay2X, (int)intersectionOfLineRay2Y);
+                // printf("(%d,%d)\n",(int)intersectionOfLineRay2X, (int)intersectionOfLineRay2Y);
 
 
 
-                // draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint1.x, tangentPoint1.y, 720, 400, 80); 
+                draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint1.x, tangentPoint1.y, intersectionOfLineRay1X, intersectionOfLineRay1Y, testCircle.radius); // using intersectionOfLineRay1
 
 
 
