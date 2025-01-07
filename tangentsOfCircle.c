@@ -709,7 +709,9 @@ int main(int argc, char* args[]) {
                 SDL_SetRenderDrawColor(gRenderer, 100, 0, 0, 255);
                 DrawPerpendicularLine(gRenderer, startX, startY, intersectionOfCircleX, intersectionOfCircleY, intersectionOfCircleX, intersectionOfCircleY, 1000, &perp_x1, &perp_y1, &perp_x2, &perp_y2); 
 
-                rayIntersectsLine(startX, startY, tangentPoint1.x, tangentPoint1.y, perp_x1, perp_y1, perp_x2, perp_y2, )
+                rayIntersectsLine(startX, startY, tangentPoint1.x, tangentPoint1.y, perp_x1, perp_y1, perp_x2, perp_y2, &intersectionOfLineRay1X, &intersectionOfLineRay1Y);
+
+                printf("(%.2f,%.2f)\n",intersectionOfLineRay1X, intersectionOfLineRay1Y);
 
 
 
