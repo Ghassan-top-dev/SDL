@@ -462,12 +462,7 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, in
         arcPoints[i].y = y;
 
         if (i > 0) {
-
             SDL_RenderDrawLine(renderer, prev_x, prev_y, x, y); 
-
-
-
-
         }
         
 
@@ -483,14 +478,6 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, in
         SDL_RenderDrawLine(renderer, 720, 332, arcPoints[i].x, arcPoints[i].y); 
         SDL_RenderDrawLine(renderer, 720, 337, arcPoints[i].x, arcPoints[i].y); 
         SDL_RenderDrawLine(renderer, 720, 342, arcPoints[i].x, arcPoints[i].y); 
-
-
-
-
-
-
-
-
         
     }
     
@@ -500,18 +487,30 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, in
 }
 
 
-bool checkIsWithInShape(){
+// Function to draw a perpendicular line
+void DrawPerpendicularLine(SDL_Renderer *renderer, int x1, int y1, int x2, int y2, int px, int py, int length) {
+    // Calculate slope of the original line
+    double dx = x2 - x1;
+    double dy = y2 - y1;
+    double original_slope = dy / dx;
 
+    // Calculate perpendicular slope
+    double perpendicular_slope = -1 / original_slope;
 
+    // Determine the endpoints of the perpendicular line
+    double angle = atan(perpendicular_slope);
+    int x_offset = length * cos(angle);
+    int y_offset = length * sin(angle);
 
+    // Perpendicular line endpoints
+    int perp_x1 = px - x_offset;
+    int perp_y1 = py - y_offset;
+    int perp_x2 = px + x_offset;
+    int perp_y2 = py + y_offset;
+
+    // Draw the perpendicular line
+    SDL_RenderDrawLine(renderer, perp_x1, perp_y1, perp_x2, perp_y2);
 }
-
-
-
-
-
-
-
 
 // main function
 int main(int argc, char* args[]) {
@@ -526,7 +525,7 @@ int main(int argc, char* args[]) {
             SDL_Event event;
             
             Circle lightCircle;
-            lightCircle.position.x = 200; lightCircle.position.y = 400; lightCircle.radius = 80; 
+            lightCircle.position.x = 200; lightCircle.position.y = 200; lightCircle.radius = 80; 
 
             Circle testCircle;
             testCircle.position.x = 800; testCircle.position.y = 400; testCircle.radius = 80; 
@@ -621,7 +620,7 @@ int main(int argc, char* args[]) {
 
                 SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
                 DrawFilledCircle(gRenderer, lightCircle.position.x, lightCircle.position.y, lightCircle.radius);
-                // DrawFilledCircle(gRenderer, testCircle.position.x, testCircle.position.y, testCircle.radius);
+                DrawFilledCircle(gRenderer, testCircle.position.x, testCircle.position.y, testCircle.radius);
  
                 // step 1
                 Vector2 lightToObstacleVector;
@@ -690,15 +689,21 @@ int main(int argc, char* args[]) {
                 DrawFilledCircle(gRenderer, tangentPoint1.x, tangentPoint1.y, 2);
                 DrawFilledCircle(gRenderer, tangentPoint2.x, tangentPoint2.y, 2);
 
-
+                float intersectionX, intersectionY; 
                 
 
 
                 // measuring lines 
-                SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
-                SDL_RenderDrawLine(gRenderer, testCircle.position.x - 80, 100, testCircle.position.x - 80, 600); 
+                
+                RayIntersectsCircle(startX, startY, testCircle.position.x, testCircle.position.y, testCircle.position.x, testCircle.position.y, testCircle.radius, &intersectionX, &intersectionY); 
+                
+                // horizontal
                 SDL_SetRenderDrawColor(gRenderer, 0, 255, 0, 255);
-                SDL_RenderDrawLine(gRenderer, lightCircle.position.x, lightCircle.position.y, testCircle.position.x, testCircle.position.y); 
+                SDL_RenderDrawLine(gRenderer, startX, startY, intersectionX, intersectionY); 
+
+                // vertical
+                SDL_SetRenderDrawColor(gRenderer, 100, 0, 0, 255);
+                DrawPerpendicularLine(gRenderer, startX, startY, intersectionX, intersectionY, intersectionX, intersectionY, 1000); 
 
 
 
