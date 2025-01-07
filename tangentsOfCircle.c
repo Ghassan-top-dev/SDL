@@ -712,7 +712,7 @@ int main(int argc, char* args[]) {
 
                 rayIntersectsLine(startX, startY, tangentPoint1.x, tangentPoint1.y, perp_x1, perp_y1, perp_x2, perp_y2, &intersectionOfLineRay1X, &intersectionOfLineRay1Y);
 
-                printf("(%.2f,%.2f)\n",intersectionOfLineRay1X, intersectionOfLineRay1Y);
+                printf("(%d,%d)\n",(int)intersectionOfLineRay1X, (int)intersectionOfLineRay1Y);
 
 
 
