@@ -472,13 +472,13 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int
         prev_y = y;
     }
     SDL_RenderDrawLine(renderer, start_x, start_y, intersectionOfLineRay1X, intersectionOfLineRay1Y); 
-    SDL_RenderDrawLine(renderer, 720, 332, end_x, end_y); 
+    SDL_RenderDrawLine(renderer, intersectionOfLineRay1X, intersectionOfLineRay1Y, end_x, end_y); 
 
     for (int i = 0; i < segments; i++)
     {
         SDL_RenderDrawLine(renderer, intersectionOfLineRay1X, intersectionOfLineRay1Y, arcPoints[i].x, arcPoints[i].y); 
-        SDL_RenderDrawLine(renderer, intersectionOfLineRay1X, intersectionOfLineRay1Y + 5, arcPoints[i].x, arcPoints[i].y); 
-        SDL_RenderDrawLine(renderer, intersectionOfLineRay1X, intersectionOfLineRay1Y + 5, arcPoints[i].x, arcPoints[i].y); 
+        SDL_RenderDrawLine(renderer, intersectionOfLineRay1X, intersectionOfLineRay1Y - 5, arcPoints[i].x, arcPoints[i].y); 
+        SDL_RenderDrawLine(renderer, intersectionOfLineRay1X, intersectionOfLineRay1Y - 5, arcPoints[i].x, arcPoints[i].y); 
         
     }
 
@@ -715,8 +715,8 @@ int main(int argc, char* args[]) {
 
 
 
-                draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint1.x, tangentPoint1.y, intersectionOfCircleX, intersectionOfCircleY, testCircle.radius, (int)intersectionOfLineRay1X, (int)intersectionOfLineRay1Y); // using intersectionOfLineRay1
-                // draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint2.x, tangentPoint2.y, intersectionOfCircleX, intersectionOfCircleY, testCircle.radius, (int)intersectionOfLineRay2X, (int)intersectionOfLineRay2Y); // using intersectionOfLineRay2
+                // draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint1.x, tangentPoint1.y, intersectionOfCircleX, intersectionOfCircleY, testCircle.radius, (int)intersectionOfLineRay1X, (int)intersectionOfLineRay1Y); // using intersectionOfLineRay1
+                draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, intersectionOfCircleX, intersectionOfCircleY, tangentPoint2.x, tangentPoint2.y, testCircle.radius, (int)intersectionOfLineRay2X, (int)intersectionOfLineRay2Y); // using intersectionOfLineRay2
 
 
 
