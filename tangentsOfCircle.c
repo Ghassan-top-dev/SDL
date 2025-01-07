@@ -428,7 +428,7 @@ double get_angle(int x1, int y1, int x2, int y2) {
     return atan2(y2 - y1, x2 - x1) * 180.0 / M_PI;
 }
 
-void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, int end_y, int start_x, int start_y, int radius, int intersectionOfLineRay1X, int intersectionOfLineRay1Y, int intersectionOfCircleX, int intersectionOfCircleY) {
+void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int end_y, int start_x, int start_y, int radius, int intersectionOfLineRay1X, int intersectionOfLineRay1Y) {
     
     // Set the draw color
     SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255);
@@ -471,7 +471,7 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, in
         prev_x = x;
         prev_y = y;
     }
-    SDL_RenderDrawLine(renderer, intersectionOfCircleX, intersectionOfCircleY, intersectionOfLineRay1X, intersectionOfLineRay1Y); 
+    SDL_RenderDrawLine(renderer, start_x, start_y, intersectionOfLineRay1X, intersectionOfLineRay1Y); 
     SDL_RenderDrawLine(renderer, 720, 332, end_x, end_y); 
 
     for (int i = 0; i < segments; i++)
@@ -715,7 +715,8 @@ int main(int argc, char* args[]) {
 
 
 
-                draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint1.x, tangentPoint1.y, intersectionOfCircleX, intersectionOfCircleY, testCircle.radius, (int)intersectionOfLineRay1X, (int)intersectionOfLineRay1Y, (int)intersectionOfCircleX, (int)intersectionOfCircleY); // using intersectionOfLineRay1
+                draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint1.x, tangentPoint1.y, intersectionOfCircleX, intersectionOfCircleY, testCircle.radius, (int)intersectionOfLineRay1X, (int)intersectionOfLineRay1Y); // using intersectionOfLineRay1
+                // draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint2.x, tangentPoint2.y, intersectionOfCircleX, intersectionOfCircleY, testCircle.radius, (int)intersectionOfLineRay2X, (int)intersectionOfLineRay2Y); // using intersectionOfLineRay2
 
 
 
