@@ -711,8 +711,10 @@ int main(int argc, char* args[]) {
                 DrawPerpendicularLine(gRenderer, startX, startY, intersectionOfCircleX, intersectionOfCircleY, intersectionOfCircleX, intersectionOfCircleY, 1000, &perp_x1, &perp_y1, &perp_x2, &perp_y2); 
 
                 rayIntersectsLine(startX, startY, tangentPoint1.x, tangentPoint1.y, perp_x1, perp_y1, perp_x2, perp_y2, &intersectionOfLineRay1X, &intersectionOfLineRay1Y);
+                rayIntersectsLine(startX, startY, tangentPoint2.x, tangentPoint2.y, perp_x1, perp_y1, perp_x2, perp_y2, &intersectionOfLineRay2X, &intersectionOfLineRay2Y);
 
-                // printf("(%d,%d)\n",(int)intersectionOfLineRay1X, (int)intersectionOfLineRay1Y);
+
+                printf("(%d,%d)\n",(int)intersectionOfLineRay2X, (int)intersectionOfLineRay2Y);
 
 
 
