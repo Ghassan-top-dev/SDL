@@ -377,7 +377,7 @@ int RayIntersectsCircle(float rayStartX, float rayStartY, float rayEndX, float r
     float t2 = (-B + sqrtDiscriminant) / (2 * A);
 
     // Check for the smallest positive t (valid intersection)
-    float t = (t1 >= 0) ? t1 : ((t2 >= 0) ? t2 : -1);
+    float t = (t2 >= 0) ? t2 : ((t1 >= 0) ? t1 : -1);
     if (t < 0) {
         return 0; // No valid intersection
     }
@@ -444,7 +444,7 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int
 
 
     // Number of segments to draw (more segments = smoother arc)
-    #define segments 300
+    #define segments 100
     double angle_step = (end_angle - start_angle) / segments;
 
     Vector2 arcPoints[segments + 1]; 
@@ -477,8 +477,7 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int
     for (int i = 0; i < segments; i++)
     {
         SDL_RenderDrawLine(renderer, intersectionOfLineRay1X, intersectionOfLineRay1Y, arcPoints[i].x, arcPoints[i].y); 
-        SDL_RenderDrawLine(renderer, intersectionOfLineRay1X, intersectionOfLineRay1Y - 5, arcPoints[i].x, arcPoints[i].y); 
-        SDL_RenderDrawLine(renderer, intersectionOfLineRay1X, intersectionOfLineRay1Y - 5, arcPoints[i].x, arcPoints[i].y); 
+
         
     }
 
@@ -715,8 +714,8 @@ int main(int argc, char* args[]) {
 
 
 
-                // draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint1.x, tangentPoint1.y, intersectionOfCircleX, intersectionOfCircleY, testCircle.radius, (int)intersectionOfLineRay1X, (int)intersectionOfLineRay1Y); // using intersectionOfLineRay1
-                draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, intersectionOfCircleX, intersectionOfCircleY, tangentPoint2.x, tangentPoint2.y, testCircle.radius, (int)intersectionOfLineRay2X, (int)intersectionOfLineRay2Y); // using intersectionOfLineRay2
+                draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, intersectionOfCircleX, intersectionOfCircleY,tangentPoint1.x, tangentPoint1.y, testCircle.radius, (int)intersectionOfLineRay1X, (int)intersectionOfLineRay1Y); // using intersectionOfLineRay1
+                draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint2.x, tangentPoint2.y, intersectionOfCircleX, intersectionOfCircleY, testCircle.radius, (int)intersectionOfLineRay2X, (int)intersectionOfLineRay2Y); // using intersectionOfLineRay2
 
 
 
