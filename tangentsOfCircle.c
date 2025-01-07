@@ -690,7 +690,9 @@ int main(int argc, char* args[]) {
                 DrawFilledCircle(gRenderer, tangentPoint2.x, tangentPoint2.y, 2);
 
                 float intersectionOfCircleX, intersectionOfCircleY; 
-                float intersectionOfLineRay1X, intersectionOfLineRay1Y; 
+                float intersectionOfLineRay1X, intersectionOfLineRay1Y; // intersection between the perpendicular line and ray 1
+                float intersectionOfLineRay2X, intersectionOfLineRay2Y; // intersection between the perpendicular line and ray 2
+
 
 
                 int perp_x1, perp_y1, perp_x2, perp_y2;
