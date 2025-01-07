@@ -439,12 +439,15 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, in
     // Ensure end angle is greater than start angle
     if (end_angle < start_angle) {
         end_angle += 360; 
-
     }
-    
+
+
     // Number of segments to draw (more segments = smoother arc)
-    #define segments 20
+    #define segments 100
     double angle_step = (end_angle - start_angle) / segments;
+
+    Vector2 arcPoints[segments + 1]; 
+
     
     // Variables to store the previous point
     int prev_x = 0;
@@ -455,9 +458,15 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, in
         int x = center_x + (int)(radius * cos(angle));
         int y = center_y + (int)(radius * sin(angle));
 
+        arcPoints[i].x = x;
+        arcPoints[i].y = y;
+
         if (i > 0) {
 
             SDL_RenderDrawLine(renderer, prev_x, prev_y, x, y); 
+
+
+
 
         }
         
@@ -469,11 +478,33 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y,  int end_x, in
     SDL_RenderDrawLine(renderer, 720, 400, 720, 332); 
     SDL_RenderDrawLine(renderer, 720, 332, end_x, end_y); 
 
+    for (int i = 0; i < segments; i++)
+    {
+        SDL_RenderDrawLine(renderer, 720, 332, arcPoints[i].x, arcPoints[i].y); 
+        SDL_RenderDrawLine(renderer, 720, 337, arcPoints[i].x, arcPoints[i].y); 
+        SDL_RenderDrawLine(renderer, 720, 342, arcPoints[i].x, arcPoints[i].y); 
+
+
+
+
+
+
+
+
+        
+    }
+    
+    
+
 
 }
 
 
-bool checkIsWithInShape();
+bool checkIsWithInShape(){
+
+
+
+}
 
 
 
