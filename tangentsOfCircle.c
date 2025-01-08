@@ -437,10 +437,9 @@ double get_angle(int x1, int y1, int x2, int y2) {
     return atan2(y2 - y1, x2 - x1) * 180.0 / M_PI;
 }
 
-void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int end_y, int start_x, int start_y, int radius, int intersectionOfLineRayX, int intersectionOfLineRayY) {
+void drawShadow(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int end_y, int start_x, int start_y, int radius, int intersectionOfLineRayX1, int intersectionOfLineRayY1, int intersectionOfLineRayX2, int intersectionOfLineRayY2, int endXRay1, int endYRay1, int endXRay2, int endYRay2) {
     
-    // Set the draw color
-    SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255);
+
     
     // Calculate start and end angles
     double start_angle = get_angle(center_x, center_y, start_x, start_y);
@@ -475,16 +474,16 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int
 
 
     // this calculates other points to draw the lines from
-    int dx_TangentPointToLine = intersectionOfLineRayX - start_x;
-    int dy_TangentPointToLine = intersectionOfLineRayY - start_y;
+    int dx_TangentPointToLine = intersectionOfLineRayX1 - start_x;
+    int dy_TangentPointToLine = intersectionOfLineRayY1 - start_y;
 
     float newEndTangentPointToLine_x = start_x + dx_TangentPointToLine * 0.80;
     float newEndTangentPointToLine_Y = start_y + dy_TangentPointToLine * 0.80;
 
 
     // this calculates other points to draw the lines from
-    int dx_CenterOfCircleToLine = intersectionOfLineRayX - end_x;
-    int dy_CenterOfCircleToLine = intersectionOfLineRayY - end_y;
+    int dx_CenterOfCircleToLine = intersectionOfLineRayX1 - end_x;
+    int dy_CenterOfCircleToLine = intersectionOfLineRayY1 - end_y;
 
     float CenterOfCircleToLine_x = end_x + dx_CenterOfCircleToLine * 0.80;
     float CenterOfCircleToLine_y = end_y + dy_CenterOfCircleToLine * 0.80;
@@ -493,11 +492,33 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int
 
     for (int i = 0; i < segments; i++)
     {
-        SDL_RenderDrawLine(renderer, intersectionOfLineRayX, intersectionOfLineRayY, arcPoints[i].x, arcPoints[i].y); 
+        SDL_RenderDrawLine(renderer, intersectionOfLineRayX1, intersectionOfLineRayY1, arcPoints[i].x, arcPoints[i].y); 
         SDL_RenderDrawLine(renderer, newEndTangentPointToLine_x, newEndTangentPointToLine_Y, arcPoints[i].x, arcPoints[i].y); // tangent point to line-ray
         SDL_RenderDrawLine(renderer, CenterOfCircleToLine_x, CenterOfCircleToLine_y, arcPoints[i].x, arcPoints[i].y); // center perpendicular line point to line-ray
 
     }
+
+    // Vertices for a square
+    SDL_Vertex vertices[4] = {
+        {{intersectionOfLineRayX1, intersectionOfLineRayY1},     {0, 0, 0, 255}},    // Top left
+        {{intersectionOfLineRayX2, intersectionOfLineRayY2},   {0, 0, 0, 255}},    // Top right
+        {{endXRay1, endYRay1}, {0, 0, 0, 255}},    // Bottom right
+        {{endXRay2, endYRay2},   {0, 0, 0, 255}}     // Bottom left
+    };
+
+    // Indices to make two triangles
+    int indices[6] = {
+        0, 2, 1,  // First triangle: left-high to right-high to left-low
+        1, 2, 3   // Second triangle: left-low to right-high to right-low
+    };
+
+    // Draw the square (made of two triangles)
+    SDL_RenderGeometry(renderer, NULL, vertices, 4, indices, 6);
+
+
+
+
+
 
 
 
@@ -597,19 +618,19 @@ int main(int argc, char* args[]) {
                         }
                     }
 
-                    if (event.type == SDL_MOUSEMOTION){
-                        int mouseX, mouseY;
-                        SDL_GetMouseState(&mouseX, &mouseY);
-                        lightCircle.position.x = mouseX;
-                        lightCircle.position.y = mouseY;
+                    // if (event.type == SDL_MOUSEMOTION){
+                    //     int mouseX, mouseY;
+                    //     SDL_GetMouseState(&mouseX, &mouseY);
+                    //     lightCircle.position.x = mouseX;
+                    //     lightCircle.position.y = mouseY;
 
 
-                    }
+                    // }
 
                 }
 
                 // Clear screen with grey background color
-                SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+                SDL_SetRenderDrawColor(gRenderer, 255, 255, 100, 255);
                 SDL_RenderClear(gRenderer);
 
                 
@@ -689,7 +710,7 @@ int main(int argc, char* args[]) {
                 float endYRay2 = startY + 5000 * sin(directionOfRay2);
                 
 
-                SDL_SetRenderDrawColor(gRenderer, 255, 255, 100, 255);
+                SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
                 // Draw the ray to the nearest intersection point or its full length
                 SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endXRay1, (int)endYRay1); // ray1
 
@@ -743,9 +764,10 @@ int main(int argc, char* args[]) {
                 // printf("(%d,%d)\n",(int)intersectionOfLineRay2X, (int)intersectionOfLineRay2Y);
 
 
-
-                draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, intersectionOfCircleX, intersectionOfCircleY,tangentPoint1.x, tangentPoint1.y, testCircle.radius, (int)intersectionOfLineRay1X, (int)intersectionOfLineRay1Y); // using intersectionOfLineRay1
-                draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint2.x, tangentPoint2.y, intersectionOfCircleX, intersectionOfCircleY, testCircle.radius, (int)intersectionOfLineRay2X, (int)intersectionOfLineRay2Y); // using intersectionOfLineRay2
+                // Set the draw color
+                SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+                drawShadow(gRenderer, testCircle.position.x, testCircle.position.y, intersectionOfCircleX, intersectionOfCircleY,tangentPoint1.x, tangentPoint1.y, testCircle.radius, intersectionOfLineRay1X, intersectionOfLineRay1Y, intersectionOfLineRay2X, intersectionOfLineRay2Y, endXRay1, endYRay1, endXRay2, endYRay2); // using intersectionOfLineRay1
+                drawShadow(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint2.x, tangentPoint2.y, intersectionOfCircleX, intersectionOfCircleY, testCircle.radius, intersectionOfLineRay2X, intersectionOfLineRay2Y, intersectionOfLineRay1X, intersectionOfLineRay1Y, endXRay1, endYRay1, endXRay2, endYRay2); // using intersectionOfLineRay2
 
 
 
