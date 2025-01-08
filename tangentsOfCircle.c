@@ -516,17 +516,6 @@ void drawShadow(SDL_Renderer* renderer, int center_x, int center_y, int end_x, i
     SDL_RenderGeometry(renderer, NULL, vertices, 4, indices, 6);
 
 
-
-
-
-
-
-
-    
-
-
-
-
 }
 
 
@@ -552,7 +541,7 @@ void DrawPerpendicularLine(SDL_Renderer *renderer, int x1, int y1, int x2, int y
     *perp_y2 = py + y_offset;
 
     // Draw the perpendicular line
-    SDL_RenderDrawLine(renderer, *perp_x1, *perp_y1, *perp_x2, *perp_y2);
+    // SDL_RenderDrawLine(renderer, *perp_x1, *perp_y1, *perp_x2, *perp_y2);
 }
 
 
@@ -710,11 +699,11 @@ int main(int argc, char* args[]) {
                 float endYRay2 = startY + 5000 * sin(directionOfRay2);
                 
 
-                SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
-                // Draw the ray to the nearest intersection point or its full length
-                SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endXRay1, (int)endYRay1); // ray1
+                // SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+                // // Draw the ray to the nearest intersection point or its full length
+                // SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endXRay1, (int)endYRay1); // ray1
 
-                SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endXRay2, (int)endYRay2); // ray2
+                // SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endXRay2, (int)endYRay2); // ray2
 
                 // this calculates the dots of the tangents of the test circle
                 // using this tutorial
@@ -737,32 +726,29 @@ int main(int argc, char* args[]) {
                 tangentPoint2.x = testCircle.position.x + testCircle.radius * cos(d2);
                 tangentPoint2.y = testCircle.position.y + testCircle.radius * sin(d2);
 
-                // Render the tangent points
-                SDL_SetRenderDrawColor(gRenderer, 100, 100, 100, 255);
-                DrawFilledCircle(gRenderer, tangentPoint1.x, tangentPoint1.y, 2);
-                DrawFilledCircle(gRenderer, tangentPoint2.x, tangentPoint2.y, 2);
+                // // Render the tangent points
+                // SDL_SetRenderDrawColor(gRenderer, 100, 100, 100, 255);
+                // DrawFilledCircle(gRenderer, tangentPoint1.x, tangentPoint1.y, 2);
+                // DrawFilledCircle(gRenderer, tangentPoint2.x, tangentPoint2.y, 2);
 
                 float intersectionOfCircleX, intersectionOfCircleY; 
                 float intersectionOfLineRay1X, intersectionOfLineRay1Y; // intersection between the perpendicular line and ray 1
                 float intersectionOfLineRay2X, intersectionOfLineRay2Y; // intersection between the perpendicular line and ray 2
                 int perp_x1, perp_y1, perp_x2, perp_y2;
 
-                // measuring lines 
-                
+    
                 RayIntersectsCircle(startX, startY, testCircle.position.x, testCircle.position.y, testCircle.position.x, testCircle.position.y, testCircle.radius, &intersectionOfCircleX, &intersectionOfCircleY); 
                 
-                SDL_SetRenderDrawColor(gRenderer, 0, 255, 0, 255);
-                SDL_RenderDrawLine(gRenderer, startX, startY, intersectionOfCircleX, intersectionOfCircleY); 
+                // measuring lines 
 
-                SDL_SetRenderDrawColor(gRenderer, 100, 0, 0, 255);
+                // SDL_SetRenderDrawColor(gRenderer, 0, 255, 0, 255);
+                // SDL_RenderDrawLine(gRenderer, startX, startY, intersectionOfCircleX, intersectionOfCircleY); 
+
+                // SDL_SetRenderDrawColor(gRenderer, 100, 0, 0, 255);
                 DrawPerpendicularLine(gRenderer, startX, startY, intersectionOfCircleX, intersectionOfCircleY, intersectionOfCircleX, intersectionOfCircleY, 1000, &perp_x1, &perp_y1, &perp_x2, &perp_y2); 
 
                 rayIntersectsLine(startX, startY, tangentPoint1.x, tangentPoint1.y, perp_x1, perp_y1, perp_x2, perp_y2, &intersectionOfLineRay1X, &intersectionOfLineRay1Y);
                 rayIntersectsLine(startX, startY, tangentPoint2.x, tangentPoint2.y, perp_x1, perp_y1, perp_x2, perp_y2, &intersectionOfLineRay2X, &intersectionOfLineRay2Y);
-
-
-                // printf("(%d,%d)\n",(int)intersectionOfLineRay2X, (int)intersectionOfLineRay2Y);
-
 
                 // Set the draw color
                 SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
