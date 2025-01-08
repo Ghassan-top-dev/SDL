@@ -450,7 +450,7 @@ void drawShadow(SDL_Renderer* renderer, int center_x, int center_y, int end_x, i
 
 
     // Number of segments to draw (more segments = smoother arc)
-    #define segments 200
+    #define segments 600
     double angle_step = (end_angle - start_angle) / segments;
 
     Vector2 arcPoints[segments + 1]; 
@@ -493,8 +493,8 @@ void drawShadow(SDL_Renderer* renderer, int center_x, int center_y, int end_x, i
     for (int i = 0; i < segments; i++)
     {
         SDL_RenderDrawLine(renderer, intersectionOfLineRayX1, intersectionOfLineRayY1, arcPoints[i].x, arcPoints[i].y); 
-        SDL_RenderDrawLine(renderer, newEndTangentPointToLine_x, newEndTangentPointToLine_Y, arcPoints[i].x, arcPoints[i].y); // tangent point to line-ray
-        SDL_RenderDrawLine(renderer, CenterOfCircleToLine_x, CenterOfCircleToLine_y, arcPoints[i].x, arcPoints[i].y); // center perpendicular line point to line-ray
+        // SDL_RenderDrawLine(renderer, newEndTangentPointToLine_x, newEndTangentPointToLine_Y, arcPoints[i].x, arcPoints[i].y); // tangent point to line-ray
+        // SDL_RenderDrawLine(renderer, CenterOfCircleToLine_x, CenterOfCircleToLine_y, arcPoints[i].x, arcPoints[i].y); // center perpendicular line point to line-ray
 
     }
 
@@ -607,14 +607,14 @@ int main(int argc, char* args[]) {
                         }
                     }
 
-                    // if (event.type == SDL_MOUSEMOTION){
-                    //     int mouseX, mouseY;
-                    //     SDL_GetMouseState(&mouseX, &mouseY);
-                    //     lightCircle.position.x = mouseX;
-                    //     lightCircle.position.y = mouseY;
+                    if (event.type == SDL_MOUSEMOTION){
+                        int mouseX, mouseY;
+                        SDL_GetMouseState(&mouseX, &mouseY);
+                        lightCircle.position.x = mouseX;
+                        lightCircle.position.y = mouseY;
 
 
-                    // }
+                    }
 
                 }
 
@@ -803,7 +803,7 @@ int main(int argc, char* args[]) {
                 SDL_RenderPresent(gRenderer); // Update screen
 
                 // Optional: Add a small delay to control simulation speed
-                SDL_Delay(16);
+                // SDL_Delay(16);
 
             }
         }
