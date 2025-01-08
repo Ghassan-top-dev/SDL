@@ -453,7 +453,7 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int
 
 
     // Number of segments to draw (more segments = smoother arc)
-    #define segments 100
+    #define segments 200
     double angle_step = (end_angle - start_angle) / segments;
 
     Vector2 arcPoints[segments + 1]; 
@@ -486,35 +486,29 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int
     // this calculates other points to draw the lines from
     int dx_TangentPointToLine = intersectionOfLineRayX - start_x;
     int dy_TangentPointToLine = intersectionOfLineRayY - start_y;
-    //  tangentToLineRayTest = scaleVector(tangentToLineRayTest, 1); 
+
     float newEndTangentPointToLine_x = start_x + dx_TangentPointToLine * 0.80;
     float newEndTangentPointToLine_Y = start_y + dy_TangentPointToLine * 0.80;
 
 
-    for (int i = 0; i < segments; i++)
-    {
-        //  SDL_RenderDrawLine(renderer, intersectionOfLineRayX, intersectionOfLineRayY, arcPoints[i].x, arcPoints[i].y); 
-        // SDL_RenderDrawLine(renderer, newEndTangentPointToLine_x, newEndTangentPointToLine_Y, arcPoints[i].x, arcPoints[i].y); // tangent point to line-ray
-        // SDL_RenderDrawLine(renderer, 879, 321, arcPoints[i].x, arcPoints[i].y); // center of circle to line ray
-
-
-// // draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, intersectionOfCircleX, intersectionOfCircleY,tangentPoint1.x, tangentPoint1.y, testCircle.radius, 
-// //    (int)intersectionOfLineRay1X, (int)intersectionOfLineRay1Y); // using intersectionOfLineRay1
-
-
-
-        
-    }
-
-    SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
     // this calculates other points to draw the lines from
     int dx_CenterOfCircleToLine = intersectionOfLineRayX - end_x;
     int dy_CenterOfCircleToLine = intersectionOfLineRayY - end_y;
-    //  tangentToLineRayTest = scaleVector(tangentToLineRayTest, 1); 
+
     float CenterOfCircleToLine_x = end_x + dx_CenterOfCircleToLine * 0.80;
     float CenterOfCircleToLine_y = end_y + dy_CenterOfCircleToLine * 0.80;
 
-    SDL_RenderDrawLine(renderer, end_x, end_y, CenterOfCircleToLine_x, dy_CenterOfCircleToLine);
+
+
+    for (int i = 0; i < segments; i++)
+    {
+        SDL_RenderDrawLine(renderer, intersectionOfLineRayX, intersectionOfLineRayY, arcPoints[i].x, arcPoints[i].y); 
+        SDL_RenderDrawLine(renderer, newEndTangentPointToLine_x, newEndTangentPointToLine_Y, arcPoints[i].x, arcPoints[i].y); // tangent point to line-ray
+        SDL_RenderDrawLine(renderer, CenterOfCircleToLine_x, CenterOfCircleToLine_y, arcPoints[i].x, arcPoints[i].y); // center perpendicular line point to line-ray
+
+    }
+
+
 
     
 
@@ -564,7 +558,7 @@ int main(int argc, char* args[]) {
             SDL_Event event;
             
             Circle lightCircle;
-            lightCircle.position.x = 100; lightCircle.position.y = 400; lightCircle.radius = 80; 
+            lightCircle.position.x = 600; lightCircle.position.y = 400; lightCircle.radius = 80; 
 
             Circle testCircle;
             testCircle.position.x = 800; testCircle.position.y = 400; testCircle.radius = 80; 
@@ -751,7 +745,7 @@ int main(int argc, char* args[]) {
 
 
                 draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, intersectionOfCircleX, intersectionOfCircleY,tangentPoint1.x, tangentPoint1.y, testCircle.radius, (int)intersectionOfLineRay1X, (int)intersectionOfLineRay1Y); // using intersectionOfLineRay1
-                // draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint2.x, tangentPoint2.y, intersectionOfCircleX, intersectionOfCircleY, testCircle.radius, (int)intersectionOfLineRay2X, (int)intersectionOfLineRay2Y); // using intersectionOfLineRay2
+                draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint2.x, tangentPoint2.y, intersectionOfCircleX, intersectionOfCircleY, testCircle.radius, (int)intersectionOfLineRay2X, (int)intersectionOfLineRay2Y); // using intersectionOfLineRay2
 
 
 
