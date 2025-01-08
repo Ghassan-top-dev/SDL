@@ -236,6 +236,15 @@ float mag(Vector2 vel) {
     return sqrt((vel.x * vel.x) + (vel.y * vel.y));
 }
 
+// Scale a vector by a number
+Vector2 scaleVector(Vector2 v, float scale) {
+    Vector2 result = {
+        .x = v.x * scale,
+        .y = v.y * scale
+    };
+    return result;
+}
+
 bool checkOverlap(Circle* b1, Circle* b2){
     float dx = b2->position.x - b1->position.x;
     float dy = b2->position.y - b1->position.y;
@@ -428,7 +437,7 @@ double get_angle(int x1, int y1, int x2, int y2) {
     return atan2(y2 - y1, x2 - x1) * 180.0 / M_PI;
 }
 
-void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int end_y, int start_x, int start_y, int radius, int intersectionOfLineRay1X, int intersectionOfLineRay1Y) {
+void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int end_y, int start_x, int start_y, int radius, int intersectionOfLineRayX, int intersectionOfLineRayY) {
     
     // Set the draw color
     SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255);
@@ -471,15 +480,46 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int
         prev_x = x;
         prev_y = y;
     }
-    SDL_RenderDrawLine(renderer, start_x, start_y, intersectionOfLineRay1X, intersectionOfLineRay1Y); 
-    SDL_RenderDrawLine(renderer, intersectionOfLineRay1X, intersectionOfLineRay1Y, end_x, end_y); 
+    SDL_RenderDrawLine(renderer, start_x, start_y, intersectionOfLineRayX, intersectionOfLineRayY); 
+    SDL_RenderDrawLine(renderer, intersectionOfLineRayX, intersectionOfLineRayY, end_x, end_y); 
+
+    // this calculates other points to draw the lines from
+    int dx_TangentPointToLine = intersectionOfLineRayX - start_x;
+    int dy_TangentPointToLine = intersectionOfLineRayY - start_y;
+    //  tangentToLineRayTest = scaleVector(tangentToLineRayTest, 1); 
+    float newEndTangentPointToLine_x = start_x + dx_TangentPointToLine * 0.80;
+    float newEndTangentPointToLine_Y = start_y + dy_TangentPointToLine * 0.80;
+
 
     for (int i = 0; i < segments; i++)
     {
-        SDL_RenderDrawLine(renderer, intersectionOfLineRay1X, intersectionOfLineRay1Y, arcPoints[i].x, arcPoints[i].y); 
+        //  SDL_RenderDrawLine(renderer, intersectionOfLineRayX, intersectionOfLineRayY, arcPoints[i].x, arcPoints[i].y); 
+        // SDL_RenderDrawLine(renderer, newEndTangentPointToLine_x, newEndTangentPointToLine_Y, arcPoints[i].x, arcPoints[i].y); // tangent point to line-ray
+        // SDL_RenderDrawLine(renderer, 879, 321, arcPoints[i].x, arcPoints[i].y); // center of circle to line ray
+
+
+// // draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, intersectionOfCircleX, intersectionOfCircleY,tangentPoint1.x, tangentPoint1.y, testCircle.radius, 
+// //    (int)intersectionOfLineRay1X, (int)intersectionOfLineRay1Y); // using intersectionOfLineRay1
+
+
 
         
     }
+
+    SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+    // this calculates other points to draw the lines from
+    int dx_CenterOfCircleToLine = intersectionOfLineRayX - end_x;
+    int dy_CenterOfCircleToLine = intersectionOfLineRayY - end_y;
+    //  tangentToLineRayTest = scaleVector(tangentToLineRayTest, 1); 
+    float CenterOfCircleToLine_x = end_x + dx_CenterOfCircleToLine * 0.80;
+    float CenterOfCircleToLine_y = end_y + dy_CenterOfCircleToLine * 0.80;
+
+    SDL_RenderDrawLine(renderer, end_x, end_y, CenterOfCircleToLine_x, dy_CenterOfCircleToLine);
+
+    
+
+
+
 
 }
 
@@ -508,6 +548,8 @@ void DrawPerpendicularLine(SDL_Renderer *renderer, int x1, int y1, int x2, int y
     // Draw the perpendicular line
     SDL_RenderDrawLine(renderer, *perp_x1, *perp_y1, *perp_x2, *perp_y2);
 }
+
+
 
 // main function
 int main(int argc, char* args[]) {
@@ -659,8 +701,6 @@ int main(int argc, char* args[]) {
 
                 SDL_RenderDrawLine(gRenderer, (int)startX, (int)startY, (int)endXRay2, (int)endYRay2); // ray2
 
-
-
                 // this calculates the dots of the tangents of the test circle
                 // using this tutorial
                 // https://stackoverflow.com/questions/49968720/find-tangent-points-in-a-circle-from-a-point
@@ -677,6 +717,7 @@ int main(int argc, char* args[]) {
                 // first tangent point
                 tangentPoint1.x = testCircle.position.x + testCircle.radius * cos(d1);
                 tangentPoint1.y = testCircle.position.y + testCircle.radius * sin(d1);
+                
                 // Second tangent point
                 tangentPoint2.x = testCircle.position.x + testCircle.radius * cos(d2);
                 tangentPoint2.y = testCircle.position.y + testCircle.radius * sin(d2);
@@ -689,20 +730,15 @@ int main(int argc, char* args[]) {
                 float intersectionOfCircleX, intersectionOfCircleY; 
                 float intersectionOfLineRay1X, intersectionOfLineRay1Y; // intersection between the perpendicular line and ray 1
                 float intersectionOfLineRay2X, intersectionOfLineRay2Y; // intersection between the perpendicular line and ray 2
-
-
-
                 int perp_x1, perp_y1, perp_x2, perp_y2;
 
                 // measuring lines 
                 
                 RayIntersectsCircle(startX, startY, testCircle.position.x, testCircle.position.y, testCircle.position.x, testCircle.position.y, testCircle.radius, &intersectionOfCircleX, &intersectionOfCircleY); 
                 
-                // horizontal
                 SDL_SetRenderDrawColor(gRenderer, 0, 255, 0, 255);
                 SDL_RenderDrawLine(gRenderer, startX, startY, intersectionOfCircleX, intersectionOfCircleY); 
 
-                // vertical
                 SDL_SetRenderDrawColor(gRenderer, 100, 0, 0, 255);
                 DrawPerpendicularLine(gRenderer, startX, startY, intersectionOfCircleX, intersectionOfCircleY, intersectionOfCircleX, intersectionOfCircleY, 1000, &perp_x1, &perp_y1, &perp_x2, &perp_y2); 
 
@@ -715,7 +751,7 @@ int main(int argc, char* args[]) {
 
 
                 draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, intersectionOfCircleX, intersectionOfCircleY,tangentPoint1.x, tangentPoint1.y, testCircle.radius, (int)intersectionOfLineRay1X, (int)intersectionOfLineRay1Y); // using intersectionOfLineRay1
-                draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint2.x, tangentPoint2.y, intersectionOfCircleX, intersectionOfCircleY, testCircle.radius, (int)intersectionOfLineRay2X, (int)intersectionOfLineRay2Y); // using intersectionOfLineRay2
+                // draw_arc(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint2.x, tangentPoint2.y, intersectionOfCircleX, intersectionOfCircleY, testCircle.radius, (int)intersectionOfLineRay2X, (int)intersectionOfLineRay2Y); // using intersectionOfLineRay2
 
 
 
