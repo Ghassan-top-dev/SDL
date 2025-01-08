@@ -447,9 +447,7 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int
     double end_angle = get_angle(center_x, center_y, end_x, end_y);
     
     // Ensure end angle is greater than start angle
-    if (end_angle < start_angle) {
-        end_angle += 360; 
-    }
+    if (end_angle < start_angle) end_angle += 360; 
 
 
     // Number of segments to draw (more segments = smoother arc)
@@ -458,7 +456,6 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int
 
     Vector2 arcPoints[segments + 1]; 
 
-    
     // Variables to store the previous point
     int prev_x = 0;
     int prev_y = 0;
@@ -471,17 +468,11 @@ void draw_arc(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int
         arcPoints[i].x = x;
         arcPoints[i].y = y;
 
-        if (i > 0) {
-            SDL_RenderDrawLine(renderer, prev_x, prev_y, x, y); 
-        }
-        
-
         // Store current point as previous
         prev_x = x;
         prev_y = y;
     }
-    SDL_RenderDrawLine(renderer, start_x, start_y, intersectionOfLineRayX, intersectionOfLineRayY); 
-    SDL_RenderDrawLine(renderer, intersectionOfLineRayX, intersectionOfLineRayY, end_x, end_y); 
+
 
     // this calculates other points to draw the lines from
     int dx_TangentPointToLine = intersectionOfLineRayX - start_x;
@@ -604,6 +595,15 @@ int main(int argc, char* args[]) {
                         if (event.button.button == SDL_BUTTON_LEFT) {
                             
                         }
+                    }
+
+                    if (event.type == SDL_MOUSEMOTION){
+                        int mouseX, mouseY;
+                        SDL_GetMouseState(&mouseX, &mouseY);
+                        lightCircle.position.x = mouseX;
+                        lightCircle.position.y = mouseY;
+
+
                     }
 
                 }
