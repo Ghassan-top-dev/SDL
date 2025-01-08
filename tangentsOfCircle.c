@@ -437,79 +437,99 @@ double get_angle(int x1, int y1, int x2, int y2) {
     return atan2(y2 - y1, x2 - x1) * 180.0 / M_PI;
 }
 
-void drawShadow(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int end_y, 
-                int start_x, int start_y, int radius, 
-                int intersectionOfLineRayX1, int intersectionOfLineRayY1,
-                int intersectionOfLineRayX2, int intersectionOfLineRayY2,
-                int endXRay1, int endYRay1, int endXRay2, int endYRay2) {
+void drawShadow(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int end_y, int start_x, int start_y, int radius, int intersectionOfLineRayX1, int intersectionOfLineRayY1, int intersectionOfLineRayX2, int intersectionOfLineRayY2, int endXRay1, int endYRay1, int endXRay2, int endYRay2) {
+    
+
     
     // Calculate start and end angles
     double start_angle = get_angle(center_x, center_y, start_x, start_y);
     double end_angle = get_angle(center_x, center_y, end_x, end_y);
     
     // Ensure end angle is greater than start angle
-    if (end_angle < start_angle) end_angle += 360;
+    if (end_angle < start_angle) end_angle += 360; 
 
-    // Reduce segments for better performance while maintaining quality
-    #define segments 60
+
+    // Number of segments to draw (more segments = smoother arc)
+    #define segments 600
     double angle_step = (end_angle - start_angle) / segments;
 
-    // Calculate total vertices needed:
-    // 1 for intersection point + (segments + 1) for arc points + 3 for remaining quad points
-    SDL_Vertex vertices[segments + 5];
-    
-    // First vertex is the intersection point (this will be the center of our triangle fan)
-    vertices[0].position.x = intersectionOfLineRayX1;
-    vertices[0].position.y = intersectionOfLineRayY1;
-    vertices[0].color = (SDL_Color){0, 0, 0, 255};  // Black color
+    Vector2 arcPoints[segments + 1]; 
 
-    // Generate vertices for arc points
+    // Variables to store the previous point
+    int prev_x = 0;
+    int prev_y = 0;
+
+    int adjustedRadius = radius + 1; 
+
     for (int i = 0; i <= segments; i++) {
         double angle = deg_to_rad(start_angle + (i * angle_step));
-        float x = center_x + (radius * cos(angle));
-        float y = center_y + (radius * sin(angle));
+        int x = center_x + (int)(adjustedRadius * cos(angle));
+        int y = center_y + (int)(adjustedRadius * sin(angle));
 
-        vertices[i + 1].position.x = x;
-        vertices[i + 1].position.y = y;
-        vertices[i + 1].color = (SDL_Color){0, 0, 0, 255};
+
+        arcPoints[i].x = x;
+        arcPoints[i].y = y;
+
+        // Store current point as previous
+        prev_x = x;
+        prev_y = y;
     }
 
-    // Add the remaining points for the quadrilateral
-    vertices[segments + 2].position.x = endXRay1;
-    vertices[segments + 2].position.y = endYRay1;
-    vertices[segments + 2].color = (SDL_Color){0, 0, 0, 255};
 
-    vertices[segments + 3].position.x = endXRay2;
-    vertices[segments + 3].position.y = endYRay2;
-    vertices[segments + 3].color = (SDL_Color){0, 0, 0, 255};
+    // this calculates other points to draw the lines from
+    int dx_TangentPointToLine = intersectionOfLineRayX1 - start_x;
+    int dy_TangentPointToLine = intersectionOfLineRayY1 - start_y;
 
-    vertices[segments + 4].position.x = intersectionOfLineRayX2;
-    vertices[segments + 4].position.y = intersectionOfLineRayY2;
-    vertices[segments + 4].color = (SDL_Color){0, 0, 0, 255};
+    float newEndTangentPointToLine_x = start_x + dx_TangentPointToLine * 0.90;
+    float newEndTangentPointToLine_Y = start_y + dy_TangentPointToLine * 0.90;
 
-    // Calculate total indices needed:
-    // (segments * 3) for the triangle fan + 6 for the quad (2 triangles)
-    int indices[segments * 3 + 6];
 
-    // Create triangle fan indices connecting intersection point to arc points
-    for (int i = 0; i < segments; i++) {
-        indices[i * 3] = 0;  // Intersection point (center of fan)
-        indices[i * 3 + 1] = i + 1;  // Current arc point
-        indices[i * 3 + 2] = i + 2;  // Next arc point
+    // this calculates other points to draw the lines from
+    int dx_CenterOfCircleToLine = intersectionOfLineRayX1 - end_x;
+    int dy_CenterOfCircleToLine = intersectionOfLineRayY1 - end_y;
+
+    float CenterOfCircleToLine_x = end_x + dx_CenterOfCircleToLine * 0.90;
+    float CenterOfCircleToLine_y = end_y + dy_CenterOfCircleToLine * 0.90;
+
+
+
+    for (int i = 0; i < segments; i++)
+    {
+        SDL_RenderDrawLine(renderer, intersectionOfLineRayX1, intersectionOfLineRayY1, arcPoints[i].x, arcPoints[i].y); 
+        SDL_RenderDrawLine(renderer, newEndTangentPointToLine_x, newEndTangentPointToLine_Y, arcPoints[i].x, arcPoints[i].y); // tangent point to line-ray
+        SDL_RenderDrawLine(renderer, CenterOfCircleToLine_x, CenterOfCircleToLine_y, arcPoints[i].x, arcPoints[i].y); // center perpendicular line point to line-ray
+
     }
 
-    // Add indices for the quadrilateral (two triangles)
-    int baseIndex = segments * 3;
-    indices[baseIndex] = segments + 2;     // endXRay1, endYRay1
-    indices[baseIndex + 1] = segments + 3; // endXRay2, endYRay2
-    indices[baseIndex + 2] = segments + 4; // intersectionOfLineRayX2, intersectionOfLineRayY2
-    
-    indices[baseIndex + 3] = segments + 2; // endXRay1, endYRay1
-    indices[baseIndex + 4] = segments + 1; // Last arc point
-    indices[baseIndex + 5] = segments + 4; // intersectionOfLineRayX2, intersectionOfLineRayY2
+    // Vertices for a square
+    SDL_Vertex vertices[4] = {
+        {{intersectionOfLineRayX1, intersectionOfLineRayY1},     {0, 0, 0, 255}},    // Top left
+        {{intersectionOfLineRayX2, intersectionOfLineRayY2},   {0, 0, 0, 255}},    // Top right
+        {{endXRay1, endYRay1}, {0, 0, 0, 255}},    // Bottom right
+        {{endXRay2, endYRay2},   {0, 0, 0, 255}}     // Bottom left
+    };
 
-    // Draw the entire shadow as one shape
-    SDL_RenderGeometry(renderer, NULL, vertices, segments + 5, indices, segments * 3 + 6);
+    double shrink_factor = 0.98; // Move vertices inward by 5%
+
+    // Adjust vertices of the trapezoid
+    for (int i = 0; i < 4; i++) {
+        float dx = vertices[i].position.x - center_x; // Direction vector X
+        float dy = vertices[i].position.y - center_y; // Direction vector Y
+
+        vertices[i].position.x = center_x + dx * shrink_factor; // Scale and update X
+        vertices[i].position.y = center_y + dy * shrink_factor; // Scale and update Y
+    }
+
+    // Indices to make two triangles
+    int indices[6] = {
+        0, 2, 1,  // First triangle: left-high to right-high to left-low
+        1, 2, 3   // Second triangle: left-low to right-high to right-low
+    };
+
+    // Draw the square (made of two triangles)
+    SDL_RenderGeometry(renderer, NULL, vertices, 4, indices, 6);
+
+
 }
 
 
