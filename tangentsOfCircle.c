@@ -437,6 +437,38 @@ double get_angle(int x1, int y1, int x2, int y2) {
     return atan2(y2 - y1, x2 - x1) * 180.0 / M_PI;
 }
 
+void drawThickerLine(SDL_Renderer* renderer, 
+                     int x1, int y1, int x2, int y2, int thickness) {
+    // Calculate the vector of the original line
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+
+    // Normalize the perpendicular vector
+    float length = sqrtf(dx * dx + dy * dy);
+    float perp_dx = -dy / length;
+    float perp_dy = dx / length;
+
+    // Scale the perpendicular vector by half the desired thickness
+    float offset = thickness / 2.0;
+
+    // Compute offset points
+    int offset_x1 = x1 + (int)(perp_dx * offset);
+    int offset_y1 = y1 + (int)(perp_dy * offset);
+    int offset_x2 = x2 + (int)(perp_dx * offset);
+    int offset_y2 = y2 + (int)(perp_dy * offset);
+
+    int offset_neg_x1 = x1 - (int)(perp_dx * offset);
+    int offset_neg_y1 = y1 - (int)(perp_dy * offset);
+    int offset_neg_x2 = x2 - (int)(perp_dx * offset);
+    int offset_neg_y2 = y2 - (int)(perp_dy * offset);
+
+    // Draw the original line and the offset lines
+    SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+    SDL_RenderDrawLine(renderer, offset_x1, offset_y1, offset_x2, offset_y2);
+    SDL_RenderDrawLine(renderer, offset_neg_x1, offset_neg_y1, offset_neg_x2, offset_neg_y2);
+}
+
+
 void drawShadow(SDL_Renderer* renderer, int center_x, int center_y, int end_x, int end_y, int start_x, int start_y, int radius, int intersectionOfLineRayX1, int intersectionOfLineRayY1, int intersectionOfLineRayX2, int intersectionOfLineRayY2, int endXRay1, int endYRay1, int endXRay2, int endYRay2) {
     
 
@@ -450,7 +482,7 @@ void drawShadow(SDL_Renderer* renderer, int center_x, int center_y, int end_x, i
 
 
     // Number of segments to draw (more segments = smoother arc)
-    #define segments 600
+    #define segments 100
     double angle_step = (end_angle - start_angle) / segments;
 
     Vector2 arcPoints[segments + 1]; 
@@ -459,7 +491,7 @@ void drawShadow(SDL_Renderer* renderer, int center_x, int center_y, int end_x, i
     int prev_x = 0;
     int prev_y = 0;
 
-    int adjustedRadius = radius + 1; 
+    float adjustedRadius = radius + 1; 
 
     for (int i = 0; i <= segments; i++) {
         double angle = deg_to_rad(start_angle + (i * angle_step));
@@ -476,30 +508,51 @@ void drawShadow(SDL_Renderer* renderer, int center_x, int center_y, int end_x, i
     }
 
 
-    // this calculates other points to draw the lines from
+  // Calculate other points to draw the lines from (0.90 length)
     int dx_TangentPointToLine = intersectionOfLineRayX1 - start_x;
     int dy_TangentPointToLine = intersectionOfLineRayY1 - start_y;
 
     float newEndTangentPointToLine_x = start_x + dx_TangentPointToLine * 0.90;
     float newEndTangentPointToLine_Y = start_y + dy_TangentPointToLine * 0.90;
 
+    // Calculate other points to draw the lines from (0.95 length)
+    float newEndTangentPointToLine_95_x = start_x + dx_TangentPointToLine * 0.95;
+    float newEndTangentPointToLine_95_Y = start_y + dy_TangentPointToLine * 0.95;
 
-    // this calculates other points to draw the lines from
+    // Calculate other points to draw the lines from (0.90 length)
     int dx_CenterOfCircleToLine = intersectionOfLineRayX1 - end_x;
     int dy_CenterOfCircleToLine = intersectionOfLineRayY1 - end_y;
 
     float CenterOfCircleToLine_x = end_x + dx_CenterOfCircleToLine * 0.90;
     float CenterOfCircleToLine_y = end_y + dy_CenterOfCircleToLine * 0.90;
 
+    // Calculate other points to draw the lines from (0.95 length)
+    float CenterOfCircleToLine_95_x = end_x + dx_CenterOfCircleToLine * 0.95;
+    float CenterOfCircleToLine_95_y = end_y + dy_CenterOfCircleToLine * 0.95;
 
-
-    for (int i = 0; i < segments; i++)
-    {
+    for (int i = 0; i < segments; i++) {
+        // Original line
         SDL_RenderDrawLine(renderer, intersectionOfLineRayX1, intersectionOfLineRayY1, arcPoints[i].x, arcPoints[i].y); 
-        SDL_RenderDrawLine(renderer, newEndTangentPointToLine_x, newEndTangentPointToLine_Y, arcPoints[i].x, arcPoints[i].y); // tangent point to line-ray
-        SDL_RenderDrawLine(renderer, CenterOfCircleToLine_x, CenterOfCircleToLine_y, arcPoints[i].x, arcPoints[i].y); // center perpendicular line point to line-ray
 
+        // 0.90 scaled tangent point
+        SDL_RenderDrawLine(renderer, newEndTangentPointToLine_x, newEndTangentPointToLine_Y, arcPoints[i].x, arcPoints[i].y); 
+
+        // 0.90 scaled center perpendicular line point
+        SDL_RenderDrawLine(renderer, CenterOfCircleToLine_x, CenterOfCircleToLine_y, arcPoints[i].x, arcPoints[i].y); 
+
+        // 0.95 scaled tangent point
+        SDL_RenderDrawLine(renderer, newEndTangentPointToLine_95_x, newEndTangentPointToLine_95_Y, arcPoints[i].x, arcPoints[i].y); 
+
+        // 0.95 scaled center perpendicular line point
+        SDL_RenderDrawLine(renderer, CenterOfCircleToLine_95_x, CenterOfCircleToLine_95_y, arcPoints[i].x, arcPoints[i].y); 
     }
+
+
+    drawThickerLine(renderer, 
+                    intersectionOfLineRayX1, intersectionOfLineRayY1, 
+                    intersectionOfLineRayX2, intersectionOfLineRayY2, 
+                    5);
+
 
     // Vertices for a square
     SDL_Vertex vertices[4] = {
@@ -509,16 +562,7 @@ void drawShadow(SDL_Renderer* renderer, int center_x, int center_y, int end_x, i
         {{endXRay2, endYRay2},   {0, 0, 0, 255}}     // Bottom left
     };
 
-    double shrink_factor = 0.98; // Move vertices inward by 5%
 
-    // Adjust vertices of the trapezoid
-    for (int i = 0; i < 4; i++) {
-        float dx = vertices[i].position.x - center_x; // Direction vector X
-        float dy = vertices[i].position.y - center_y; // Direction vector Y
-
-        vertices[i].position.x = center_x + dx * shrink_factor; // Scale and update X
-        vertices[i].position.y = center_y + dy * shrink_factor; // Scale and update Y
-    }
 
     // Indices to make two triangles
     int indices[6] = {
@@ -573,10 +617,10 @@ int main(int argc, char* args[]) {
             SDL_Event event;
             
             Circle lightCircle;
-            lightCircle.position.x = 600; lightCircle.position.y = 400; lightCircle.radius = 80; 
+            lightCircle.position.x = 600; lightCircle.position.y = 400; lightCircle.radius = 40; 
 
             Circle testCircle;
-            testCircle.position.x = 800; testCircle.position.y = 400; testCircle.radius = 80; 
+            testCircle.position.x = 800; testCircle.position.y = 400; testCircle.radius = 40; 
 
             Vector2 tangentPoint1, tangentPoint2;
 
@@ -675,9 +719,7 @@ int main(int argc, char* args[]) {
                 }
 
 
-                SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
-                DrawFilledCircle(gRenderer, lightCircle.position.x, lightCircle.position.y, lightCircle.radius);
-                DrawFilledCircle(gRenderer, testCircle.position.x, testCircle.position.y, testCircle.radius);
+
  
                 // step 1
                 Vector2 lightToObstacleVector;
@@ -769,7 +811,9 @@ int main(int argc, char* args[]) {
                 drawShadow(gRenderer, testCircle.position.x, testCircle.position.y, intersectionOfCircleX, intersectionOfCircleY,tangentPoint1.x, tangentPoint1.y, testCircle.radius, intersectionOfLineRay1X, intersectionOfLineRay1Y, intersectionOfLineRay2X, intersectionOfLineRay2Y, endXRay1, endYRay1, endXRay2, endYRay2); // using intersectionOfLineRay1
                 drawShadow(gRenderer, testCircle.position.x, testCircle.position.y, tangentPoint2.x, tangentPoint2.y, intersectionOfCircleX, intersectionOfCircleY, testCircle.radius, intersectionOfLineRay2X, intersectionOfLineRay2Y, intersectionOfLineRay1X, intersectionOfLineRay1Y, endXRay1, endYRay1, endXRay2, endYRay2); // using intersectionOfLineRay2
 
-
+                SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
+                DrawFilledCircle(gRenderer, lightCircle.position.x, lightCircle.position.y, lightCircle.radius);
+                DrawFilledCircle(gRenderer, testCircle.position.x, testCircle.position.y, testCircle.radius);
 
 
 
