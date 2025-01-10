@@ -10,7 +10,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include <math.h>
-
+ 
 #define SCREEN_WIDTH 1392 // Screen dimension constants
 #define SCREEN_HEIGHT 744 // the size of the screen
 #define NUM_RAYS 2 // Number of points on the circle
