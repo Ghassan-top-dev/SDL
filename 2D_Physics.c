@@ -42,7 +42,7 @@ typedef struct {
 } Circle;
 
 Circle circles[MAX_BALLS]; // Declare the array
-int DYNAMIC_CIRCLES = 1;
+int DYNAMIC_CIRCLES = 10;
 
 
 const Color colors[] = {
@@ -809,6 +809,16 @@ int main(int argc, char* args[]) {
         } else {
             int quit = 0;
             SDL_Event event;
+
+            // which mode
+            int mode = 0; char modePresented[32], lastMode = -1; 
+            const lookUpOfModes[] = {
+                "Elastic Collision", 
+                "Ray Cast", 
+                "Tangent Rays",    
+                "Lighting System"
+            };
+
             
             Circle lightCircle;
             lightCircle.position.x = 600; lightCircle.position.y = 400; lightCircle.radius = 40; 
@@ -834,9 +844,8 @@ int main(int argc, char* args[]) {
                         if (event.key.keysym.sym == SDLK_ESCAPE) quit = 1;
                         if (event.key.keysym.sym == SDLK_c) {};
 
-                        // mode for which substance will be dropped
-                        if (event.key.keysym.sym == SDLK_RIGHT){};
-                        if (event.key.keysym.sym == SDLK_LEFT){};
+                        if (event.key.keysym.sym == SDLK_RIGHT && mode+1 <= 4) mode+=1;
+                        if (event.key.keysym.sym == SDLK_LEFT && mode-1 >= 0) mode-=1;
 
                         // this changes the size of the dropper
                         if (event.key.keysym.sym == SDLK_UP) {};
@@ -870,47 +879,20 @@ int main(int argc, char* args[]) {
 
                 }
 
+                // this chooses the mode and presents it
+                if (mode != lastMode)
+                {
+                    int CurrentMode = (mode >= 1 && mode <= 4) ? &lookUpOfModes[mode] : &lookUpOfModes[0];
+                    loadFromRenderedText(&modeTextTexture, CurrentMode, textColor);
+                    lastMode = mode; 
+                }
+
                 // Clear screen with grey background color
                 SDL_SetRenderDrawColor(gRenderer, 255, 255, 100, 255);
                 SDL_RenderClear(gRenderer);
 
                 
-                // Update and draw each circle
-                for (int i = 0; i < DYNAMIC_CIRCLES; i++) {
-                    // Update position based on velocity
-                    circles[i].position.x += circles[i].velocity.x;
-                    circles[i].position.y += circles[i].velocity.y;
-
-                    // Handle boundaries
-                    // right
-                    if (circles[i].position.x >= SCREEN_WIDTH - circles[i].radius) {
-                        circles[i].velocity.x *= -1;
-                        circles[i].position.x = SCREEN_WIDTH - circles[i].radius; 
- 
-                    }
-                    // left
-                    else if (circles[i].position.x <= circles[i].radius)
-                    {
-                        circles[i].velocity.x *= -1;
-                        circles[i].position.x = circles[i].radius; 
-                    }
-                    // bottom
-                    else if (circles[i].position.y >= SCREEN_HEIGHT - circles[i].radius) { 
-                        circles[i].velocity.y *= -1;
-                        circles[i].position.y = SCREEN_HEIGHT - circles[i].radius; 
-
-                    }
-                    // top
-                    else if (circles[i].position.y <= circles[i].radius)
-                    {
-                        circles[i].velocity.y *= -1;
-                        circles[i].position.y = circles[i].radius; 
- 
-                    }
-                    
-                    // // Draw the circle
-                    // DrawFilledCircle(gRenderer, circles[i].position.x, circles[i].position.y, circles[i].radius);
-                }
+               
 
 
 
@@ -994,6 +976,46 @@ int main(int argc, char* args[]) {
 
                 rayIntersectsLine(startX, startY, tangentPoint1.x, tangentPoint1.y, perp_x1, perp_y1, perp_x2, perp_y2, &intersectionOfLineRay1X, &intersectionOfLineRay1Y);
                 rayIntersectsLine(startX, startY, tangentPoint2.x, tangentPoint2.y, perp_x1, perp_y1, perp_x2, perp_y2, &intersectionOfLineRay2X, &intersectionOfLineRay2Y);
+
+                // Update and draw each circle
+                for (int i = 0; i < DYNAMIC_CIRCLES; i++) {
+                    // Update position based on velocity
+                    circles[i].position.x += circles[i].velocity.x;
+                    circles[i].position.y += circles[i].velocity.y;
+
+                    // Handle boundaries
+                    // right
+                    if (circles[i].position.x >= SCREEN_WIDTH - circles[i].radius) {
+                        circles[i].velocity.x *= -1;
+                        circles[i].position.x = SCREEN_WIDTH - circles[i].radius; 
+ 
+                    }
+                    // left
+                    else if (circles[i].position.x <= circles[i].radius)
+                    {
+                        circles[i].velocity.x *= -1;
+                        circles[i].position.x = circles[i].radius; 
+                    }
+                    // bottom
+                    else if (circles[i].position.y >= SCREEN_HEIGHT - circles[i].radius) { 
+                        circles[i].velocity.y *= -1;
+                        circles[i].position.y = SCREEN_HEIGHT - circles[i].radius; 
+
+                    }
+                    // top
+                    else if (circles[i].position.y <= circles[i].radius)
+                    {
+                        circles[i].velocity.y *= -1;
+                        circles[i].position.y = circles[i].radius; 
+ 
+                    }
+                    int randColor = rand() % 15;  // Random index (0 to 14)
+                    SDL_SetRenderDrawColor(gRenderer, circles[i].colour.r, circles[i].colour.g, circles[i].colour.b, circles[i].colour.a);
+                    
+                    // Draw the circle
+                    DrawFilledCircle(gRenderer, circles[i].position.x, circles[i].position.y, circles[i].radius);
+                }
+
 
                 // Set the draw color
                 SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
